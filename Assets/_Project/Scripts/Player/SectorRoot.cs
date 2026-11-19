@@ -24,7 +24,9 @@ namespace LastSignal.Player
             if (startPowered) GameServices.World.SetBool(WorldKeys.Power(sectorId), true);
             GameServices.World.SetBool(WorldKeys.SectorVisited(sectorId), true);
             SpawnPlayer();
+            RestoreSavedPose();
             GameServices.State.Set(GameState.Playing);
+            GameServices.Checkpoint();
         }
 
         private void SpawnPlayer()
@@ -52,6 +54,15 @@ namespace LastSignal.Player
                 return;
             }
             Player.Teleport(spawn.transform.position, spawn.transform.eulerAngles.y);
+        }
+
+        private void RestoreSavedPose()
+        {
+            var save = GameServices.Saves.PendingRestore;
+            if (save == null || save.scene != gameObject.scene.name || Player == null) return;
+            GameServices.Saves.ConsumePendingRestore();
+            var p = save.playerPosition;
+            Player.Teleport(new Vector3(p[0], p[1], p[2]), save.playerYaw, save.playerPitch);
         }
 
 #if UNITY_EDITOR

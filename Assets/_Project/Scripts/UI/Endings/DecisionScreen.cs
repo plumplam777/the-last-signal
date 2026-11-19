@@ -85,6 +85,13 @@ namespace LastSignal.UI
         {
             if (_pending == EndingType.None) return;
             EndingScript.Commit(GameServices.World, _pending);
+            var auth = GameServices.Auth;
+            if (auth.IsLoggedIn && auth.Current.UserId > 0 && GameServices.Database.IsAvailable)
+            {
+                GameServices.Database.Progress.RecordChoice(auth.Current.UserId, "final_decision", EndingScript.Id(_pending));
+                GameServices.Database.Progress.RecordChoice(auth.Current.UserId, "ai_trust_at_end", GameServices.World.GetInt(WorldKeys.AiTrust).ToString());
+                GameServices.Checkpoint();
+            }
             Log.Info(nameof(DecisionScreen), $"Final decision: {_pending}");
             Close();
             GameServices.State.Set(GameState.Ending);

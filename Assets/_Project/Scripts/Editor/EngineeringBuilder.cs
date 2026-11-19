@@ -158,7 +158,7 @@ namespace LastSignal.EditorTools
             var hatch = hatchGo.AddComponent<SectorHatch>();
             hatch.EditorConfigure("eng_hatch_medical", "prompt.hatch.go", null, false,
                 new ConditionSet { conditions = new List<Condition> { Condition.Flag(WorldKeys.Story("dev.medical_built"), "dev.sector_unavailable") } });
-            hatch.EditorSetTarget(SceneIds.Medical, "from_engineering", "sector.medical.name");
+            hatch.EditorSetTarget(SceneIds.Medical, "from_engineering", "sector.medical.name", SectorIds.Medical);
 
             // the door into the corridor, powered by routing
             var doorRoot = Group("Door_MedicalCorridor", env, new Vector3(-3.5f, 0, HalfL + 0.1f));
@@ -413,7 +413,7 @@ namespace LastSignal.EditorTools
             hatchGo.AddComponent<BoxCollider>().size = new Vector3(2.3f, 2.3f, 0.3f);
             var hatch = hatchGo.AddComponent<SectorHatch>();
             hatch.EditorConfigure("eng_hatch_docking", "prompt.hatch.go", null, false);
-            hatch.EditorSetTarget(SceneIds.DockingBay, "from_engineering", "sector.docking.name");
+            hatch.EditorSetTarget(SceneIds.DockingBay, "from_engineering", "sector.docking.name", SectorIds.Docking);
             WorldText("Sign_Docking", props, new Vector3(0, 2.9f, -HalfL + 0.05f), Quaternion.Euler(0, 180, 0), "sector.docking.name", 2.6f, SignalCyan);
 
             var spawn = Group("Spawn_FromDocking", root, new Vector3(0, 0.05f, -5.6f));

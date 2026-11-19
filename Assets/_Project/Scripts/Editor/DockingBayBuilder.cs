@@ -230,7 +230,7 @@ namespace LastSignal.EditorTools
             var hatch = hatchGo.AddComponent<SectorHatch>();
             hatch.EditorConfigure("dock_hatch_engineering", "prompt.hatch.go", null, false,
                 new ConditionSet { conditions = new List<Condition> { Condition.Powered(SectorIds.Docking, "prompt.door.no_power") } });
-            hatch.EditorSetTarget(SceneIds.Engineering, "from_docking", "sector.engineering.name");
+            hatch.EditorSetTarget(SceneIds.Engineering, "from_docking", "sector.engineering.name", SectorIds.Engineering);
             var back = Group("Spawn_FromEngineering", c, new Vector3(0, 0.05f, z1 - 1.6f));
             back.transform.localRotation = Quaternion.Euler(0, 180, 0);
             back.AddComponent<SpawnPoint>().EditorSetId("from_engineering");

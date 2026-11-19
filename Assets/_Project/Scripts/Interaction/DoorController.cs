@@ -63,7 +63,7 @@ namespace LastSignal.Interaction
 
         public override bool CanInteract(PlayerInteractor interactor, out string reasonKey)
         {
-            if (GameServices.World.GetBool(UnlockedFlag))
+            if (GameServices.World.GetBool(UnlockedFlag) || GameServices.Admin.UnlockAllDoors)
             {
                 reasonKey = null;
                 return true;

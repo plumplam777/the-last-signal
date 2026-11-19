@@ -1,4 +1,7 @@
+using LastSignal.Admin;
 using LastSignal.Audio;
+using LastSignal.Database;
+using LastSignal.SaveSystem;
 using LastSignal.Dialogue;
 using LastSignal.Inventory;
 using LastSignal.Puzzles;
@@ -31,6 +34,10 @@ namespace LastSignal.Core
         private GameContent _content;
         private DialogueManager _dialogue;
         private AudioManager _audio;
+        private DatabaseManager _database;
+        private AuthService _auth;
+        private SaveManager _saves;
+        private AdminManager _admin;
 
         public static bool IsReady => _instance != null;
 
@@ -47,6 +54,10 @@ namespace LastSignal.Core
         public static GameContent Content => Require()._content;
         public static DialogueManager Dialogue => Require()._dialogue;
         public static AudioManager Audio => Require()._audio;
+        public static DatabaseManager Database => Require()._database;
+        public static AuthService Auth => Require()._auth;
+        public static SaveManager Saves => Require()._saves;
+        public static AdminManager Admin => Require()._admin;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateOnStartup()
@@ -73,6 +84,7 @@ namespace LastSignal.Core
             s._world.Clear();
             s._inventory.Clear();
             s._audioLogs.Stop();
+            s._saves.BeginNewRun();
             s._dialogue.StopAll();
             s._world.SetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
             Log.Info(nameof(GameServices), "New run started.");
@@ -101,12 +113,47 @@ namespace LastSignal.Core
             _audioLogs = gameObject.AddComponent<AudioLogManager>();
             _dialogue = gameObject.AddComponent<DialogueManager>();
             _audio = gameObject.AddComponent<AudioManager>();
+
+            _database = new DatabaseManager();
+            if (_database.Open(System.IO.Path.Combine(Application.persistentDataPath, "lastsignal.db")))
+            {
+                try
+                {
+                    var english = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, string>>(
+                        Resources.Load<TextAsset>("Localization/en").text);
+                    _database.SeedCatalog(_content, key => key != null && english.TryGetValue(key, out var v) ? v : key);
+                }
+                catch (System.Exception e)
+                {
+                    Log.Error(nameof(GameServices), $"Catalog seeding failed: {e.Message}");
+                }
+            }
+            _auth = new AuthService(_database);
+            _saves = new SaveManager(_database, _auth);
+            _admin = new AdminManager(_database, _auth);
+            _localization.LanguageChanged += () =>
+            {
+                if (_auth.IsLoggedIn && _auth.Current.UserId > 0 && _database.IsAvailable)
+                    _database.Users.UpdateLanguage(_auth.Current.UserId, LocalizationService.Code(_localization.Current));
+            };
+            _quests.ObjectiveCompleted += (_, _) => Checkpoint();
             _audioLogs.RegisterCatalog(_content.AudioLogs);
             _quests = new QuestManager(_world, _inventory);
             foreach (var quest in _content.Quests) _quests.Register(quest);
 
             _state.Changed += (_, next) => _input.ApplyState(next);
             Log.Info(nameof(GameServices), "Services initialised.");
+        }
+
+        /// <summary>Autosaves the current sector for the logged-in user (no-op without a real session).</summary>
+        public static void Checkpoint()
+        {
+            var s = Require();
+            if (!s._auth.IsLoggedIn || s._auth.Current.UserId <= 0) return;
+            var player = FindAnyObjectByType<Player.PlayerController>();
+            if (player == null || s._state.Current == GameState.Ending) return;
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            s._saves.Save(s._saves.Capture(scene, player.transform.position, player.Yaw, player.Pitch));
         }
 
         private void Update()
@@ -119,6 +166,7 @@ namespace LastSignal.Core
         {
             if (_instance != this) return;
             _input?.Dispose();
+            _database?.Dispose();
             _instance = null;
         }
     }

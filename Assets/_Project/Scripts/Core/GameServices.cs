@@ -1,4 +1,5 @@
 using LastSignal.Audio;
+using LastSignal.Dialogue;
 using LastSignal.Inventory;
 using LastSignal.Puzzles;
 using LastSignal.Quests;
@@ -28,6 +29,7 @@ namespace LastSignal.Core
         private PuzzleManager _puzzles;
         private AudioLogManager _audioLogs;
         private GameContent _content;
+        private DialogueManager _dialogue;
 
         public static bool IsReady => _instance != null;
 
@@ -42,6 +44,7 @@ namespace LastSignal.Core
         public static PuzzleManager Puzzles => Require()._puzzles;
         public static AudioLogManager AudioLogs => Require()._audioLogs;
         public static GameContent Content => Require()._content;
+        public static DialogueManager Dialogue => Require()._dialogue;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateOnStartup()
@@ -68,6 +71,7 @@ namespace LastSignal.Core
             s._world.Clear();
             s._inventory.Clear();
             s._audioLogs.Stop();
+            s._dialogue.StopAll();
             s._world.SetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
             Log.Info(nameof(GameServices), "New run started.");
         }
@@ -93,6 +97,7 @@ namespace LastSignal.Core
             _content = GameContent.Load();
             _puzzles = new PuzzleManager(_world);
             _audioLogs = gameObject.AddComponent<AudioLogManager>();
+            _dialogue = gameObject.AddComponent<DialogueManager>();
             _audioLogs.RegisterCatalog(_content.AudioLogs);
             _quests = new QuestManager(_world, _inventory);
             foreach (var quest in _content.Quests) _quests.Register(quest);

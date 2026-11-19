@@ -23,6 +23,20 @@ namespace LastSignal.Core
                 target = overrideScene;
             }
             GameServices.Scenes.Load(target);
+
+            // automated smoke tests: quit cleanly instead of being killed (avoids macOS crash/"Reopen" dialogs)
+            if (float.TryParse(ReadArg("-quitAfterSeconds"), System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out var seconds) && seconds > 0f)
+            {
+                DontDestroyOnLoad(gameObject);
+                Invoke(nameof(QuitNow), seconds);
+            }
+        }
+
+        private void QuitNow()
+        {
+            Log.Info(nameof(BootstrapEntry), "Quitting (-quitAfterSeconds).");
+            Application.Quit(0);
         }
 
         private static string ReadArg(string name)

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "blender": {
+      "command": "/Users/plami/Library/Python/3.9/bin/uvx",
+      "args": ["mcp-for-blender"]
+    },
+    "unity": {
+      "command": "/Users/plami/Library/Python/3.9/bin/uvx",
+      "args": ["--from", "mcpforunityserver", "mcp-for-unity", "--transport", "stdio"]
+    }
+  }
+}

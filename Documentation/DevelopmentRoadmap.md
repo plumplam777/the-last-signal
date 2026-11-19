@@ -1,0 +1,50 @@
+# Development Roadmap (1 month: 2026-11-19 → 2026-12-19)
+
+Solo developer + Claude as technical lead. Scope is cut to **5 compact areas**:
+Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & Command (finale).
+
+| Week | Dates | Phases | Deliverable |
+|---|---|---|---|
+| 1 | Nov 19–25 | **P1 Foundation**, **P2 First playable**, start **P3** | Docking Bay greybox: walk, flashlight, pick up fuse, restore power, open door. Inventory, doors, puzzle framework, quest tracker. |
+| 2 | Nov 26–Dec 2 | Finish **P3**, **P4 Narrative**, **P5 Database & Admin** | Terminal UI, audio logs w/ subtitles, AI dialogue + trust, endings logic. SQLite accounts, polished login/start screen, admin panel with 3 CRUDs, save/load. EN/BG UI. |
+| 3 | Dec 3–9 | **P6 Content** | All 5 areas built with asset packs + Blender props, ≥ 4 puzzles, opening cutscene, TTS audio logs, both endings (+ hidden if on track). |
+| 4 | Dec 10–16 | **P7 Polish & testing** | Lighting/audio/UI polish, BG translation pass, bug fixing, macOS build, Windows build. |
+| — | Dec 17–19 | Buffer | Diploma documentation, demo script, recorded voices if desired. |
+
+## Phase 1 — Foundation (in progress)
+- [x] Unity 6.3 URP project, Input System only
+- [x] MCP for Unity + Blender MCP set up
+- [ ] Folder structure, assembly definitions
+- [ ] Input actions asset (Player / Interaction / UI)
+- [ ] Core services: GameServices, SceneLoader, GameStateMachine, LocalizationService (EN/BG), WorldState, Log
+- [ ] Scenes: Bootstrap, MainMenu, Sector_DockingBay in Build Settings
+- [ ] Git + Unity .gitignore + GitHub remote
+- [ ] macOS build launches
+
+## Phase 2 — First playable
+PlayerController, PlayerInteractor + prompt UI, FlashlightController, pickup interactable,
+minimal InventoryManager, fuse box (power restore), powered Door, Docking Bay greybox.
+
+## Phase 3 — Core gameplay systems
+Inventory UI + inspection, Condition/Effect system, Door/access levels/keycards, Puzzle base +
+PuzzleManager, Terminal UI framework, QuestManager + HUD objective, AudioLog collection.
+
+## Phase 4 — Narrative
+DialogueGraph + DialogueManager + UI, AI comms (speaker portrait/waveform), trust, story flags,
+audio log playback + subtitles, ending selection, opening cutscene (Timeline).
+
+## Phase 5 — Database & administration
+sqlite-net integration + migrations, AuthService (PBKDF2), start screen (login/register/first-run admin),
+admin panel: Users CRUD, Sectors CRUD, Items CRUD, unlock all / teleport / grant items;
+SaveManager JSON + GameProgress summary.
+
+## Phase 6 — Content
+Sectors, puzzles (power routing, keycard security, decode sequence, reactor balance), props, lighting,
+audio, TTS voice lines, endings.
+
+## Phase 7 — Polish & testing
+Acceptance checklist from the spec §16, performance pass, builds.
+
+## Cut list if behind schedule (in this order)
+1. Hidden ending C  2. Item combination  3. Drag-and-drop inventory  4. Jump
+5. Merge Medical into Research  6. Windows build verification.

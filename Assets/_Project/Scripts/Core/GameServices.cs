@@ -1,4 +1,7 @@
+using LastSignal.Audio;
 using LastSignal.Inventory;
+using LastSignal.Puzzles;
+using LastSignal.Quests;
 using UnityEngine;
 
 namespace LastSignal.Core
@@ -20,6 +23,11 @@ namespace LastSignal.Core
         private InputService _input;
         private SceneLoader _scenes;
         private InventoryManager _inventory;
+        private SettingsService _settings;
+        private QuestManager _quests;
+        private PuzzleManager _puzzles;
+        private AudioLogManager _audioLogs;
+        private GameContent _content;
 
         public static bool IsReady => _instance != null;
 
@@ -29,6 +37,11 @@ namespace LastSignal.Core
         public static InputService Input => Require()._input;
         public static SceneLoader Scenes => Require()._scenes;
         public static InventoryManager Inventory => Require()._inventory;
+        public static SettingsService Settings => Require()._settings;
+        public static QuestManager Quests => Require()._quests;
+        public static PuzzleManager Puzzles => Require()._puzzles;
+        public static AudioLogManager AudioLogs => Require()._audioLogs;
+        public static GameContent Content => Require()._content;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateOnStartup()
@@ -54,6 +67,7 @@ namespace LastSignal.Core
             var s = Require();
             s._world.Clear();
             s._inventory.Clear();
+            s._audioLogs.Stop();
             s._world.SetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
             Log.Info(nameof(GameServices), "New run started.");
         }
@@ -68,6 +82,7 @@ namespace LastSignal.Core
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
+            _settings = new SettingsService();
             _state = new GameStateMachine();
             _world = new WorldState();
             _localization = new LocalizationService();
@@ -75,6 +90,12 @@ namespace LastSignal.Core
             _input = new InputService();
             _scenes = gameObject.AddComponent<SceneLoader>();
             _inventory = new InventoryManager();
+            _content = GameContent.Load();
+            _puzzles = new PuzzleManager(_world);
+            _audioLogs = gameObject.AddComponent<AudioLogManager>();
+            _audioLogs.RegisterCatalog(_content.AudioLogs);
+            _quests = new QuestManager(_world, _inventory);
+            foreach (var quest in _content.Quests) _quests.Register(quest);
 
             _state.Changed += (_, next) => _input.ApplyState(next);
             Log.Info(nameof(GameServices), "Services initialised.");

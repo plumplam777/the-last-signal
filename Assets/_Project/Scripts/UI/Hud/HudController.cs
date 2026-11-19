@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LastSignal.Audio;
 using LastSignal.Core;
 using LastSignal.Interaction;
 using LastSignal.Inventory;
@@ -43,6 +44,7 @@ namespace LastSignal.UI
             GameServices.State.Changed += OnStateChanged;
             GameServices.Localization.LanguageChanged += OnLanguageChanged;
             GameServices.World.Changed += OnWorldChanged;
+            GameServices.AudioLogs.Collected += OnLogCollected;
             OnFocusChanged(null, false, null, null);
             if (toastGroup != null) toastGroup.alpha = 0f;
             OnStateChanged(GameServices.State.Current, GameServices.State.Current);
@@ -61,6 +63,7 @@ namespace LastSignal.UI
             GameServices.State.Changed -= OnStateChanged;
             GameServices.Localization.LanguageChanged -= OnLanguageChanged;
             GameServices.World.Changed -= OnWorldChanged;
+            GameServices.AudioLogs.Collected -= OnLogCollected;
         }
 
         private void Update()
@@ -137,6 +140,9 @@ namespace LastSignal.UI
             if (key == Player.FlashlightController.OwnedFlag) ShowToast(Loc.Get("hint.flashlight"));
             else if (key.StartsWith("power.") && GameServices.World.GetBool(key)) ShowToast(Loc.Get("toast.power_restored"));
         }
+
+        private void OnLogCollected(AudioLogDefinition log)
+            => ShowToast(Loc.Get("toast.log_collected", GameServices.AudioLogs.CollectedCount, Mathf.Max(GameServices.AudioLogs.HiddenEndingTotal, 14)));
 
         private void OnLanguageChanged()
         {

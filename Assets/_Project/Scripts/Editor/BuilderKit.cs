@@ -238,7 +238,7 @@ namespace LastSignal.EditorTools
 
         public static Button UiButton(string name, Transform parent, Vector2 pos, string key)
         {
-            var img = UiImage(name, parent, new Vector2(0.5f, 0.5f), pos, new Vector2(380, 64), new Color(0.08f, 0.11f, 0.16f, 0.92f));
+            var img = UiImage(name, parent, new Vector2(0.5f, 0.5f), pos, new Vector2(380, 64), new Color(0.08f, 0.11f, 0.16f, 1f));
             var outline = img.gameObject.AddComponent<Outline>();
             outline.effectColor = new Color(Brass.r, Brass.g, Brass.b, 0.8f);
             outline.effectDistance = new Vector2(2, -2);

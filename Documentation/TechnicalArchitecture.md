@@ -66,6 +66,13 @@ All managers are components under the persistent `GameServices` object and are r
 | `AuthService` | Database | Register / login / roles, PBKDF2 password hashing, current `UserSession`. | UI. |
 | `AdminManager` | Admin | Admin-only commands (unlock all, teleport to sector, grant items, toggle god-flags); refuses if session is not Admin. | Change the normal player's save unless explicitly "applied". |
 
+### 3.1 Implemented in Phase 3
+`SettingsService` (Core), `GameContent` registry (Core, `Resources/GameContent.asset`), `QuestManager` + `QuestDefinition` (Quests),
+`PuzzleManager` + `Puzzle`/`SequencePuzzle`/`SequenceStepInteractable`/`CodeLock` (Puzzles), `TerminalDefinition` + `TerminalInteractable` (Puzzles),
+`AudioLogManager` + `AudioLogDefinition` (Audio), `AudioLogPickup`/`LeverInteractable` (Interaction), UI: `UiScreen` base (one open screen at a time →
+`GameState.InMenu`), `InventoryScreen` + `ItemInspector`, `TerminalScreen`, `ObjectiveHud`, `SubtitleHud`. `GameServices` is the composition root
+and may reference every system; nothing else references `GameServices` internals.
+
 ## 4. Dependency map
 
 Arrows = "depends on / calls". No cycles allowed; lower rows never reference upper rows.

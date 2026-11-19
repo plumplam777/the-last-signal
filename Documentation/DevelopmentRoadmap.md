@@ -30,9 +30,17 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [x] EditMode (9) + PlayMode (4) tests, macOS build starts in the sector without errors
 - [ ] Footstep/door/flashlight audio (needs audio assets)
 
-## Phase 3 — Core gameplay systems
-Inventory UI + inspection, Condition/Effect system, Door/access levels/keycards, Puzzle base +
-PuzzleManager, Terminal UI framework, QuestManager + HUD objective, AudioLog collection.
+## Phase 3 — Core gameplay systems (done 2026-11-19)
+- [x] Mouse sensitivity setting (default ×2.5 after playtest) + invert Y in the pause menu (`SettingsService`)
+- [x] QuestDefinition + QuestManager (sequential, cascading, completion stored in WorldState) + HUD objective panel
+- [x] Puzzle base + PuzzleManager, SequencePuzzle (+ step interactables), CodeLock, LeverInteractable (breaker)
+- [x] TerminalDefinition + TerminalInteractable + TerminalScreen (entries, PIN lock, read tracking)
+- [x] InventoryScreen (Q): items with 3D inspection (ItemInspector), audio logs tab with replay and x/14 counter
+- [x] AudioLogDefinition + AudioLogManager (clip per language or subtitle-only timing) + SubtitleHud
+- [x] Keycards: `AccessLevelAtLeast` / `HasItem` conditions on doors (content arrives with Medical/Research)
+- [x] GameContent registry (Resources) for id → asset resolution
+- [x] Docking Bay content from the story bible: OBJ_01–04, LOG_DOCK_01/02, Bay Control terminal, fuse + breaker B-2
+- [x] Tests: 12 EditMode + 10 PlayMode passing; macOS build smoke test
 
 ## Phase 4 — Narrative
 DialogueGraph + DialogueManager + UI, AI comms (speaker portrait/waveform), trust, story flags,

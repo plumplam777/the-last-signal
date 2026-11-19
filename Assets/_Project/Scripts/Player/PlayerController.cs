@@ -23,7 +23,8 @@ namespace LastSignal.Player
         [SerializeField] private float jumpHeight = 0.9f;
 
         [Header("Look")]
-        [SerializeField] private float mouseSensitivity = 0.08f;
+        [Tooltip("Multiplier on the player's sensitivity setting (Settings → Mouse sensitivity).")]
+        [SerializeField] private float lookScale = 1f;
         [SerializeField] private float minPitch = -85f;
         [SerializeField] private float maxPitch = 85f;
 
@@ -44,12 +45,6 @@ namespace LastSignal.Player
         public float Pitch => _pitch;
         public bool IsSprinting { get; private set; }
 
-        public float MouseSensitivity
-        {
-            get => mouseSensitivity;
-            set => mouseSensitivity = Mathf.Clamp(value, 0.01f, 1f);
-        }
-
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();
@@ -66,8 +61,11 @@ namespace LastSignal.Player
 
         private void Look(Vector2 delta)
         {
-            transform.Rotate(0f, delta.x * mouseSensitivity, 0f, Space.Self);
-            _pitch = Mathf.Clamp(_pitch - delta.y * mouseSensitivity, minPitch, maxPitch);
+            var settings = GameServices.Settings;
+            float sensitivity = settings.MouseSensitivity * lookScale;
+            float dy = settings.InvertY ? -delta.y : delta.y;
+            transform.Rotate(0f, delta.x * sensitivity, 0f, Space.Self);
+            _pitch = Mathf.Clamp(_pitch - dy * sensitivity, minPitch, maxPitch);
             cameraPivot.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
         }
 

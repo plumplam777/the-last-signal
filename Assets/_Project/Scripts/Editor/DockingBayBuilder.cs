@@ -5,6 +5,7 @@ using LastSignal.Core;
 using LastSignal.Interaction;
 using LastSignal.Inventory;
 using LastSignal.Player;
+using LastSignal.Puzzles;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -21,7 +22,6 @@ namespace LastSignal.EditorTools
     /// </summary>
     public static class DockingBayBuilder
     {
-        public const string ItemsFolder = "Assets/_Project/ScriptableObjects/Items";
         public const string VolumePath = "Assets/_Project/Settings/Volume_DockingBay.asset";
 
         private static Material _floor, _wall, _ceiling, _brass, _terracotta, _slateDark, _ceramic,
@@ -39,8 +39,10 @@ namespace LastSignal.EditorTools
         public static void Build()
         {
             CreateMaterials();
-            var flashlightItem = CreateItem("item_flashlight", ItemType.Tool, "item.flashlight");
-            var fuseItem = CreateItem("item_fuse", ItemType.Component, "item.fuse");
+            DockingBayContent.CreateAll();
+            var flashlightItem = DockingBayContent.Flashlight;
+            var fuseItem = DockingBayContent.Fuse;
+            CreateInspectPrefabs(flashlightItem, fuseItem);
             var playerPrefab = PlayerPrefabBuilder.Build();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -59,6 +61,8 @@ namespace LastSignal.EditorTools
             BuildBenchWithFlashlight(props, flashlightItem);
             BuildCratesWithFuse(props, fuseItem);
             BuildFuseBox(props, fuseItem, poweredOff);
+            BuildBreaker(props);
+            BuildLanderConsole(props, poweredOn);
             BuildInnerDoor(props);
 
             var power = Group("PowerController", root.transform);
@@ -98,21 +102,6 @@ namespace LastSignal.EditorTools
             _lampOff = Lit("M_Lamp_Off", new Color(0.18f, 0.17f, 0.15f), 0.6f);
             _redLamp = Emissive("M_Emissive_EmergencyRed", EmergencyRed, 1.1f, EmergencyRed * 0.5f);
             _statusLight = Emissive("M_Emissive_Status", Color.white, 1f, Color.white);
-        }
-
-        private static ItemDefinition CreateItem(string id, ItemType type, string keyPrefix)
-        {
-            Directory.CreateDirectory(ItemsFolder);
-            var path = $"{ItemsFolder}/{id}.asset";
-            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(path);
-            if (item == null)
-            {
-                item = ScriptableObject.CreateInstance<ItemDefinition>();
-                AssetDatabase.CreateAsset(item, path);
-            }
-            item.EditorInit(id, type, $"{keyPrefix}.name", $"{keyPrefix}.desc");
-            EditorUtility.SetDirty(item);
-            return item;
         }
 
         // ---------------------------------------------------------------- architecture
@@ -277,6 +266,10 @@ namespace LastSignal.EditorTools
             Cylinder("Head", pickupGo.transform, new Vector3(0.16f, 0, 0), new Vector3(0.12f, 0.04f, 0.12f), _brass, false, Quaternion.Euler(0, 0, 90), false);
             Cylinder("Lens", pickupGo.transform, new Vector3(0.2f, 0, 0), new Vector3(0.1f, 0.005f, 0.1f), _cyanStrip, false, Quaternion.Euler(0, 0, 90), false);
             Cylinder("Grip", pickupGo.transform, new Vector3(-0.06f, 0, 0), new Vector3(0.085f, 0.06f, 0.085f), _rubber, false, Quaternion.Euler(0, 0, 90), false);
+            // Jonah's jacket (name tape "LIND") and his recorder: LOG_DOCK_01 [critical]
+            Box("Jacket", bench, new Vector3(-0.05f, 0.95f, 0.05f), new Vector3(0.7f, 0.06f, 0.55f), _terracotta, false, Quaternion.Euler(0, 12, 3));
+            Box("Jacket_NameTape", bench, new Vector3(0.1f, 0.985f, 0.05f), new Vector3(0.2f, 0.01f, 0.06f), _ceramic, false, Quaternion.Euler(0, 12, 3));
+            BuildRecorder(props, "Recorder_LogDock01", new Vector3(-4.1f, 0.95f, -5.05f), Quaternion.Euler(0, 70, 0), DockingBayContent.LogDock01);
             // little pool of light so the first pickup reads in the dark
             PointLight("Bench_Glow", props, new Vector3(-3.9f, 1.5f, -5.4f), TealLight, 0.9f, 2.4f);
 
@@ -306,7 +299,7 @@ namespace LastSignal.EditorTools
             Box("Band", fuseGo.transform, Vector3.zero, new Vector3(0.05f, 0.1f, 0.1f), _terracotta, false, null, false);
 
             var pickup = fuseGo.AddComponent<PickupInteractable>();
-            pickup.EditorConfigure("dock_fuse", "prompt.pickup", fuseItem.NameKey, true);
+            pickup.EditorConfigure("dock_fuse_30a", "prompt.pickup", fuseItem.NameKey, true);
             pickup.EditorSetItem(fuseItem);
         }
 
@@ -347,7 +340,7 @@ namespace LastSignal.EditorTools
 
             var socket = box.AddComponent<ItemSocketInteractable>();
             socket.EditorConfigure("dock_fusebox", "prompt.inspect", "obj.fusebox.name", true, null,
-                new List<Effect> { Effect.Power(SectorIds.Docking) });
+                new List<Effect> { Effect.Flag(DockingBayContent.FuseInstalledFlag) });
             socket.EditorSetSocket(fuseItem, installed, empty);
             installed.SetActive(false);
         }
@@ -381,6 +374,97 @@ namespace LastSignal.EditorTools
             var reqs = new ConditionSet { conditions = new List<Condition> { Condition.Powered(SectorIds.Docking, "prompt.door.no_power") } };
             door.EditorConfigure("dock_inner", "prompt.door.open", null, false, reqs);
             door.EditorSetPanels(left.transform, right.transform, new[] { statusL.GetComponent<Renderer>(), statusR.GetComponent<Renderer>() });
+        }
+
+        private static void BuildRecorder(Transform parent, string name, Vector3 pos, Quaternion rot, LastSignal.Audio.AudioLogDefinition log)
+        {
+            var go = Group(name, parent, pos);
+            go.transform.localRotation = rot;
+            var col = go.AddComponent<BoxCollider>();
+            col.size = new Vector3(0.32f, 0.2f, 0.32f);
+            col.center = new Vector3(0, 0.04f, 0);
+            Box("Body", go.transform, new Vector3(0, 0.03f, 0), new Vector3(0.2f, 0.06f, 0.13f), _brass, false, null, false);
+            Box("Grille", go.transform, new Vector3(-0.03f, 0.062f, 0), new Vector3(0.1f, 0.005f, 0.1f), _rubber, false, null, false);
+            Cylinder("Reel", go.transform, new Vector3(0.06f, 0.07f, 0), new Vector3(0.05f, 0.01f, 0.05f), _terracotta, false, null, false);
+            var blink = Sphere("UncollectedLight", go.transform, new Vector3(0.08f, 0.065f, 0.05f), Vector3.one * 0.025f, _cyanStrip, false, false);
+            var glow = PointLight("Glow", blink.transform, Vector3.zero, SignalCyan, 0.35f, 0.8f);
+            _ = glow;
+            var pickup = go.AddComponent<AudioLogPickup>();
+            pickup.EditorConfigure(log.Id, "prompt.log.play", null, false);
+            pickup.EditorSetLog(log, blink);
+        }
+
+        private static void BuildBreaker(Transform props)
+        {
+            // Breaker B-2 next to the fuse box: works only once the fuse is installed.
+            var root = Group("Breaker_B2", props, new Vector3(4.85f, 1.45f, 2.75f));
+            root.transform.localRotation = Quaternion.Euler(0, -90, 0);
+            var col = root.AddComponent<BoxCollider>();
+            col.size = new Vector3(0.45f, 0.7f, 0.4f);
+            col.center = new Vector3(0, 0, 0.12f);
+            var t = root.transform;
+            Box("Plate", t, Vector3.zero, new Vector3(0.36f, 0.6f, 0.06f), _slateDark, false);
+            Box("Frame", t, new Vector3(0, 0, 0.035f), new Vector3(0.4f, 0.64f, 0.02f), _brass, false);
+            Box("Label", t, new Vector3(0, 0.22f, 0.05f), new Vector3(0.2f, 0.07f, 0.01f), _terracotta, false);
+            var pivot = Group("HandlePivot", t, new Vector3(0, -0.05f, 0.06f));
+            Box("Handle", pivot.transform, new Vector3(0, 0.12f, 0.03f), new Vector3(0.06f, 0.24f, 0.05f), _brass, false, null, false);
+            Box("Grip", pivot.transform, new Vector3(0, 0.25f, 0.05f), new Vector3(0.14f, 0.05f, 0.07f), _rubber, false, null, false);
+            var lever = root.AddComponent<LeverInteractable>();
+            var reqs = new ConditionSet { conditions = new List<Condition> { Condition.Flag(DockingBayContent.FuseInstalledFlag, "prompt.breaker.no_fuse") } };
+            lever.EditorConfigure("dock_breaker_b2", "prompt.breaker.close", null, true, reqs, new List<Effect> { Effect.Power(SectorIds.Docking) });
+            lever.EditorSetHandle(pivot.transform);
+            pivot.transform.localRotation = Quaternion.Euler(-40, 0, 0);
+        }
+
+        private static void BuildLanderConsole(Transform props, List<GameObject> on)
+        {
+            // Bay control console beside the empty Survey Lander cradle (front-left), plus Rhee's log LOG_DOCK_02.
+            var cradle = Group("SurveyLanderCradle_Empty", props, new Vector3(-2.6f, 0, 3.4f)).transform;
+            Box("RailL", cradle, new Vector3(-0.9f, 0.08f, 0), new Vector3(0.12f, 0.16f, 3.0f), _brass);
+            Box("RailR", cradle, new Vector3(0.9f, 0.08f, 0), new Vector3(0.12f, 0.16f, 3.0f), _brass);
+            Box("FrostMark", cradle, new Vector3(0, 0.005f, 0), new Vector3(1.6f, 0.01f, 2.6f), _glassTeal, false);
+            Cylinder("CutUmbilical", cradle, new Vector3(0.4f, 1.4f, 1.1f), new Vector3(0.06f, 1.4f, 0.06f), _rubber, false, Quaternion.Euler(0, 0, 8));
+
+            var console = Group("Console_BayControl", props, new Vector3(-4.45f, 0, 1.2f));
+            console.transform.localRotation = Quaternion.Euler(0, 90, 0);
+            var t = console.transform;
+            var col = console.AddComponent<BoxCollider>();
+            col.size = new Vector3(1.3f, 1.4f, 0.8f);
+            col.center = new Vector3(0, 0.7f, 0);
+            Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.2f, 0.9f, 0.55f), _slateDark, false);
+            Box("Desk", t, new Vector3(0, 0.93f, 0.08f), new Vector3(1.3f, 0.06f, 0.7f), _brass, false, Quaternion.Euler(-12, 0, 0));
+            Box("Screen", t, new Vector3(0, 1.32f, -0.12f), new Vector3(0.9f, 0.55f, 0.05f), _slateDark, false, Quaternion.Euler(-12, 0, 0));
+            Box("ScreenFrame", t, new Vector3(0, 1.32f, -0.15f), new Vector3(0.98f, 0.63f, 0.03f), _brass, false, Quaternion.Euler(-12, 0, 0));
+            var glow = Box("ScreenGlow", t, new Vector3(0, 1.32f, -0.09f), new Vector3(0.84f, 0.49f, 0.005f), _cyanStrip, false, Quaternion.Euler(-12, 0, 0), false);
+            var light = PointLight("ScreenLight", glow.transform, new Vector3(0, 0, 1.5f), SignalCyan, 0.6f, 2.2f);
+            _ = light;
+            var terminal = console.AddComponent<TerminalInteractable>();
+            terminal.EditorConfigure("dock_console", "prompt.terminal.use", null, false);
+            terminal.EditorSetTerminal(DockingBayContent.BayTerminal, glow);
+
+            BuildRecorder(props, "Recorder_LogDock02", new Vector3(-4.2f, 0.98f, 2.05f), Quaternion.Euler(0, 100, 0), DockingBayContent.LogDock02);
+        }
+
+        private const string InspectFolder = "Assets/_Project/Prefabs/Interactables/Inspect";
+
+        private static void CreateInspectPrefabs(ItemDefinition flashlight, ItemDefinition fuse)
+        {
+            Directory.CreateDirectory(InspectFolder);
+            var f = new GameObject("Inspect_Flashlight");
+            Cylinder("Body", f.transform, Vector3.zero, new Vector3(0.08f, 0.14f, 0.08f), _brass, false, Quaternion.Euler(0, 0, 90), false);
+            Cylinder("Head", f.transform, new Vector3(0.16f, 0, 0), new Vector3(0.12f, 0.04f, 0.12f), _brass, false, Quaternion.Euler(0, 0, 90), false);
+            Cylinder("Lens", f.transform, new Vector3(0.2f, 0, 0), new Vector3(0.1f, 0.005f, 0.1f), _cyanStrip, false, Quaternion.Euler(0, 0, 90), false);
+            Cylinder("Grip", f.transform, new Vector3(-0.06f, 0, 0), new Vector3(0.085f, 0.06f, 0.085f), _rubber, false, Quaternion.Euler(0, 0, 90), false);
+            DockingBayContent.SetInspectPrefab(flashlight, PrefabUtility.SaveAsPrefabAsset(f, $"{InspectFolder}/Inspect_Flashlight.prefab"));
+            Object.DestroyImmediate(f);
+
+            var u = new GameObject("Inspect_Fuse30A");
+            Cylinder("Ceramic", u.transform, Vector3.zero, new Vector3(0.09f, 0.11f, 0.09f), _ceramic, false, Quaternion.Euler(0, 0, 90), false);
+            Cylinder("CapA", u.transform, new Vector3(0.12f, 0, 0), new Vector3(0.1f, 0.025f, 0.1f), _brass, false, Quaternion.Euler(0, 0, 90), false);
+            Cylinder("CapB", u.transform, new Vector3(-0.12f, 0, 0), new Vector3(0.1f, 0.025f, 0.1f), _brass, false, Quaternion.Euler(0, 0, 90), false);
+            Box("Band", u.transform, Vector3.zero, new Vector3(0.05f, 0.1f, 0.1f), _terracotta, false, null, false);
+            DockingBayContent.SetInspectPrefab(fuse, PrefabUtility.SaveAsPrefabAsset(u, $"{InspectFolder}/Inspect_Fuse30A.prefab"));
+            Object.DestroyImmediate(u);
         }
 
         // ---------------------------------------------------------------- lighting & post

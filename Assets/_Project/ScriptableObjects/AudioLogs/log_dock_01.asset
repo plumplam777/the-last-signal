@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6216333faa7a14f4ebad499cdd71c2c2, type: 3}
+  m_Name: log_dock_01
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Audio.AudioLogDefinition
+  id: log_dock_01
+  sectorId: docking
+  titleKey: log.log_dock_01.title
+  speakerKey: speaker.jonah
+  dateKey: date.day_m61
+  englishClip: {fileID: 0}
+  bulgarianClip: {fileID: 0}
+  fallbackDuration: 39.04231
+  critical: 1
+  countsForHiddenEnding: 1
+  subtitles:
+  - start: 0.6
+    textKey: log.log_dock_01.line.1
+  - start: 8.257692
+    textKey: log.log_dock_01.line.2
+  - start: 10.915384
+    textKey: log.log_dock_01.line.3
+  - start: 14.342307
+    textKey: log.log_dock_01.line.4
+  - start: 18.538462
+    textKey: log.log_dock_01.line.5
+  - start: 20.811539
+    textKey: log.log_dock_01.line.6
+  - start: 24.623077
+    textKey: log.log_dock_01.line.7
+  - start: 31.51154
+    textKey: log.log_dock_01.line.8
+  - start: 36.092308
+    textKey: log.log_dock_01.line.9

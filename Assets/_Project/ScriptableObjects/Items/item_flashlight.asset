@@ -19,4 +19,4 @@ MonoBehaviour:
   icon: {fileID: 0}
   accessLevel: 0
   stackable: 0
-  inspectPrefab: {fileID: 0}
+  inspectPrefab: {fileID: 5249537460559914706, guid: e0c51e929f48149d1948bbaaaad21d05, type: 3}

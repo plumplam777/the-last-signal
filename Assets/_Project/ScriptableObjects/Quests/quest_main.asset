@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acfceb660a4b34572b86b3b93ee25ae4, type: 3}
+  m_Name: quest_main
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Quests.QuestDefinition
+  id: main
+  titleKey: quest.main.title
+  sequential: 1
+  objectives:
+  - id: obj_01
+    textKey: obj.obj_01
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 5
+        key: 
+        value: 1
+        text: 
+        item: {fileID: 11400000, guid: 8020d79a78d86493ba57a2c5f1697a4f, type: 2}
+        failReasonKey: 
+  - id: obj_02
+    textKey: obj.obj_02
+    completeWhen:
+      requireAll: 0
+      conditions:
+      - type: 5
+        key: 
+        value: 1
+        text: 
+        item: {fileID: 11400000, guid: 34cd3e0a09f8f47ed9a83816fc420304, type: 2}
+        failReasonKey: 
+      - type: 0
+        key: story.dock_fuse_installed
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_03
+    textKey: obj.obj_03
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 6
+        key: docking
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_04
+    textKey: obj.obj_04
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: door.dock_inner.unlocked
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_04b
+    textKey: obj.obj_04b
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: sector.engineering.visited
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 

@@ -24,9 +24,70 @@ namespace LastSignal.UI
 
         public bool IsOpen => panel != null && panel.activeSelf;
 
+        private GameObject _adminTools;
+        private Button _adminButton;
+        private TMPro.TMP_Text _status;
+
         private void Awake()
         {
             if (panel != null) panel.SetActive(false);
+            BuildRuntimeButtons();
+        }
+
+        /// <summary>Save + admin tools are added at runtime (they depend on the session, not on the prefab).</summary>
+        private void BuildRuntimeButtons()
+        {
+            if (panel == null) return;
+            var t = panel.transform;
+            RuntimeUi.Button("SaveButton", t, new Vector2(430, 40), new Vector2(340, 60), "ui.pause.save", SaveNow, 24);
+            _adminButton = RuntimeUi.Button("AdminToolsButton", t, new Vector2(430, -40), new Vector2(340, 60), "ui.pause.admin_tools", ToggleAdminTools, 24);
+            _status = RuntimeUi.Text("Status", t, new Vector2(430, -110), new Vector2(400, 40), 21, RuntimeUi.Cyan);
+
+            var tools = RuntimeUi.Panel("AdminTools", t, new Vector2(-470, -40), new Vector2(420, 470));
+            _adminTools = tools.gameObject;
+            var tt = tools.transform;
+            RuntimeUi.Text("Title", tt, new Vector2(0, 200), new Vector2(380, 40), 24, RuntimeUi.Brass, "ui.pause.admin_tools");
+            RuntimeUi.Toggle("UnlockAll", tt, new Vector2(10, 145), "ui.admin.tool_unlock_all", GameServices.Admin.UnlockAllDoors,
+                on => { GameServices.Admin.SetUnlockAllDoors(on); });
+            RuntimeUi.Button("Power", tt, new Vector2(0, 85), new Vector2(360, 50), "ui.admin.tool_power", () =>
+            {
+                var sector = FindAnyObjectByType<Player.SectorRoot>();
+                if (sector != null) GameServices.Admin.RestorePower(sector.SectorId);
+            }, 21);
+            RuntimeUi.Button("Items", tt, new Vector2(0, 25), new Vector2(360, 50), "ui.admin.tool_items", () => GameServices.Admin.GiveAllItems(), 21);
+            RuntimeUi.Button("ToDocking", tt, new Vector2(0, -35), new Vector2(360, 50), "ui.admin.tool_tp_docking", () => Teleport(SectorIds.Docking), 21);
+            RuntimeUi.Button("ToEngineering", tt, new Vector2(0, -95), new Vector2(360, 50), "ui.admin.tool_tp_engineering", () => Teleport(SectorIds.Engineering), 21);
+            RuntimeUi.Button("Decision", tt, new Vector2(0, -155), new Vector2(360, 50), "ui.admin.tool_decision", () =>
+            {
+                Close();
+                DecisionScreen.RequestOpen();
+            }, 21);
+            _adminTools.SetActive(false);
+        }
+
+        private void SaveNow()
+        {
+            var auth = GameServices.Auth;
+            if (!auth.IsLoggedIn || auth.Current.UserId <= 0)
+            {
+                _status.text = Loc.Get("save.err.no_session");
+                return;
+            }
+            GameServices.Checkpoint();
+            _status.text = Loc.Get("toast.saved");
+            GameServices.Audio.Sfx("sfx_terminal_ok", 0.7f);
+        }
+
+        private void ToggleAdminTools()
+        {
+            if (!GameServices.Auth.IsAdmin) return;
+            _adminTools.SetActive(!_adminTools.activeSelf);
+        }
+
+        private void Teleport(string sectorId)
+        {
+            Close();
+            GameServices.Admin.Teleport(sectorId);
         }
 
         private void OnEnable()
@@ -87,6 +148,9 @@ namespace LastSignal.UI
         {
             panel.SetActive(true);
             _openedThisFrame = true;
+            if (_adminButton != null) _adminButton.gameObject.SetActive(GameServices.Auth.IsAdmin);
+            if (_adminTools != null) _adminTools.SetActive(false);
+            if (_status != null) _status.text = string.Empty;
             GameServices.State.Set(GameState.Paused);
             resumeButton.Select();
         }

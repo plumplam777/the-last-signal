@@ -12,6 +12,7 @@ namespace LastSignal.EditorTools
             EngineeringBuilder.Build();
             CutsceneBuilder.Build();
             EndingBuilder.Build();
+            MainMenuBuilder.Build();
             ProjectSetup.RegisterBuildScenes();
             EditorSceneManagerOpen(ProjectSetup.DockingBayPath);
         }

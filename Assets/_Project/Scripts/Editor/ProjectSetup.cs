@@ -1,7 +1,6 @@
 using System.IO;
 using System.Linq;
 using LastSignal.Core;
-using LastSignal.UI;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -32,7 +31,7 @@ namespace LastSignal.EditorTools
             ImportTmpEssentialsIfMissing();
             ApplyPlayerSettings();
             CreateBootstrapScene();
-            CreateMainMenuScene();
+            if (!File.Exists(MainMenuPath)) MainMenuBuilder.Build();
             CreateSectorPlaceholder(DockingBayPath, "Docking Bay");
             RegisterBuildScenes();
             AssetDatabase.SaveAssets();
@@ -89,39 +88,6 @@ namespace LastSignal.EditorTools
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Color.black;
             Save(scene, BootstrapPath);
-        }
-
-        private static void CreateMainMenuScene()
-        {
-            if (File.Exists(MainMenuPath)) return;
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            var cam = new GameObject("Main Camera").AddComponent<Camera>();
-            cam.tag = "MainCamera";
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.03f, 0.05f, 0.09f);
-
-            CreateEventSystem();
-            var canvas = CreateCanvas("MenuCanvas");
-
-            var title = CreateText(canvas.transform, "Title", "ui.game.title", 96, new Vector2(0, 220));
-            title.characterSpacing = 12;
-            title.color = new Color(0.55f, 0.9f, 1f);
-            var note = CreateText(canvas.transform, "PlaceholderNote", "ui.menu.placeholder_note", 22, new Vector2(0, -420));
-            note.color = new Color(1f, 1f, 1f, 0.4f);
-
-            var start = CreateButton(canvas.transform, "StartButton", "ui.menu.start", new Vector2(0, 40));
-            var language = CreateButton(canvas.transform, "LanguageButton", "ui.menu.language", new Vector2(0, -50));
-            var quit = CreateButton(canvas.transform, "QuitButton", "ui.menu.quit", new Vector2(0, -140));
-
-            var controller = canvas.gameObject.AddComponent<MainMenuController>();
-            var so = new SerializedObject(controller);
-            so.FindProperty("startButton").objectReferenceValue = start;
-            so.FindProperty("languageButton").objectReferenceValue = language;
-            so.FindProperty("quitButton").objectReferenceValue = quit;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            Save(scene, MainMenuPath);
         }
 
         private static void CreateSectorPlaceholder(string path, string label)

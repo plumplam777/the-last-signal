@@ -136,10 +136,10 @@ namespace LastSignal.Core
                 if (_auth.IsLoggedIn && _auth.Current.UserId > 0 && _database.IsAvailable)
                     _database.Users.UpdateLanguage(_auth.Current.UserId, LocalizationService.Code(_localization.Current));
             };
-            _quests.ObjectiveCompleted += (_, _) => Checkpoint();
             _audioLogs.RegisterCatalog(_content.AudioLogs);
             _quests = new QuestManager(_world, _inventory);
             foreach (var quest in _content.Quests) _quests.Register(quest);
+            _quests.ObjectiveCompleted += (_, _) => Checkpoint();
 
             _state.Changed += (_, next) => _input.ApplyState(next);
             Log.Info(nameof(GameServices), "Services initialised.");

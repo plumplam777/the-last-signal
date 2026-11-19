@@ -106,7 +106,11 @@ namespace LastSignal.Core
             Log.Info(nameof(GameServices), "Services initialised.");
         }
 
-        private void Update() => _state.EnforceCursor();
+        private void Update()
+        {
+            if (_instance != this || _state == null) return; // duplicate pending destruction
+            _state.EnforceCursor();
+        }
 
         private void OnDestroy()
         {

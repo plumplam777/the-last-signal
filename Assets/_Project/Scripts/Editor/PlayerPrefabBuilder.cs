@@ -59,6 +59,7 @@ namespace LastSignal.EditorTools
             BuildDialogue(root.transform);
             BuildInventory(root.transform);
             BuildTerminal(root.transform);
+            BuildDecision(root.transform);
             BuildPause(root.transform);
 
             var es = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
@@ -305,6 +306,38 @@ namespace LastSignal.EditorTools
 
             var screen = canvas.gameObject.AddComponent<TerminalScreen>();
             screen.EditorBind(panel.gameObject, title, subtitle, lockPage.gameObject, pin, hint, feedback, pad, entriesPage.gameObject, list, template, entryTitle, entryBody);
+        }
+
+        private static void BuildDecision(Transform parent)
+        {
+            var canvas = UiCanvas("DecisionScreen", parent, 45);
+            var panel = UiImage("Panel", canvas.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(4000, 3000), new Color(0.01f, 0.02f, 0.03f, 0.9f));
+            var frame = Panel("Frame", panel.transform, Vector2.zero, new Vector2(1300, 640));
+            var title = UiText("Title", frame.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 250), new Vector2(1200, 60), 38, Brass, "ui.dec.title");
+            title.characterSpacing = 10;
+            UiText("Subtitle", frame.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 195), new Vector2(1200, 40), 22, new Color(1f, 0.62f, 0.55f), "ui.dec.subtitle");
+
+            var choices = UiRect("ChoicePage", frame.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -60), new Vector2(1200, 420));
+            Button Option(string name, float y, string key)
+            {
+                var b = UiButton(name, choices, new Vector2(0, y), key);
+                ((RectTransform)b.transform).sizeDelta = new Vector2(980, 80);
+                ((RectTransform)b.GetComponentInChildren<TMP_Text>().transform).sizeDelta = new Vector2(940, 76);
+                return b;
+            }
+            var a = Option("Option_A", 110, "ui.dec.option_a");
+            var bOpt = Option("Option_B", 0, "ui.dec.option_b");
+            var c = Option("Option_C", -110, "ui.dec.option_c");
+            c.GetComponent<Image>().color = new Color(0.05f, 0.14f, 0.16f, 1f);
+
+            var confirm = UiRect("ConfirmPage", frame.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -60), new Vector2(1200, 420));
+            var chosen = UiText("Chosen", confirm, new Vector2(0.5f, 0.5f), new Vector2(0, 120), new Vector2(1100, 60), 30, new Color(0.92f, 0.97f, 1f));
+            UiText("Question", confirm, new Vector2(0.5f, 0.5f), new Vector2(0, 40), new Vector2(1100, 50), 26, EmergencyRed, "ui.dec.confirm_q");
+            var ok = UiButton("Confirm", confirm, new Vector2(-170, -80), "ui.dec.confirm");
+            var back = UiButton("Back", confirm, new Vector2(170, -80), "ui.dec.back");
+            confirm.gameObject.SetActive(false);
+
+            canvas.gameObject.AddComponent<DecisionScreen>().EditorBind(panel.gameObject, choices.gameObject, a, bOpt, c, confirm.gameObject, chosen, ok, back);
         }
 
         private static Sprite WhiteSprite() => AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");

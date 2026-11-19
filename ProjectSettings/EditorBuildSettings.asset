@@ -12,6 +12,12 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/MainMenu/MainMenu.unity
     guid: bd72a52154e44429d910e31de4e303bd
   - enabled: 1
+    path: Assets/_Project/Scenes/Cutscenes/Cutscene_Opening.unity
+    guid: 672e78fd6497343c4a8aecf37fc87252
+  - enabled: 1
+    path: Assets/_Project/Scenes/Endings/Ending.unity
+    guid: e34d1d0d9dceb4d209ae88dfa114fcbc
+  - enabled: 1
     path: Assets/_Project/Scenes/Station/Sector_DockingBay.unity
     guid: 37f60a6bb2e04453e9199b06caedb1c3
   - enabled: 1

@@ -31,3 +31,8 @@
 | 27 | 2026-11-19 | Engineering built ahead of Phase 6 (playtest: the hatch led nowhere). Medical hatch states honestly that the sector is not built yet. | Keep the playable path continuous. |
 | 28 | 2026-11-19 | Every MonoBehaviour lives in a file with the same name (SpawnPoint moved out of SectorRoot.cs). | A mismatch corrupted the Engineering scene in the macOS player while the Editor showed no error. Found with `Last Signal/Diagnostics`. |
 | 29 | 2026-11-19 | BG term for "the Array": „Решетката“. CAIRN stays in Latin letters in both languages. | Translation consistency. |
+| 30 | 2026-11-19 | Cutscenes use a small data-driven `CutsceneDirector` (shot list) instead of Unity Timeline. | Reviewable as code, built by `CutsceneBuilder`, no Timeline/Cinemachine dependency. |
+| 31 | 2026-11-19 | Epilogue/ending-line variant: trust ≥ 50 → "high", < 50 → "low". | Story bible gives only two epilogue variants; split at the starting value. |
+| 32 | 2026-11-19 | `story.fed_array` is set by the player's answer in AI_ENG_03, not by plugging the Array-feed cable. | Matches StoryBible §7.2; the plug only triggers the conversation. |
+| 33 | 2026-11-19 | The player docks at Bay 2 (cutscene); the bay terminal now says "Docking Bay 2". | Consistency with StoryBible §10. |
+| 34 | 2026-11-19 | Editor-only fake-cursor-lock detection with a "Click to look around" prompt. | macOS Editor reports Locked before the Game view has focus. |

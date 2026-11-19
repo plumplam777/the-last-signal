@@ -19,6 +19,7 @@ namespace LastSignal.EditorTools
         [MenuItem(Root + "Play First Audio Log", true)]
         [MenuItem(Root + "Give All Items", true)]
         [MenuItem(Root + "Restore Sector Power", true)]
+        [MenuItem(Root + "Open Decision Screen", true)]
         private static bool PlayingOnly() => Application.isPlaying;
 
         [MenuItem(Root + "Open Inventory")]
@@ -44,6 +45,9 @@ namespace LastSignal.EditorTools
             foreach (var item in GameServices.Content.Items) GameServices.Inventory.Add(item);
             GameServices.World.SetBool(Player.FlashlightController.OwnedFlag, true);
         }
+
+        [MenuItem(Root + "Open Decision Screen")]
+        private static void OpenDecision() => LastSignal.UI.DecisionScreen.RequestOpen();
 
         [MenuItem(Root + "Restore Sector Power")]
         private static void RestorePower()

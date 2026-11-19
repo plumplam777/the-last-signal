@@ -49,9 +49,15 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [x] Objectives OBJ_05–07; puzzle failure feedback on the HUD
 - [x] 12 EditMode + 14 PlayMode tests; clean macOS build verified for both sectors
 
-## Phase 4 — Narrative
-DialogueGraph + DialogueManager + UI, AI comms (speaker portrait/waveform), trust, story flags,
-audio log playback + subtitles, ending selection, opening cutscene (Timeline).
+## Phase 4 — Narrative (done 2026-11-19, voices pending)
+- [x] DialogueGraph / DialogueManager / DialogueTrigger (sector start, flag, volume) + CAIRN comms panel (eye, typewriter, choices 1–3, trust flash)
+- [x] CAIRN conversations AI_DOCK_01/02, AI_ENG_01/02/03 with scripted trust deltas and flags (EN/BG)
+- [x] Trust: 0–100 from 50; add-on lines at ≥65 / ≤35; epilogues split at 50
+- [x] Opening cutscene "The Call": 14 shots, cockpit + exterior sets (Nereth, the Murmur, Lantern Station, Tern), hold Space to skip
+- [x] Decision screen (A / B / hidden C with all 14 logs, confirmation) + Ending scene (events, lines, epilogue, credits → main menu)
+- [x] 16 EditMode + 20 PlayMode tests; clean macOS build, all 5 scenes load without errors
+- [ ] Text-to-speech voices for CAIRN, logs and cutscene (subtitles already work without audio)
+- [ ] Ending A escape countdown and the finale sector (Phase 6)
 
 ## Phase 5 — Database & administration
 sqlite-net integration + migrations, AuthService (PBKDF2), start screen (login/register/first-run admin),

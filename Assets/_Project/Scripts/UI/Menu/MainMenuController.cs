@@ -13,7 +13,6 @@ namespace LastSignal.UI
         [SerializeField] private Button startButton;
         [SerializeField] private Button languageButton;
         [SerializeField] private Button quitButton;
-        [SerializeField] private string firstGameplayScene = SceneIds.DockingBay;
 
         private void OnEnable()
         {
@@ -34,7 +33,8 @@ namespace LastSignal.UI
         private void OnStart()
         {
             GameServices.StartNewRun();
-            GameServices.Scenes.Load(firstGameplayScene);
+            // new game: opening cutscene "The Call", which then loads the Docking Bay
+            GameServices.Scenes.Load(SceneIds.CutsceneOpening);
         }
 
         private static void OnQuit()

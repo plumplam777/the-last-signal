@@ -175,6 +175,23 @@ namespace LastSignal.EditorTools
 
         private static void PodShell(Transform pod, bool open)
         {
+            if (PropModels.Place("prop_cryo_pod_base", pod, Vector3.zero) != null)
+            {
+                // Blender model (Tools/blender/build_props.py); canopy hinges on the wall side (-X)
+                if (open)
+                    PropModels.Place("prop_cryo_pod_canopy", pod, new Vector3(-0.5f, 0.66f, 0), Quaternion.Euler(0, 0, 105),
+                        new Dictionary<string, Material> { ["Glass"] = M.GlassTeal });
+                else
+                {
+                    PropModels.Place("prop_cryo_pod_canopy", pod, new Vector3(-0.5f, 0.66f, 0), null,
+                        new Dictionary<string, Material> { ["Glass"] = _frost });
+                    Box("Shape", pod, new Vector3(0, 0.74f, 0.1f), new Vector3(0.42f, 0.16f, 1.5f), M.SlateDark, false);
+                }
+                var col = Group("Collider", pod).AddComponent<BoxCollider>();
+                col.center = new Vector3(0, 0.6f, 0);
+                col.size = new Vector3(1.2f, 1.2f, 2.45f);
+                return;
+            }
             Box("Plinth", pod, new Vector3(0, 0.25f, 0), new Vector3(1.2f, 0.5f, 2.4f), M.SlateDark);
             Box("Trim", pod, new Vector3(0, 0.51f, 0), new Vector3(1.26f, 0.04f, 2.46f), M.Brass, false);
             Cylinder("Bed", pod, new Vector3(0, 0.7f, 0), new Vector3(1.0f, 1.1f, 0.5f), _clinicalTrim, false, Quaternion.Euler(90, 0, 0));
@@ -250,7 +267,7 @@ namespace LastSignal.EditorTools
         private static void BuildCabinet(Transform props)
         {
             var c = Group("SecureCabinet", props, new Vector3(3.4f, 0, HalfL - 0.35f)).transform;
-            Box("Body", c, new Vector3(0, 1.0f, 0), new Vector3(1.2f, 2.0f, 0.5f), M.SlateDark);
+            HollowCase("Body", c, new Vector3(0, 1.0f, 0), new Vector3(1.2f, 2.0f, 0.5f), M.SlateDark); // hollow: the keycard inside must be visible and reachable
             Box("Shelf", c, new Vector3(0, 1.2f, -0.02f), new Vector3(1.1f, 0.04f, 0.42f), M.Brass, false);
             var label = WorldText("Label", c, new Vector3(0, 2.25f, -0.26f), Quaternion.identity, "med.cabinet.label", 1.1f, EmergencyRed);
             ((RectTransform)label.transform).sizeDelta = new Vector2(1.4f, 0.4f);

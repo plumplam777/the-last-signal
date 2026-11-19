@@ -206,14 +206,20 @@ namespace LastSignal.EditorTools
                 var dir = Quaternion.Euler(0, yaw, 0) * Vector3.forward;
                 var v = Group($"Valve_{i + 1}", t, dir * (R - 0.35f) + Vector3.up * 1.2f);
                 v.transform.localRotation = Quaternion.Euler(0, yaw, 0); // local +Z into the wall, wheel (-Z) faces the catwalk
-                Cylinder("Pipe", v.transform, new Vector3(0, 0, 0.25f), new Vector3(0.3f, 0.25f, 0.3f), M.Brass, false, Quaternion.Euler(90, 0, 0));
+                bool modelBody = PropModels.Place("prop_valve_body", v.transform, new Vector3(0, 0, -0.05f)) != null;
+                if (!modelBody) Cylinder("Pipe", v.transform, new Vector3(0, 0, 0.25f), new Vector3(0.3f, 0.25f, 0.3f), M.Brass, false, Quaternion.Euler(90, 0, 0));
                 Cylinder("PipeUp", v.transform, new Vector3(0, 1.8f, 0.3f), new Vector3(0.22f, 1.8f, 0.22f), M.Brass, false);
                 Cylinder("PipeDown", v.transform, new Vector3(0, -0.6f, 0.3f), new Vector3(0.22f, 0.6f, 0.22f), M.Brass, false);
                 var wheel = Group("Wheel", v.transform, new Vector3(0, 0, -0.05f)).transform;
-                Ring("Rim", wheel, Vector3.zero, 0.32f, 0.05f, 0.06f, 16, M.Terracotta);
-                Box("Spoke_A", wheel, Vector3.zero, new Vector3(0.62f, 0.04f, 0.04f), M.Terracotta, false, null, false);
-                Box("Spoke_B", wheel, Vector3.zero, new Vector3(0.04f, 0.62f, 0.04f), M.Terracotta, false, null, false);
-                Box("Marker", wheel, new Vector3(0, 0.3f, -0.03f), new Vector3(0.06f, 0.1f, 0.02f), M.CyanStrip, false, null, false);
+                if (PropModels.Place("prop_valve_wheel", wheel, Vector3.zero) != null)
+                    Box("Marker", wheel, new Vector3(0, 0.3f, -0.05f), new Vector3(0.05f, 0.09f, 0.02f), M.CyanStrip, false, null, false);
+                else
+                {
+                    Ring("Rim", wheel, Vector3.zero, 0.32f, 0.05f, 0.06f, 16, M.Terracotta);
+                    Box("Spoke_A", wheel, Vector3.zero, new Vector3(0.62f, 0.04f, 0.04f), M.Terracotta, false, null, false);
+                    Box("Spoke_B", wheel, Vector3.zero, new Vector3(0.04f, 0.62f, 0.04f), M.Terracotta, false, null, false);
+                    Box("Marker", wheel, new Vector3(0, 0.3f, -0.03f), new Vector3(0.06f, 0.1f, 0.02f), M.CyanStrip, false, null, false);
+                }
                 var tag = WorldText("Label", v.transform, new Vector3(0, 0.6f, -0.05f), Quaternion.identity, label, 1.0f, Brass);
                 ((RectTransform)tag.transform).sizeDelta = new Vector2(1.6f, 0.2f);
                 tag.characterSpacing = 1;
@@ -310,6 +316,17 @@ namespace LastSignal.EditorTools
             PointLight("PlanetFill", r, new Vector3(0, 1.8f, CmdHalfL - 0.8f), Hex("#5A8FD0"), 1.3f, 8f);
         }
 
+        /// <summary>Bridge workstation from the Blender model; false when the model is missing (greybox fallback).</summary>
+        private static bool StationConsole(Transform con)
+        {
+            if (PropModels.Place("prop_console_station", con, Vector3.zero) == null) return false;
+            Box("Glow", con, new Vector3(0, 1.3f, 0.175f), new Vector3(1.12f, 0.48f, 0.005f), _consoleGlow, false, Quaternion.Euler(-8, 0, 0), false);
+            var col = Group("Collider", con).AddComponent<BoxCollider>();
+            col.center = new Vector3(0, 0.8f, 0.05f);
+            col.size = new Vector3(1.5f, 1.6f, 0.7f);
+            return true;
+        }
+
         private static void BuildCommandProps(Transform c)
         {
             var p = Group("Props", c).transform;
@@ -320,6 +337,7 @@ namespace LastSignal.EditorTools
                 var pos = new Vector3(Mathf.Sin(a) * 4.6f, 0, Mathf.Cos(a) * 4.6f - 0.6f);
                 var con = Group($"Console_{i}", p, pos).transform;
                 con.localRotation = Quaternion.Euler(0, a * Mathf.Rad2Deg, 0);
+                if (StationConsole(con)) continue;
                 Box("Body", con, new Vector3(0, 0.45f, 0), new Vector3(1.4f, 0.9f, 0.6f), _console);
                 Box("Top", con, new Vector3(0, 0.95f, -0.05f), new Vector3(1.5f, 0.06f, 0.7f), M.Brass, false, Quaternion.Euler(-12, 0, 0));
                 Box("Screen", con, new Vector3(0, 1.3f, 0.2f), new Vector3(1.2f, 0.55f, 0.04f), M.SlateDark, false, Quaternion.Euler(-8, 0, 0));
@@ -328,11 +346,24 @@ namespace LastSignal.EditorTools
 
             // captain's chair with the notebook recorder (LOG_CORE_01)
             var chair = Group("CaptainChair", p, new Vector3(0, 0, -1.2f)).transform;
+            if (PropModels.Place("prop_captain_chair", chair, Vector3.zero) != null)
+            {
+                // seat and back separately: the notebook recorder (LOG_CORE_01) rests on the seat and must stay reachable
+                var seatCol = Group("Collider_Seat", chair).AddComponent<BoxCollider>();
+                seatCol.center = new Vector3(0, 0.3f, 0);
+                seatCol.size = new Vector3(0.75f, 0.6f, 0.7f);
+                var backCol = Group("Collider_Back", chair).AddComponent<BoxCollider>();
+                backCol.center = new Vector3(0, 1.1f, -0.34f);
+                backCol.size = new Vector3(0.75f, 1.0f, 0.2f);
+            }
+            else
+            {
             Cylinder("Base", chair, new Vector3(0, 0.25f, 0), new Vector3(0.5f, 0.25f, 0.5f), M.Brass);
             Box("Seat", chair, new Vector3(0, 0.55f, 0), new Vector3(0.75f, 0.12f, 0.7f), M.Terracotta);
             Box("Back", chair, new Vector3(0, 1.1f, -0.33f), new Vector3(0.75f, 1.0f, 0.1f), M.Terracotta);
             Box("Arm_L", chair, new Vector3(-0.42f, 0.8f, 0), new Vector3(0.08f, 0.08f, 0.6f), M.Brass, false);
             Box("Arm_R", chair, new Vector3(0.42f, 0.8f, 0), new Vector3(0.08f, 0.08f, 0.6f), M.Brass, false);
+            }
             Box("Notebook", chair, new Vector3(0.12f, 0.63f, 0.05f), new Vector3(0.22f, 0.03f, 0.3f), M.Ceramic, false, Quaternion.Euler(0, 15, 0));
             DockingBayBuilder.BuildRecorder(p, "Recorder_LogCore01", new Vector3(-0.15f, 0.62f, -1.15f), Quaternion.Euler(0, 20, 0), StationContent.LogCore01);
 
@@ -356,14 +387,29 @@ namespace LastSignal.EditorTools
             var comms = Group("CommsConsole", p, new Vector3(-6.3f, 0, 1.2f));
             comms.transform.localRotation = Quaternion.Euler(0, -90, 0); // faces the room (+X)
             var cm = comms.transform;
-            Box("Body", cm, new Vector3(0, 0.45f, 0), new Vector3(1.6f, 0.9f, 0.6f), _console);
-            Box("Top", cm, new Vector3(0, 0.95f, -0.05f), new Vector3(1.7f, 0.06f, 0.7f), M.Brass, false, Quaternion.Euler(-12, 0, 0));
-            Box("Screen", cm, new Vector3(0, 1.45f, 0.2f), new Vector3(1.4f, 0.7f, 0.04f), M.SlateDark, false);
-            var cglow = Box("ScreenGlow", cm, new Vector3(0, 1.45f, 0.175f), new Vector3(1.32f, 0.62f, 0.005f), _consoleGlow, false, null, false);
-            var beacon = WorldText("Beacon", cm, new Vector3(0, 1.45f, 0.16f), Quaternion.identity, "command.comms", 0.9f, Amber);
-            ((RectTransform)beacon.transform).sizeDelta = new Vector2(1.3f, 0.5f);
+            GameObject cglow;
+            TMPro.TextMeshPro beacon;
+            Vector3 blinkPos;
+            if (PropModels.Place("prop_console_station", cm, Vector3.zero) != null)
+            {
+                var tilt = Quaternion.Euler(-8, 0, 0);
+                cglow = Box("ScreenGlow", cm, new Vector3(0, 1.3f, 0.175f), new Vector3(1.12f, 0.48f, 0.005f), _consoleGlow, false, tilt, false);
+                beacon = WorldText("Beacon", cm, new Vector3(0, 1.3f, 0.165f), tilt, "command.comms", 0.8f, Amber);
+                ((RectTransform)beacon.transform).sizeDelta = new Vector2(1.05f, 0.42f);
+                blinkPos = new Vector3(0.58f, 1.05f, -0.3f);
+            }
+            else
+            {
+                Box("Body", cm, new Vector3(0, 0.45f, 0), new Vector3(1.6f, 0.9f, 0.6f), _console);
+                Box("Top", cm, new Vector3(0, 0.95f, -0.05f), new Vector3(1.7f, 0.06f, 0.7f), M.Brass, false, Quaternion.Euler(-12, 0, 0));
+                Box("Screen", cm, new Vector3(0, 1.45f, 0.2f), new Vector3(1.4f, 0.7f, 0.04f), M.SlateDark, false);
+                cglow = Box("ScreenGlow", cm, new Vector3(0, 1.45f, 0.175f), new Vector3(1.32f, 0.62f, 0.005f), _consoleGlow, false, null, false);
+                beacon = WorldText("Beacon", cm, new Vector3(0, 1.45f, 0.16f), Quaternion.identity, "command.comms", 0.9f, Amber);
+                ((RectTransform)beacon.transform).sizeDelta = new Vector2(1.3f, 0.5f);
+                blinkPos = new Vector3(0.6f, 1.12f, -0.1f);
+            }
             beacon.characterSpacing = 1;
-            var blink = Sphere("BeaconBlink", cm, new Vector3(0.6f, 1.12f, -0.1f), Vector3.one * 0.06f, M.RedLamp);
+            var blink = Sphere("BeaconBlink", cm, blinkPos, Vector3.one * 0.06f, M.RedLamp);
             blink.AddComponent<EmissionPulse>().EditorSet(EmergencyRed, 0f, 3f, 1.4f, 0f);
             var commsCol = comms.AddComponent<BoxCollider>();
             commsCol.size = new Vector3(1.6f, 1.6f, 0.8f);

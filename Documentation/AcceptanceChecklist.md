@@ -3,7 +3,7 @@
 Evidence for every acceptance bullet of `The_Last_Signal_Master_Plan.md` §16. Test names refer to
 `Assets/_Project/Tests/{EditMode,PlayMode}` (class.method). Screenshots are in `Documentation/Screenshots/`.
 
-**Last full run:** 2026-11-19 — EditMode 27/27, PlayMode 49/49 (incl. the 5 full-playthrough tests).
+**Last full run:** 2026-11-19 — EditMode 27/27, PlayMode 54/54 (incl. the 5 full-playthrough tests and 5 reachability checks).
 
 Status: ✅ verified by an automated test · 🖼 verified by screenshot/manual check · ⏳ still open
 
@@ -33,7 +33,7 @@ reset/restore the inventory first.
 | Criterion | Status | Evidence |
 |---|---|---|
 | Player movement and camera work | ✅ / 🖼 | `PlayerMovementTests.Walk_Forward_ThenSprint_IsFaster`, `MenuOpen_FreezesMovement` (virtual keyboard through the Input System). Mouse look: manual (needs a captured cursor). |
-| Interactions work consistently | ✅ | every sector test + `FullPlaythroughTests` drive the real `Interactable`s; locked ones report their reason key (`FuseAndBreaker_RestorePower_AndUnlockDoor`, `FullMedicalFlow`) |
+| Interactions work consistently | ✅ | `InteractableReachabilityTests` (per sector: no interactable is buried inside another collider, so the look-ray can reach it — found 3 Phase 6 bugs: both keycards sealed inside solid cabinet/safe bodies, LOG_RES_03 inside the booth terminal); every sector test + `FullPlaythroughTests` drive the real `Interactable`s; locked ones report their reason key (`FuseAndBreaker_RestorePower_AndUnlockDoor`, `FullMedicalFlow`) |
 | Items can be collected | ✅ | `DockingBaySliceTests.Flashlight_RequiresPickup`, `FullMedicalFlow` (keycard), `Decode_WrongTwice_GivesHint_ThenSolvingOpensSafe` |
 | Inventory updates correctly | ✅ | `InventoryAndConditionTests.*`, `DockingBaySliceTests.Inventory_ShowsPickedUpItems`, fuse consumed in `FuseAndBreaker_…`; 🖼 `phase3_inventory.png` |
 | Doors validate access requirements | ✅ | `FuseAndBreaker_…` (no power), `FullEngineeringFlow` (no routed power), `FullMedicalFlow` / `Decode_…` (keycards), `Tunnel_IsSealed_OutsideTheEscape` |
@@ -76,7 +76,7 @@ reset/restore the inventory first.
 |---|---|---|
 | Project opens in the intended Unity version | ✅ | Unity 6000.3.10f1 (`ProjectSettings/ProjectVersion.txt`) |
 | No persistent compilation errors | ✅ | clean console after full refresh; all suites compile and run |
-| No critical missing references or runtime exceptions | ✅ | Unity Test Framework fails any test that logs an unexpected error; 76 tests incl. 4 complete runs pass |
+| No critical missing references or runtime exceptions | ✅ | Unity Test Framework fails any test that logs an unexpected error; 81 tests incl. 4 complete runs pass |
 | macOS build launches | ✅ | Phase 6 build smoke-tested in all 8 scenes (`-batchmode -startScene … -quitAfterSeconds`); ⏳ re-run on the final build |
 | Performance is acceptable on the M4 | ⏳ | profiler pass (Docking Bay, Reactor) still to do |
 | Project follows the agreed Git workflow | ⏳ | one commit per step on `main`, Unity `.gitignore`; GitHub remote not connected yet |

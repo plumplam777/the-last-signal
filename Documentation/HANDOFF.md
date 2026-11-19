@@ -72,7 +72,7 @@ Solo developer = the user; Claude = technical lead (writes code, content, docs; 
 | `Assets/_Project/Localization/Resources/Localization/{en,bg}.json` | **All player-facing text** (keys: `log.<id>.line.N`, `dlg.<id>.<node>`, `obj.<id>`, `terminal.<id>.*`, `end.*`, `epi.*`, `ui.*`) |
 | `Assets/_Project/Audio/Resources/{Voice,Sfx,Ambience}` | TTS voices (+ `voice_manifest.json` subtitle timings), procedural SFX/ambience |
 | `Tools/generate_voices.py`, `Tools/generate_sfx.py` | Regenerate audio (`python3 Tools/generate_voices.py` ≈ 5 min, macOS `say`) |
-| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 49 PlayMode tests (`FullPlaythroughTests` = 4 complete runs, one per ending) |
+| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 54 PlayMode tests (`FullPlaythroughTests` = 4 complete runs, one per ending) |
 | `Documentation/AcceptanceChecklist.md` | Spec §16 bullets with test/screenshot evidence |
 
 **Content pipeline:** edit a builder/content class → `refresh_unity` → menu `Last Signal/Build Content/Build All Sectors`
@@ -133,7 +133,15 @@ power, open decision screen, …), `Last Signal/Diagnostics/*` (UI previews, att
 2. **Spec §16 acceptance checklist** (`The_Last_Signal_Master_Plan.md`): go through every bullet and record evidence
    (test name or screenshot) — useful for the diploma documentation. Admin bullets: admin can unlock sectors/bypass
    progression and manage records; ordinary players cannot.
-3. **Art pass** (biggest visual gap): Medical/Research/Command props are greybox primitives. Replace hero props with
+3. **Art pass** (biggest visual gap) — **started 2026-11-19**: `Tools/blender/build_props.py` builds hero props
+   headlessly (`/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python
+   Tools/blender/build_props.py -- [--preview <dir>] [--only name,…]`); author parts in *Unity* coords (script converts).
+   Builders place them with `PropModels.Place(id, parent, pos, rot, overrides)` and keep the greybox as fallback.
+   Done: cryo pods (Medical), bridge workstations + comms console, captain's chair (Command), valve wheels/bodies
+   (Reactor). User chose **Blender only, no paid generation**. Every new prop collider must keep interactables
+   reachable — `InteractableReachabilityTests` enforces it. Next candidates: captain's console, patient terminal,
+   decode console, Okafor/Rhee desks, cabinet & safe, wall ribs/pipes for the flat walls.
+   Old note: Medical/Research/Command props are greybox primitives. Replace hero props with
    asset-pack or Blender models (Blender MCP available; `generate_3d` may cost the user credits — ask). Keep the palette
    in `ArtDirection.md`. Record every external asset in `Documentation/AssetRegister.md` (licence!).
    Known nits: Nereth through windows looks flat/bright; pod numbers float slightly; admin form input outlines faint on

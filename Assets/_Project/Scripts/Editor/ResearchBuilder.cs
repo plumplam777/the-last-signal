@@ -286,13 +286,13 @@ namespace LastSignal.EditorTools
             term.EditorConfigure("res_booth", "prompt.terminal.use", null, false);
             term.EditorSetTerminal(StationContent.BoothTerminal, glow);
 
-            DockingBayBuilder.BuildRecorder(props, "Recorder_LogRes03", new Vector3(-6.55f, 1.04f, 4.0f), Quaternion.Euler(0, 90, 0), StationContent.LogRes03);
+            DockingBayBuilder.BuildRecorder(props, "Recorder_LogRes03", new Vector3(-6.55f, 1.04f, 4.65f), Quaternion.Euler(0, 90, 0), StationContent.LogRes03);
         }
 
         private static void BuildSafe(Transform props)
         {
             var s = Group("SpecimenSafe", props, new Vector3(4.6f, 0, HalfL - 0.5f)).transform;
-            Box("Body", s, new Vector3(0, 0.75f, 0), new Vector3(1.1f, 1.5f, 0.7f), M.SlateDark);
+            HollowCase("Body", s, new Vector3(0, 0.75f, 0), new Vector3(1.1f, 1.5f, 0.7f), M.SlateDark, 0.08f); // hollow: keycard reachable once open
             Box("Trim", s, new Vector3(0, 1.52f, 0), new Vector3(1.16f, 0.05f, 0.76f), M.Brass, false);
             var label = WorldText("Label", s, new Vector3(0, 1.75f, -0.36f), Quaternion.identity, "res.safe.label", 1.0f, Brass);
             ((RectTransform)label.transform).sizeDelta = new Vector2(1.6f, 0.25f);

@@ -108,6 +108,19 @@ namespace LastSignal.EditorTools
             bool collider = true, Quaternion? rot = null, bool isStatic = true)
             => Prim(PrimitiveType.Cube, name, parent, pos, size, mat, collider, rot, isStatic);
 
+        /// <summary>Open-fronted box (front = local -Z): back, sides, top and bottom panels, so things inside are visible and reachable.</summary>
+        public static GameObject HollowCase(string name, Transform parent, Vector3 center, Vector3 size, Material mat, float wall = 0.05f)
+        {
+            var g = Group(name, parent, center).transform;
+            Vector3 h = size * 0.5f;
+            Box("Back", g, new Vector3(0, 0, h.z - wall * 0.5f), new Vector3(size.x, size.y, wall), mat);
+            Box("Side_L", g, new Vector3(-h.x + wall * 0.5f, 0, 0), new Vector3(wall, size.y, size.z), mat);
+            Box("Side_R", g, new Vector3(h.x - wall * 0.5f, 0, 0), new Vector3(wall, size.y, size.z), mat);
+            Box("Top", g, new Vector3(0, h.y - wall * 0.5f, 0), new Vector3(size.x, wall, size.z), mat);
+            Box("Bottom", g, new Vector3(0, -h.y + wall * 0.5f, 0), new Vector3(size.x, wall, size.z), mat);
+            return g.gameObject;
+        }
+
         public static GameObject Cylinder(string name, Transform parent, Vector3 pos, Vector3 size, Material mat,
             bool collider = true, Quaternion? rot = null, bool isStatic = true)
             => Prim(PrimitiveType.Cylinder, name, parent, pos, size, mat, collider, rot, isStatic);

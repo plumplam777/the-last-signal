@@ -279,6 +279,119 @@ def valve_body():
     cyl(0.13, 0.42, (0, 0, 0.3), "Brass", axis="y", verts=24, bevel=0.01)    # body bulge (vertical)
 
 
+def captain_console():
+    """Captain's console: low wide desk, top tilted +12° towards the chair (operator at -Z). Key glow added by the builder."""
+    box((1.6, 0.86, 0.5), (0, 0.45, 0), "Slate", 0.035)
+    box((1.5, 0.1, 0.44), (0, 0.05, 0.03), "Rubber", 0.01)
+    box((1.4, 0.5, 0.02), (0, 0.45, -0.255), "Steel", 0.006)
+    for x in (-0.47, 0.0, 0.47):
+        box((0.02, 0.44, 0.025), (x, 0.45, -0.265), "Brass", 0.004)
+    for x in (-0.82, 0.82):
+        box((0.05, 0.95, 0.56), (x, 0.47, 0), "Brass", 0.015)
+    box((1.72, 0.04, 0.62), (0, 0.925, 0), "Brass", 0.012, rot=(12, 0, 0))
+    box((1.66, 0.05, 0.56), (0, 0.955, 0), "Slate", 0.015, rot=(12, 0, 0))
+    box((0.36, 0.06, 0.08), (0, 1.0, 0.27), "Steel", 0.01)                   # comms grille at the back
+    for i in range(5):
+        box((0.3, 0.008, 0.008), (0, 1.0 + (i - 2) * 0.012, 0.225), "Rubber", 0.0)
+
+
+def terminal_kiosk():
+    """Patient terminal: cabinet with a front-mounted, tilted screen (glow plane at (0, 1.38, -0.18) by the builder)."""
+    box((1.3, 0.86, 0.55), (0, 0.45, 0), "Slate", 0.035)
+    box((1.2, 0.1, 0.5), (0, 0.05, 0.02), "Rubber", 0.01)
+    box((1.4, 0.05, 0.7), (0, 0.93, 0.05), "Brass", 0.015)
+    box((1.1, 0.42, 0.02), (0, 0.45, -0.28), "Ceramic", 0.008)               # clinical white front panel
+    box((0.5, 0.06, 0.03), (0, 0.6, -0.295), "Steel", 0.006)                 # handle
+    box((0.12, 0.3, 0.1), (0, 1.1, -0.05), "Steel", 0.01)                    # screen arm
+    box((1.02, 0.66, 0.06), (0, 1.38, -0.13), "Slate", 0.015, rot=(-10, 0, 0))
+    box((1.06, 0.7, 0.03), (0, 1.38, -0.1), "Brass", 0.008, rot=(-10, 0, 0))
+    box((0.06, 0.06, 0.02), (0.45, 1.06, -0.165), "Cyan", 0.0, rot=(-10, 0, 0))  # status LED
+
+
+def decode_console():
+    """Research decode console: pedestal + desk tilted -15° (the six key interactables sit on it) + symbol display housing."""
+    box((1.8, 0.96, 0.5), (0, 0.5, 0), "Slate", 0.035)
+    box((1.7, 0.1, 0.44), (0, 0.05, 0.03), "Rubber", 0.01)
+    for x in (-0.6, 0.0, 0.6):
+        box((0.5, 0.6, 0.02), (x, 0.5, -0.255), "Steel", 0.006)
+    for x in (-0.92, 0.92):
+        box((0.05, 1.08, 0.58), (x, 0.52, -0.02), "Brass", 0.015)
+    box((1.92, 0.06, 0.62), (0, 1.03, -0.05), "Brass", 0.015, rot=(-15, 0, 0))
+    box((1.86, 0.04, 0.56), (0, 1.06, -0.05), "Slate", 0.01, rot=(-15, 0, 0))
+    box((1.9, 0.42, 0.1), (0, 1.36, 0.27), "Slate", 0.02)                    # display housing (text at z 0.2)
+    box((1.94, 0.46, 0.04), (0, 1.36, 0.31), "Brass", 0.01)
+
+
+def desk():
+    """Desk along Z (2.0 m), top at y 0.8, wall side = +X, drawer pedestal at +Z. Scale Z for longer desks."""
+    box((1.1, 0.05, 2.0), (0, 0.8, 0), "Slate", 0.015)
+    box((1.14, 0.03, 2.04), (0, 0.765, 0), "Brass", 0.008)
+    box((0.85, 0.74, 0.62), (0.1, 0.38, 0.62), "Steel", 0.02)                # drawer pedestal
+    for i in range(3):
+        y = 0.16 + i * 0.22
+        box((0.02, 0.18, 0.54), (-0.33, y + 0.02, 0.62), "Slate", 0.006)
+        box((0.025, 0.025, 0.16), (-0.35, y + 0.07, 0.62), "Brass", 0.004)
+    box((0.05, 0.74, 0.06), (-0.45, 0.38, -0.92), "Slate", 0.01)             # legs at the open end
+    box((0.05, 0.74, 0.06), (0.45, 0.38, -0.92), "Slate", 0.01)
+    box((0.04, 0.5, 1.7), (0.5, 0.45, 0.0), "Slate", 0.01)                   # modesty panel (wall side)
+
+
+def office_chair():
+    """Small swivel chair, faces +Z. Seat at y 0.48."""
+    cyl(0.24, 0.04, (0, 0.02, 0), "Steel", bevel=0.01, verts=24)
+    for a in range(5):
+        ang = math.radians(a * 72)
+        box((0.05, 0.04, 0.26), (math.sin(ang) * 0.14, 0.05, math.cos(ang) * 0.14), "Steel", 0.01, rot=(0, a * 72, 0))
+    cyl(0.04, 0.36, (0, 0.24, 0), "Steel", bevel=0.004)
+    box((0.48, 0.09, 0.46), (0, 0.46, 0), "Rubber", 0.035, segments=3)
+    box((0.44, 0.48, 0.07), (0, 0.8, -0.23), "Rubber", 0.03, rot=(-8, 0, 0), segments=3)
+    box((0.04, 0.3, 0.04), (0, 0.6, -0.24), "Brass", 0.006)
+
+
+def cabinet_case():
+    """Secure cabinet shell 1.2 x 2.0 x 0.5, open front (-Z), origin at the floor centre. Doors are separate (builder)."""
+    w, h, d, t = 1.2, 2.0, 0.5, 0.05
+    box((w, h, t), (0, h / 2, d / 2 - t / 2), "Slate", 0.01)
+    for x in (-1, 1):
+        box((t, h, d), (x * (w / 2 - t / 2), h / 2, 0), "Slate", 0.01)
+        box((0.06, h + 0.02, 0.06), (x * (w / 2 - 0.02), h / 2, -d / 2 + 0.02), "Brass", 0.012)   # corner posts
+    box((w, t, d), (0, h - t / 2, 0), "Slate", 0.01)
+    box((w, t, d), (0, t / 2, 0), "Slate", 0.01)
+    box((w + 0.06, 0.06, d + 0.06), (0, h + 0.02, 0), "Brass", 0.012)
+    box((w + 0.04, 0.1, d + 0.04), (0, 0.05, 0), "Rubber", 0.01)
+    box((0.28, 0.12, 0.02), (0, h - 0.18, -d / 2 + 0.005), "Steel", 0.005)   # label plate
+
+
+def safe_case():
+    """Specimen safe shell 1.1 x 1.5 x 0.7, thick walls, open front (-Z). Door separate (builder)."""
+    w, h, d, t = 1.1, 1.5, 0.7, 0.08
+    box((w, h, t), (0, h / 2, d / 2 - t / 2), "Steel", 0.015)
+    for x in (-1, 1):
+        box((t, h, d), (x * (w / 2 - t / 2), h / 2, 0), "Steel", 0.015)
+    box((w, t, d), (0, h - t / 2, 0), "Steel", 0.015)
+    box((w, t, d), (0, t / 2, 0), "Steel", 0.015)
+    box((w + 0.04, 0.08, d + 0.04), (0, -0.0 + 0.04, 0), "Slate", 0.012)
+    for x in (-1, 1):                                                        # front frame rails with rivets
+        box((0.05, h, 0.04), (x * (w / 2 - 0.025), h / 2, -d / 2 + 0.01), "Brass", 0.01)
+        for i in range(6):
+            cyl(0.012, 0.02, (x * (w / 2 - 0.025), 0.15 + i * 0.24, -d / 2 - 0.012), "Steel", axis="z", verts=8, bevel=0.0)
+    for y in (0.35, 1.15):                                                   # hinge barrels (left)
+        cyl(0.03, 0.18, (-w / 2 - 0.02, y, -d / 2), "Brass", axis="y", verts=12, bevel=0.004)
+
+
+def pipe_run():
+    """2 m pipe segment along X, mounted on a wall at z = 0 and sticking out towards -Z. Tile it along walls."""
+    for x in (-0.75, 0.25):                                                  # wall brackets
+        box((0.08, 0.36, 0.05), (x, 0.0, -0.025), "Slate", 0.01)
+        box((0.05, 0.05, 0.26), (x, 0.11, -0.13), "Steel", 0.008)
+        box((0.05, 0.05, 0.2), (x, -0.11, -0.1), "Steel", 0.008)
+        torus(0.085, 0.015, (x, 0.11, -0.22), "Brass", axis="x", major_seg=20, minor_seg=6)
+        torus(0.06, 0.012, (x, -0.11, -0.16), "Brass", axis="x", major_seg=20, minor_seg=6)
+    cyl(0.07, 2.0, (0, 0.11, -0.22), "Brass", axis="x", verts=20, bevel=0.0)  # coolant line
+    cyl(0.045, 2.0, (0, -0.11, -0.16), "Steel", axis="x", verts=16, bevel=0.0)  # cable conduit
+    cyl(0.085, 0.06, (0.98, 0.11, -0.22), "Steel", axis="x", verts=20, bevel=0.005)  # flange at the joint
+
+
 PROPS = [
     ("prop_cryo_pod_base", cryo_pod_base),
     ("prop_cryo_pod_canopy", cryo_pod_canopy),
@@ -286,6 +399,14 @@ PROPS = [
     ("prop_captain_chair", captain_chair),
     ("prop_valve_wheel", valve_wheel),
     ("prop_valve_body", valve_body),
+    ("prop_captain_console", captain_console),
+    ("prop_terminal_kiosk", terminal_kiosk),
+    ("prop_decode_console", decode_console),
+    ("prop_desk", desk),
+    ("prop_office_chair", office_chair),
+    ("prop_cabinet_case", cabinet_case),
+    ("prop_safe_case", safe_case),
+    ("prop_pipe_run", pipe_run),
 ]
 
 

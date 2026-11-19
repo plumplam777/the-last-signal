@@ -123,6 +123,8 @@ namespace LastSignal.EditorTools
                 off.Add(Box($"EmergencyGlow_{p.z:0}", r, p + new Vector3(-Mathf.Sign(p.x) * 0.06f, 0, 0), new Vector3(0.02f, 0.08f, 0.38f), M.RedLamp, false, null, false));
                 off.Add(PointLight($"EmergencyLight_{p.z:0}", r, p + new Vector3(-Mathf.Sign(p.x) * 0.6f, -0.3f, 0), EmergencyRed, 1.4f, 6f).gameObject);
             }
+            PropModels.PipeRun(r, "Pipes_W", new Vector3(-HalfW, H - 0.55f, -HalfL), new Vector3(-HalfW, H - 0.55f, HalfL), -90f);
+            PropModels.PipeRun(r, "Pipes_E", new Vector3(HalfW, H - 0.55f, -HalfL), new Vector3(HalfW, H - 0.55f, HalfL), 90f);
             // red cross over the south hatch, "Medical" sign
             WorldText("Sign_Medical", r, new Vector3(0, 3.3f, -HalfL + 0.02f), Quaternion.Euler(0, 180, 0), "sector.medical.name", 2.6f, TealLight);
         }
@@ -213,12 +215,21 @@ namespace LastSignal.EditorTools
         private static void BuildOkaforDesk(Transform props)
         {
             var d = Group("OkaforDesk", props, new Vector3(4.9f, 0, -2.8f)).transform;
-            Box("Top", d, new Vector3(0, 0.8f, 0), new Vector3(1.1f, 0.06f, 2.0f), M.SlateDark);
-            Box("Trim", d, new Vector3(0, 0.77f, 0), new Vector3(1.14f, 0.03f, 2.04f), M.Brass, false);
-            Box("Drawers", d, new Vector3(0.1f, 0.38f, 0.6f), new Vector3(0.8f, 0.76f, 0.7f), _clinical);
-            Box("Leg", d, new Vector3(0.1f, 0.38f, -0.85f), new Vector3(0.8f, 0.76f, 0.08f), M.SlateDark, false);
+            if (PropModels.Place("prop_desk", d, Vector3.zero) != null)
+            {
+                PropModels.Solid(d, new Vector3(0, 0.4f, 0), new Vector3(1.1f, 0.82f, 2.0f));
+                PropModels.Place("prop_office_chair", props, new Vector3(4.0f, 0, -2.8f), Quaternion.Euler(0, 90, 0), name: "Chair");
+                PropModels.Solid(props.Find("Chair"), new Vector3(0, 0.45f, 0), new Vector3(0.5f, 0.9f, 0.5f));
+            }
+            else
+            {
+                Box("Top", d, new Vector3(0, 0.8f, 0), new Vector3(1.1f, 0.06f, 2.0f), M.SlateDark);
+                Box("Trim", d, new Vector3(0, 0.77f, 0), new Vector3(1.14f, 0.03f, 2.04f), M.Brass, false);
+                Box("Drawers", d, new Vector3(0.1f, 0.38f, 0.6f), new Vector3(0.8f, 0.76f, 0.7f), _clinical);
+                Box("Leg", d, new Vector3(0.1f, 0.38f, -0.85f), new Vector3(0.8f, 0.76f, 0.08f), M.SlateDark, false);
+                Box("Chair", props, new Vector3(4.0f, 0.45f, -2.8f), new Vector3(0.5f, 0.08f, 0.5f), M.Rubber);
+            }
             Box("PrayerBook", d, new Vector3(-0.15f, 0.86f, 0.55f), new Vector3(0.22f, 0.05f, 0.3f), M.Terracotta, false, Quaternion.Euler(0, 8, 0));
-            Box("Chair", props, new Vector3(4.0f, 0.45f, -2.8f), new Vector3(0.5f, 0.08f, 0.5f), M.Rubber);
             // battery desk lamp: the one warm light in the room (always on)
             var lamp = Group("DeskLamp", d, new Vector3(0.25f, 0.83f, -0.6f)).transform;
             Cylinder("Base", lamp, Vector3.zero, new Vector3(0.18f, 0.02f, 0.18f), M.Brass, false);
@@ -247,9 +258,12 @@ namespace LastSignal.EditorTools
             var col = desk.AddComponent<BoxCollider>();
             col.size = new Vector3(1.4f, 1.6f, 0.8f);
             col.center = new Vector3(0, 0.8f, 0);
-            Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.3f, 0.9f, 0.55f), M.SlateDark, false);
-            Box("Top", t, new Vector3(0, 0.93f, 0.05f), new Vector3(1.4f, 0.06f, 0.7f), M.Brass, false);
-            Box("Screen", t, new Vector3(0, 1.38f, -0.15f), new Vector3(0.95f, 0.6f, 0.05f), M.SlateDark, false, Quaternion.Euler(-10, 0, 0));
+            if (PropModels.Place("prop_terminal_kiosk", t, Vector3.zero) == null)
+            {
+                Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.3f, 0.9f, 0.55f), M.SlateDark, false);
+                Box("Top", t, new Vector3(0, 0.93f, 0.05f), new Vector3(1.4f, 0.06f, 0.7f), M.Brass, false);
+                Box("Screen", t, new Vector3(0, 1.38f, -0.15f), new Vector3(0.95f, 0.6f, 0.05f), M.SlateDark, false, Quaternion.Euler(-10, 0, 0));
+            }
             var glow = Box("ScreenGlow", t, new Vector3(0, 1.38f, -0.18f), new Vector3(0.88f, 0.53f, 0.005f), M.CyanStrip, false, Quaternion.Euler(-10, 0, 0), false);
             var term = desk.AddComponent<TerminalInteractable>();
             term.EditorConfigure("med_patient", "prompt.terminal.use", null, false,
@@ -267,7 +281,8 @@ namespace LastSignal.EditorTools
         private static void BuildCabinet(Transform props)
         {
             var c = Group("SecureCabinet", props, new Vector3(3.4f, 0, HalfL - 0.35f)).transform;
-            HollowCase("Body", c, new Vector3(0, 1.0f, 0), new Vector3(1.2f, 2.0f, 0.5f), M.SlateDark); // hollow: the keycard inside must be visible and reachable
+            bool caseModel = PropModels.Place("prop_cabinet_case", c, Vector3.zero) != null;
+            HideRenderers(HollowCase("Body", c, new Vector3(0, 1.0f, 0), new Vector3(1.2f, 2.0f, 0.5f), M.SlateDark), caseModel); // hollow: the keycard inside must be visible and reachable
             Box("Shelf", c, new Vector3(0, 1.2f, -0.02f), new Vector3(1.1f, 0.04f, 0.42f), M.Brass, false);
             var label = WorldText("Label", c, new Vector3(0, 2.25f, -0.26f), Quaternion.identity, "med.cabinet.label", 1.1f, EmergencyRed);
             ((RectTransform)label.transform).sizeDelta = new Vector2(1.4f, 0.4f);

@@ -99,6 +99,8 @@ namespace LastSignal.EditorTools
         {
             var r = Group("Room", env).transform;
             Box("Floor", r, new Vector3(0, -0.1f, 0), new Vector3(HalfW * 2, 0.2f, HalfL * 2), M.Floor);
+            PropModels.PipeRun(r, "Pipes_W", new Vector3(-HalfW, H - 0.55f, -HalfL), new Vector3(-HalfW, H - 0.55f, HalfL), -90f);
+            PropModels.PipeRun(r, "Pipes_S", new Vector3(-HalfW, H - 0.55f, -HalfL), new Vector3(HalfW, H - 0.55f, -HalfL), 180f);
             Box("Ceiling", r, new Vector3(0, H + 0.1f, 0), new Vector3(HalfW * 2, 0.2f, HalfL * 2), M.Ceiling);
             Box("Wall_W", r, new Vector3(-HalfW - 0.1f, H / 2, 0), new Vector3(0.2f, H + 0.2f, HalfL * 2), _wallDark);
             Box("Wall_E", r, new Vector3(HalfW + 0.1f, H / 2, 0), new Vector3(0.2f, H + 0.2f, HalfL * 2), _wallDark);
@@ -183,8 +185,13 @@ namespace LastSignal.EditorTools
             var c = Group("DecodeConsole", props, new Vector3(5.1f, 0, 1.0f));
             c.transform.localRotation = Quaternion.Euler(0, 90, 0); // player stands west of it, facing the wall
             var t = c.transform;
-            Box("Pedestal", t, new Vector3(0, 0.5f, 0), new Vector3(1.8f, 1.0f, 0.5f), M.SlateDark);
-            Box("Desk", t, new Vector3(0, 1.05f, -0.05f), new Vector3(1.9f, 0.08f, 0.6f), M.Brass, false, Quaternion.Euler(-15, 0, 0));
+            if (PropModels.Place("prop_decode_console", t, Vector3.zero) != null)
+                PropModels.Solid(t, new Vector3(0, 0.5f, 0), new Vector3(1.8f, 1.0f, 0.5f));
+            else
+            {
+                Box("Pedestal", t, new Vector3(0, 0.5f, 0), new Vector3(1.8f, 1.0f, 0.5f), M.SlateDark);
+                Box("Desk", t, new Vector3(0, 1.05f, -0.05f), new Vector3(1.9f, 0.08f, 0.6f), M.Brass, false, Quaternion.Euler(-15, 0, 0));
+            }
             var display = RawText("Display", t, new Vector3(0, 1.36f, 0.2f), Quaternion.identity, "_  _  _  _  _  _", 2.0f, Color.white);
             ((RectTransform)display.transform).sizeDelta = new Vector2(1.8f, 0.3f);
             display.characterSpacing = 0;
@@ -226,12 +233,21 @@ namespace LastSignal.EditorTools
         private static void BuildRheeDesk(Transform props)
         {
             var d = Group("RheeDesk", props, new Vector3(-5.9f, 0, -3.5f)).transform;
-            Box("Top", d, new Vector3(0, 0.8f, 0), new Vector3(1.1f, 0.06f, 2.6f), M.SlateDark);
-            Box("Trim", d, new Vector3(0, 0.77f, 0), new Vector3(1.14f, 0.03f, 2.64f), M.Brass, false);
-            Box("Body", d, new Vector3(0.1f, 0.38f, 0), new Vector3(0.9f, 0.76f, 2.4f), _wallDark);
+            if (PropModels.Place("prop_desk", d, Vector3.zero, Quaternion.Euler(0, 180, 0), scale: new Vector3(1f, 1f, 1.3f)) != null)
+            {
+                PropModels.Solid(d, new Vector3(0, 0.4f, 0), new Vector3(1.1f, 0.82f, 2.6f));
+                PropModels.Place("prop_office_chair", props, new Vector3(-4.9f, 0, -3.5f), Quaternion.Euler(0, -90, 0), name: "Chair");
+                PropModels.Solid(props.Find("Chair"), new Vector3(0, 0.45f, 0), new Vector3(0.5f, 0.9f, 0.5f));
+            }
+            else
+            {
+                Box("Top", d, new Vector3(0, 0.8f, 0), new Vector3(1.1f, 0.06f, 2.6f), M.SlateDark);
+                Box("Trim", d, new Vector3(0, 0.77f, 0), new Vector3(1.14f, 0.03f, 2.64f), M.Brass, false);
+                Box("Body", d, new Vector3(0.1f, 0.38f, 0), new Vector3(0.9f, 0.76f, 2.4f), _wallDark);
+                Box("Chair", props, new Vector3(-4.9f, 0.45f, -3.5f), new Vector3(0.5f, 0.08f, 0.5f), M.Rubber);
+            }
             Box("Monitor", d, new Vector3(-0.3f, 1.2f, 0.3f), new Vector3(0.05f, 0.5f, 0.8f), M.SlateDark, false);
             Box("MonitorGlow", d, new Vector3(-0.27f, 1.2f, 0.3f), new Vector3(0.01f, 0.44f, 0.74f), _screen, false);
-            Box("Chair", props, new Vector3(-4.9f, 0.45f, -3.5f), new Vector3(0.5f, 0.08f, 0.5f), M.Rubber);
             PointLight("DeskGlow", d, new Vector3(0.4f, 1.4f, 0), Amber, 0.9f, 3.5f);
 
             // sticky notes on the wall above the desk: many small ones, one large, one half hidden
@@ -292,7 +308,8 @@ namespace LastSignal.EditorTools
         private static void BuildSafe(Transform props)
         {
             var s = Group("SpecimenSafe", props, new Vector3(4.6f, 0, HalfL - 0.5f)).transform;
-            HollowCase("Body", s, new Vector3(0, 0.75f, 0), new Vector3(1.1f, 1.5f, 0.7f), M.SlateDark, 0.08f); // hollow: keycard reachable once open
+            bool caseModel = PropModels.Place("prop_safe_case", s, Vector3.zero) != null;
+            HideRenderers(HollowCase("Body", s, new Vector3(0, 0.75f, 0), new Vector3(1.1f, 1.5f, 0.7f), M.SlateDark, 0.08f), caseModel); // hollow: keycard reachable once open
             Box("Trim", s, new Vector3(0, 1.52f, 0), new Vector3(1.16f, 0.05f, 0.76f), M.Brass, false);
             var label = WorldText("Label", s, new Vector3(0, 1.75f, -0.36f), Quaternion.identity, "res.safe.label", 1.0f, Brass);
             ((RectTransform)label.transform).sizeDelta = new Vector2(1.6f, 0.25f);

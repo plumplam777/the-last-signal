@@ -23,7 +23,7 @@ namespace LastSignal.EditorTools
 
         /// <summary>Instantiates the model under <paramref name="parent"/> (pivot = floor centre, front = local −Z unless noted).</summary>
         public static GameObject Place(string id, Transform parent, Vector3 localPos, Quaternion? localRot = null,
-            IDictionary<string, Material> overrides = null, string name = null)
+            IDictionary<string, Material> overrides = null, string name = null, Vector3? scale = null)
         {
             var asset = AssetDatabase.LoadAssetAtPath<GameObject>(PathOf(id));
             if (asset == null)
@@ -36,7 +36,7 @@ namespace LastSignal.EditorTools
             go.name = name ?? $"Model_{id}";
             go.transform.localPosition = localPos;
             go.transform.localRotation = localRot ?? Quaternion.identity;
-            go.transform.localScale = Vector3.one;
+            go.transform.localScale = scale ?? Vector3.one;
             foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
             {
                 r.sharedMaterials = r.sharedMaterials.Select(m => Remap(m, overrides)).ToArray();
@@ -44,6 +44,34 @@ namespace LastSignal.EditorTools
                 GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.ContributeGI | StaticEditorFlags.ReflectionProbeStatic | StaticEditorFlags.BatchingStatic);
             }
             return go;
+        }
+
+        /// <summary>Invisible box collider child (models carry no colliders of their own).</summary>
+        public static BoxCollider Solid(Transform parent, Vector3 center, Vector3 size, string name = "Collider")
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            var col = go.AddComponent<BoxCollider>();
+            col.center = center;
+            col.size = size;
+            return col;
+        }
+
+        /// <summary>
+        /// Tiles 2 m pipe segments along a wall. <paramref name="from"/>/<paramref name="to"/> are points on the wall face
+        /// (same height); <paramref name="yaw"/> turns the segment's front (-Z) to face the room. Visual only.
+        /// </summary>
+        public static void PipeRun(Transform parent, string name, Vector3 from, Vector3 to, float yaw)
+        {
+            if (!Exists("prop_pipe_run")) return;
+            var group = new GameObject(name).transform;
+            group.SetParent(parent, false);
+            float length = Vector3.Distance(from, to);
+            int count = Mathf.Max(1, Mathf.FloorToInt(length / 2f + 0.01f));
+            float start = (length - count * 2f) / 2f + 1f;
+            var dir = (to - from).normalized;
+            for (int i = 0; i < count; i++)
+                Place("prop_pipe_run", group, from + dir * (start + i * 2f), Quaternion.Euler(0, yaw, 0), name: $"Pipe_{i}");
         }
 
         private static Material _steel;

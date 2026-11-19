@@ -121,6 +121,19 @@ namespace LastSignal.EditorTools
             return g.gameObject;
         }
 
+        /// <summary>Removes the renderers under <paramref name="go"/> (keeps colliders) when a model replaces the greybox look.</summary>
+        public static GameObject HideRenderers(GameObject go, bool hide = true)
+        {
+            if (!hide) return go;
+            foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                var mf = r.GetComponent<MeshFilter>();
+                Object.DestroyImmediate(r);
+                if (mf != null) Object.DestroyImmediate(mf);
+            }
+            return go;
+        }
+
         public static GameObject Cylinder(string name, Transform parent, Vector3 pos, Vector3 size, Material mat,
             bool collider = true, Quaternion? rot = null, bool isStatic = true)
             => Prim(PrimitiveType.Cylinder, name, parent, pos, size, mat, collider, rot, isStatic);

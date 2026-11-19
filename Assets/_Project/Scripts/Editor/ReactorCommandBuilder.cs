@@ -303,6 +303,8 @@ namespace LastSignal.EditorTools
                 Emissive("M_Nereth_Night", Hex("#1E4E7A"), 0.5f, Hex("#0B1A2A")));
             planet.AddComponent<EmissionPulse>().EditorSet(Hex("#2F8FD8"), 0.15f, 1.2f, 40f / 6f, 0.3f);
             Box("Band", r, new Vector3(0, 1.0f, -CmdHalfL + 0.03f), new Vector3(CmdHalfW * 2, 0.18f, 0.05f), M.Terracotta, false);
+            PropModels.PipeRun(r, "Pipes_W", new Vector3(-CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(-CmdHalfW, CmdH - 0.55f, CmdHalfL), -90f);
+            PropModels.PipeRun(r, "Pipes_E", new Vector3(CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(CmdHalfW, CmdH - 0.55f, CmdHalfL), 90f);
 
             int i = 0;
             foreach (var p in new[] { new Vector3(-3.5f, CmdH - 0.05f, -2f), new Vector3(3.5f, CmdH - 0.05f, -2f), new Vector3(0, CmdH - 0.05f, 2f) })
@@ -370,8 +372,11 @@ namespace LastSignal.EditorTools
             // captain's console in front of the chair: CAIRN's confrontation, then the decision
             var cap = Group("CaptainConsole", p, new Vector3(0, 0, 0.3f));
             var ct = cap.transform;
-            Box("Body", ct, new Vector3(0, 0.45f, 0), new Vector3(1.6f, 0.9f, 0.5f), _console);
-            Box("Top", ct, new Vector3(0, 0.95f, 0), new Vector3(1.7f, 0.06f, 0.6f), M.Brass, false, Quaternion.Euler(12, 0, 0));
+            if (PropModels.Place("prop_captain_console", ct, Vector3.zero) == null)
+            {
+                Box("Body", ct, new Vector3(0, 0.45f, 0), new Vector3(1.6f, 0.9f, 0.5f), _console);
+                Box("Top", ct, new Vector3(0, 0.95f, 0), new Vector3(1.7f, 0.06f, 0.6f), M.Brass, false, Quaternion.Euler(12, 0, 0));
+            }
             var glow = Box("KeyGlow", ct, new Vector3(0, 0.99f, 0), new Vector3(1.4f, 0.01f, 0.4f), _consoleGlow, false, Quaternion.Euler(12, 0, 0), false);
             Box("LockoutPlate", ct, new Vector3(0.55f, 1.0f, 0.05f), new Vector3(0.3f, 0.02f, 0.2f), M.RedLamp, false, Quaternion.Euler(12, 0, 0));
             var col = cap.AddComponent<BoxCollider>();

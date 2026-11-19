@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6216333faa7a14f4ebad499cdd71c2c2, type: 3}
+  m_Name: log_med_03
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Audio.AudioLogDefinition
+  id: log_med_03
+  sectorId: medical
+  titleKey: log.log_med_03.title
+  speakerKey: speaker.okafor
+  dateKey: date.day_m9
+  englishClip: {fileID: 8300000, guid: f6552cbfb339343cd8f747c9a065e814, type: 3}
+  bulgarianClip: {fileID: 8300000, guid: 80dec4471a4024caa9610ab5b0c476b1, type: 3}
+  fallbackDuration: 35.812
+  critical: 0
+  countsForHiddenEnding: 1
+  subtitles:
+  - start: 0.6
+    startBg: 0.6
+    textKey: log.log_med_03.line.1
+  - start: 2.746
+    startBg: 2.508
+    textKey: log.log_med_03.line.2
+  - start: 10.175
+    startBg: 12.331
+    textKey: log.log_med_03.line.3
+  - start: 15.078
+    startBg: 18.7
+    textKey: log.log_med_03.line.4
+  - start: 17.364
+    startBg: 20.792
+    textKey: log.log_med_03.line.5
+  - start: 23.772
+    startBg: 27.494
+    textKey: log.log_med_03.line.6
+  - start: 27.903
+    startBg: 33.542
+    textKey: log.log_med_03.line.7
+  - start: 32.604
+    startBg: 38.966
+    textKey: log.log_med_03.line.8

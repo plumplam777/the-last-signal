@@ -36,11 +36,17 @@ CAST = {
     "kaye":  {"en": ("Karen", 182, 1.0, False), "bg": ("Daria", 178, 1.05, False)},
     "dunn":  {"en": ("Tessa", 150, 1.0, True), "bg": ("Daria", 145, 0.95, True)},
     "noa":   {"en": ("Samantha", 172, 1.0, False), "bg": ("Daria", 168, 1.02, False)},
+    "okafor": {"en": ("Ralph", 150, 1.0, False), "bg": ("Daria", 138, 0.8, False)},
+    # the captain's own notebook recorder in Command: same voice, no radio filter
+    "dunn_log": {"en": ("Tessa", 150, 1.0, False), "bg": ("Daria", 145, 0.95, False)},
 }
 
 LOG_SPEAKERS = {
     "log_dock_01": "jonah", "log_dock_02": "rhee",
     "log_eng_01": "kaye", "log_eng_02": "kaye", "log_eng_03": "kaye",
+    "log_med_01": "okafor", "log_med_02": "okafor", "log_med_03": "okafor",
+    "log_res_01": "rhee", "log_res_02": "rhee", "log_res_03": "cairn",
+    "log_core_01": "dunn_log", "log_core_02": "dunn", "log_core_03": "rhee",
 }
 
 CUTSCENE_SPEAKERS = {

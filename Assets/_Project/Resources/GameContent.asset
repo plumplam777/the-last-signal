@@ -16,15 +16,30 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8020d79a78d86493ba57a2c5f1697a4f, type: 2}
   - {fileID: 11400000, guid: 34cd3e0a09f8f47ed9a83816fc420304, type: 2}
   - {fileID: 11400000, guid: 67e73e0a3cf4041bd86e9352a1c55960, type: 2}
+  - {fileID: 11400000, guid: b7efd8bfc0cf24e3b8cf28b86d4f1b48, type: 2}
+  - {fileID: 11400000, guid: c128115c359174accac8c2db18f896a3, type: 2}
   audioLogs:
   - {fileID: 11400000, guid: 121c325f30a63460ea035bb391daecd5, type: 2}
   - {fileID: 11400000, guid: c6fdd9ce723184427a410bf6f9e67b0e, type: 2}
   - {fileID: 11400000, guid: 1876498c7204f4a69b0bd1b76a1fc4f8, type: 2}
   - {fileID: 11400000, guid: 655aae13ef0744aee9d82dbd3bbf63ce, type: 2}
   - {fileID: 11400000, guid: b4d5bd79b226541fdbe46390a1a76b7e, type: 2}
+  - {fileID: 11400000, guid: dc57a993155db4feba619ca437c4d82d, type: 2}
+  - {fileID: 11400000, guid: a3a3e7328abbd431693438837aed98d6, type: 2}
+  - {fileID: 11400000, guid: 6bdf51b0c9bd34522b8b1bd312c55051, type: 2}
+  - {fileID: 11400000, guid: 3152d536941814649bc757dd04ca590f, type: 2}
+  - {fileID: 11400000, guid: 8bfe0a56fbfdc42f89c54adceb5f68b0, type: 2}
+  - {fileID: 11400000, guid: aa5aa547563d34d4792b4711e6ec19c1, type: 2}
+  - {fileID: 11400000, guid: e5a113c0419f4477887b92a2a64ffb00, type: 2}
+  - {fileID: 11400000, guid: 593c81893d12a4185bf91b6f425f0d32, type: 2}
+  - {fileID: 11400000, guid: ee6f3cfb02c95431681b11379c837cfe, type: 2}
   quests:
   - {fileID: 11400000, guid: 50c9b548a4af4470cb524927752e8ffc, type: 2}
   terminals:
   - {fileID: 11400000, guid: 7b0ce5c3816684c70baf27c9b1510dc4, type: 2}
   - {fileID: 11400000, guid: 93068dcc64559497a8b9f0c772bbb6ba, type: 2}
   - {fileID: 11400000, guid: 9ba3bbcb9204b406c9d716f988e10e4f, type: 2}
+  - {fileID: 11400000, guid: 84599572788ea4328a17cfd003b9b0df, type: 2}
+  - {fileID: 11400000, guid: fd6fb12cc5fde4e25a08ebc0437117a9, type: 2}
+  - {fileID: 11400000, guid: a2267620f20bd469581e64fd662d0dda, type: 2}
+  - {fileID: 11400000, guid: e34535caeea4e48f8a54a91717c3951c, type: 2}

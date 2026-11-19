@@ -62,13 +62,14 @@ namespace LastSignal.Tests
             Assert.IsTrue(screen.IsOpen);
             screen.Pick(EndingType.Silence); // not available without 14 logs → ignored
             Assert.AreEqual(string.Empty, GameServices.World.GetString(EndingScript.ChoiceKey, string.Empty));
-            screen.Pick(EndingType.Destroy);
+            // B goes straight to the ending scene (A is played as the escape run: see EscapeTests)
+            screen.Pick(EndingType.Restore);
             screen.Confirm();
-            Assert.AreEqual("destroy", GameServices.World.GetString(EndingScript.ChoiceKey));
+            Assert.AreEqual("restore", GameServices.World.GetString(EndingScript.ChoiceKey));
             yield return WaitForScene(SceneIds.Ending, 10f);
             Assert.AreEqual(SceneIds.Ending, SceneManager.GetActiveScene().name);
             var ending = Object.FindAnyObjectByType<EndingController>();
-            Assert.AreEqual(EndingType.Destroy, ending.Type);
+            Assert.AreEqual(EndingType.Restore, ending.Type);
 
             Time.timeScale = 60f;
             yield return WaitForScene(SceneIds.MainMenu, 30f);

@@ -74,6 +74,7 @@ namespace LastSignal.EditorTools
                 });
             EditorUtility.SetDirty(BayTerminal);
 
+            StationContent.CreateAll(registry); // quest objectives below reference its assets
             MainQuest = Asset<QuestDefinition>(QuestsFolder, "quest_main");
             MainQuest.EditorInit("main", "quest.main.title", true, new List<ObjectiveDefinition>
             {
@@ -90,6 +91,18 @@ namespace LastSignal.EditorTools
                 Objective("obj_06", new ConditionSet { conditions = { new Condition { type = ConditionType.PuzzleSolved, key = EngineeringContent.GeneratorPuzzleId } } }),
                 Objective("obj_07", new ConditionSet { conditions = { new Condition { type = ConditionType.PuzzleSolved, key = EngineeringContent.RoutingPuzzleId } } }),
                 Objective("obj_07b", new ConditionSet { conditions = { Condition.Flag(WorldKeys.SectorVisited(SectorIds.Medical)) } }),
+                // Phase 6 (StoryBible §11)
+                Objective("obj_08", Solved(StationContent.PatientTerminalPuzzleId)),
+                Objective("obj_09", new ConditionSet { conditions = { Condition.Item(StationContent.KeycardResearch) } }),
+                Objective("obj_10", new ConditionSet { conditions = { Condition.Flag(WorldKeys.SectorVisited(SectorIds.Research)) } }),
+                Objective("obj_11", Solved(StationContent.DecodePuzzleId)),
+                Objective("obj_12", new ConditionSet { conditions = { Condition.Item(StationContent.KeycardCore) } }),
+                Objective("obj_13", new ConditionSet { conditions = { Condition.Flag(WorldKeys.SectorVisited(SectorIds.Reactor)) } }),
+                Objective("obj_14", Solved(StationContent.ReactorPuzzleId)),
+                Objective("obj_14b", new ConditionSet { conditions = { Condition.Flag(StationContent.CommandReachedFlag) } }),
+                Objective("obj_15", new ConditionSet { conditions = { new Condition { type = ConditionType.LogCollected, key = "log_core_02" } } }),
+                Objective("obj_16", new ConditionSet { conditions = { Condition.Flag(WorldKeys.Story("ending_reached")) } }),
+                Objective("obj_17a", new ConditionSet { conditions = { Condition.Flag(WorldKeys.Story("escaped")) } }),
             });
             EditorUtility.SetDirty(MainQuest);
 
@@ -107,6 +120,9 @@ namespace LastSignal.EditorTools
             so.FindProperty("inspectPrefab").objectReferenceValue = prefab;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
+
+        private static ConditionSet Solved(string puzzleId)
+            => new() { conditions = { new Condition { type = ConditionType.PuzzleSolved, key = puzzleId } } };
 
         private static ObjectiveDefinition Objective(string id, ConditionSet completeWhen)
             => new() { id = id, textKey = $"obj.{id}", completeWhen = completeWhen };

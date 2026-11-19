@@ -10,6 +10,9 @@ namespace LastSignal.EditorTools
         {
             DockingBayBuilder.Build();
             EngineeringBuilder.Build();
+            MedicalBuilder.Build();
+            ResearchBuilder.Build();
+            ReactorCommandBuilder.Build();
             CutsceneBuilder.Build();
             EndingBuilder.Build();
             MainMenuBuilder.Build();

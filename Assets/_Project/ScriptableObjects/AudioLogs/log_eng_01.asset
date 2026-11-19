@@ -19,31 +19,31 @@ MonoBehaviour:
   dateKey: date.day_m33
   englishClip: {fileID: 8300000, guid: e1624cd42cb7e4f48815cece77a6f013, type: 3}
   bulgarianClip: {fileID: 8300000, guid: ad49a4dce7fe6464ab0af0b21e73f72c, type: 3}
-  fallbackDuration: 28.574
+  fallbackDuration: 28.551
   critical: 0
   countsForHiddenEnding: 1
   subtitles:
   - start: 0.6
     startBg: 0.6
     textKey: log.log_eng_01.line.1
-  - start: 3.425
+  - start: 3.402
     startBg: 3.645
     textKey: log.log_eng_01.line.2
-  - start: 8.108
+  - start: 8.085
     startBg: 9.447
     textKey: log.log_eng_01.line.3
-  - start: 9.995
+  - start: 9.971
     startBg: 11.265
     textKey: log.log_eng_01.line.4
-  - start: 14.216
+  - start: 14.193
     startBg: 15.431
     textKey: log.log_eng_01.line.5
-  - start: 17.459
+  - start: 17.435
     startBg: 18.934
     textKey: log.log_eng_01.line.6
-  - start: 20.725
+  - start: 20.701
     startBg: 22.42
     textKey: log.log_eng_01.line.7
-  - start: 25.74
+  - start: 25.717
     startBg: 26.847
     textKey: log.log_eng_01.line.8

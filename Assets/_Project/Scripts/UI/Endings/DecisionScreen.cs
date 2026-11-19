@@ -94,6 +94,12 @@ namespace LastSignal.UI
             }
             Log.Info(nameof(DecisionScreen), $"Final decision: {_pending}");
             Close();
+            if (_pending == EndingType.Destroy && EscapeSequence.Instance != null)
+            {
+                // Ending A is played: get back to the Tern before the reactor goes (StoryBible §9.3)
+                EscapeSequence.Instance.Begin();
+                return;
+            }
             GameServices.State.Set(GameState.Ending);
             GameServices.Scenes.Load(SceneIds.Ending);
         }

@@ -25,6 +25,8 @@ namespace LastSignal.EditorTools
         public static DialogueGraph AiEng01 { get; private set; }
         public static DialogueGraph AiEng02 { get; private set; }
         public static DialogueGraph AiEng03 { get; private set; }
+        public static DialogueGraph AiMed01, AiMed02, AiRes01, AiResHint, AiRes02, AiCore01, AiCore02, AiCore03;
+        public static readonly string HeardAllLogs = WorldKeys.Story("heard_all_logs");
 
         public static void CreateAll()
         {
@@ -74,7 +76,110 @@ namespace LastSignal.EditorTools
                 Choice("ai_eng_03", 1, +10, EngineeringContent.FedArrayFlag),
                 Choice("ai_eng_03", 2, -5)));
 
+            CreatePhase6();
             AssetDatabase.SaveAssets();
+        }
+
+        // ------------------------------------------------------------------ Phase 6 (StoryBible §7.3–7.5)
+
+        private static ConditionSet TrustAtLeast(int v) => new() { conditions = { new Condition { type = ConditionType.IntAtLeast, key = WorldKeys.AiTrust, value = v } } };
+        private static ConditionSet TrustBelow(int v) => new() { conditions = { new Condition { type = ConditionType.IntBelow, key = WorldKeys.AiTrust, value = v } } };
+        private static ConditionSet FlagIs(string flag, bool value)
+            => new() { conditions = { new Condition { type = value ? ConditionType.FlagTrue : ConditionType.FlagFalse, key = flag } } };
+
+        private static DialogueChoice ChoiceTo(string id, string textN, string replyNode, int trustDelta, ConditionSet showWhen = null, string setsFlag = null)
+        {
+            var c = new DialogueChoice { id = $"{id}_{replyNode}", textKey = $"dlg.{id}.{textN}", next = replyNode, showWhen = showWhen ?? new ConditionSet() };
+            if (trustDelta != 0) c.effects.Add(new Effect { type = EffectType.AddInt, key = WorldKeys.AiTrust, value = trustDelta });
+            if (!string.IsNullOrEmpty(setsFlag)) c.effects.Add(Effect.Flag(setsFlag));
+            return c;
+        }
+
+        private static DialogueNode Line(string id, string node, string next, ConditionSet showWhen = null, string onEnterFlag = null)
+        {
+            var n = new DialogueNode { id = node, lineKey = $"dlg.{id}.{node}", next = next, showWhen = showWhen ?? new ConditionSet() };
+            if (onEnterFlag != null) n.onEnter.Add(Effect.Flag(onEnterFlag));
+            return n;
+        }
+
+        private static DialogueNode Reply(string id, string node) => new() { id = node, lineKey = $"dlg.{id}.{node}" };
+
+        private static void CreatePhase6()
+        {
+            AiMed01 = Graph("ai_med_01", Question("ai_med_01", Choice("ai_med_01", 1, 0), Choice("ai_med_01", 2, +5), Choice("ai_med_01", 3, -10)));
+
+            var med02 = new List<DialogueNode>
+            {
+                Line("ai_med_02", "high", "low", TrustAtLeast(HighTrust), StationContent.KnowsJonahDeath),
+                Line("ai_med_02", "low", "ask", TrustBelow(HighTrust), StationContent.KnowsJonahDeath),
+                new() { id = "ask", choices = { Choice("ai_med_02", 1, -10), Choice("ai_med_02", 2, +5), Choice("ai_med_02", 3, 0) } },
+            };
+            AddReplies("ai_med_02", med02, 3);
+            AiMed02 = Graph("ai_med_02", med02);
+
+            AiRes01 = Graph("ai_res_01", Question("ai_res_01",
+                Choice("ai_res_01", 1, +10, StationContent.ListenedMurmur), Choice("ai_res_01", 2, -5), Choice("ai_res_01", 3, 0)));
+
+            var mid = TrustAtLeast(LowTrustBelow);
+            mid.conditions.AddRange(TrustBelow(HighTrust).conditions);
+            AiResHint = Graph("ai_res_hint", new List<DialogueNode>
+            {
+                // the high-trust hint gives the rule away: entering it now counts as noticing the mirror
+                Line("ai_res_hint", "high", "mid", TrustAtLeast(HighTrust), StationContent.NoticedMirror),
+                Line("ai_res_hint", "mid", "low", mid),
+                Line("ai_res_hint", "low", null, TrustBelow(LowTrustBelow)),
+            });
+
+            var res02 = new List<DialogueNode>
+            {
+                Line("ai_res_02", "l0", "mirror"),
+                Line("ai_res_02", "mirror", "ask", FlagIs(StationContent.NoticedMirror, true)),
+                new() { id = "ask", choices = { Choice("ai_res_02", 1, -5, StationContent.ToldCairnMirror), Choice("ai_res_02", 2, +10), Choice("ai_res_02", 3, -5) } },
+            };
+            AddReplies("ai_res_02", res02, 3);
+            AiRes02 = Graph("ai_res_02", res02);
+
+            AiCore01 = Graph("ai_core_01", Question("ai_core_01", Choice("ai_core_01", 1, -5), Choice("ai_core_01", 2, +5)));
+
+            AiCore02 = Graph("ai_core_02", new List<DialogueNode>
+            {
+                Line("ai_core_02", "l0", "high", null, StationContent.HeardOriginalWarning),
+                Line("ai_core_02", "high", "low", TrustAtLeast(HighTrust)),
+                Line("ai_core_02", "low", "ask", TrustBelow(LowTrustBelow)),
+                new()
+                {
+                    id = "ask",
+                    choices =
+                    {
+                        ChoiceTo("ai_core_02", "c1", "r1", -10),
+                        ChoiceTo("ai_core_02", "c2", "r2a", +5, TrustAtLeast(50)),
+                        ChoiceTo("ai_core_02", "c2", "r2b", 0, TrustBelow(50)),
+                        ChoiceTo("ai_core_02", "c3", "r3", +5),
+                    },
+                },
+                Reply("ai_core_02", "r1"), Reply("ai_core_02", "r2a"), Reply("ai_core_02", "r2b"), Reply("ai_core_02", "r3"),
+            });
+
+            AiCore03 = Graph("ai_core_03", new List<DialogueNode>
+            {
+                Line("ai_core_03", "a", "b"),
+                Line("ai_core_03", "b", "high"),
+                Line("ai_core_03", "high", "low", TrustAtLeast(HighTrust)),
+                Line("ai_core_03", "low", "c", TrustBelow(LowTrustBelow)),
+                Line("ai_core_03", "c", "ask", StationContent.AllLogsCollected(), HeardAllLogs),
+                new()
+                {
+                    id = "ask",
+                    choices =
+                    {
+                        ChoiceTo("ai_core_03", "c1", "r1", 0),
+                        ChoiceTo("ai_core_03", "c2", "r2a", 0, FlagIs(HeardAllLogs, false)),
+                        ChoiceTo("ai_core_03", "c2", "r2b", 0, FlagIs(HeardAllLogs, true)),
+                        new DialogueChoice { id = "ai_core_03_c3", textKey = "dlg.ai_core_03.c3", next = null },
+                    },
+                },
+                Reply("ai_core_03", "r1"), Reply("ai_core_03", "r2a"), Reply("ai_core_03", "r2b"),
+            });
         }
 
         /// <summary>Opening line with choices, each followed by its reply node (r1..rN).</summary>

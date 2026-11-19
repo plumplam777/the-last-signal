@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6216333faa7a14f4ebad499cdd71c2c2, type: 3}
+  m_Name: log_core_02
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Audio.AudioLogDefinition
+  id: log_core_02
+  sectorId: reactor
+  titleKey: log.log_core_02.title
+  speakerKey: speaker.dunn
+  dateKey: date.day_m4
+  englishClip: {fileID: 8300000, guid: 5414e7bf183d44b2eaf9cb6572f4bd89, type: 3}
+  bulgarianClip: {fileID: 8300000, guid: 0792225f432084673a25645ff6579310, type: 3}
+  fallbackDuration: 25.541
+  critical: 1
+  countsForHiddenEnding: 1
+  subtitles:
+  - start: 0.6
+    startBg: 0.6
+    textKey: log.log_core_02.line.1
+  - start: 4.497
+    startBg: 4.079
+    textKey: log.log_core_02.line.2
+  - start: 9.546
+    startBg: 9.4
+    textKey: log.log_core_02.line.3
+  - start: 14.193
+    startBg: 13.808
+    textKey: log.log_core_02.line.4
+  - start: 19.834
+    startBg: 18.9
+    textKey: log.log_core_02.line.5
+  - start: 21.892
+    startBg: 20.922
+    textKey: log.log_core_02.line.6

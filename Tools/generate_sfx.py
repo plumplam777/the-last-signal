@@ -256,6 +256,64 @@ def clamp():
     return out
 
 
+def alarm():
+    """Two-tone reactor klaxon (overshoot, overload countdown)."""
+    out = []
+    for b in range(3):
+        for f in (620, 440):
+            total = n(0.32)
+            for i in range(total):
+                t = i / SR
+                s = math.copysign(1, math.sin(TAU * f * t)) * 0.35 + math.sin(TAU * f * t) * 0.4
+                out.append(s * env(i, total, 0.01, 0.05))
+    return out
+
+
+def valve():
+    """Metal wheel turning a step: squeal + clunk."""
+    nz, out = Noise(80), []
+    total = n(0.6)
+    for i in range(total):
+        t = i / SR
+        f = 520 + 140 * math.sin(TAU * 3 * t)
+        s = math.sin(TAU * f * t) * 0.25 * env(i, total, 0.05, 0.2) + nz.lowpassed(0.3) * 0.3 * env(i, total, 0.02, 0.3)
+        out.append(s)
+    for i in range(n(0.2)):
+        t = i / SR
+        out.append(math.sin(TAU * 75 * t) * decay(i, 0.05))
+    return out
+
+
+def lift():
+    """Lift motor run-up, travel hum, stop thunk."""
+    out = []
+    total = n(1.8)
+    for i in range(total):
+        t = i / SR
+        f = 55 + 25 * min(1, t / 0.4)
+        s = math.sin(TAU * f * t) * 0.5 + math.sin(TAU * f * 3 * t) * 0.12
+        out.append(s * env(i, total, 0.3, 0.3))
+    for i in range(n(0.3)):
+        t = i / SR
+        out.append(math.sin(TAU * 60 * t) * decay(i, 0.07) * 0.9)
+    return out
+
+
+def crank():
+    """Ratchet: a few quick clicks over a creak."""
+    nz, out = Noise(90), []
+    total = n(0.5)
+    for i in range(total):
+        t = i / SR
+        s = math.sin(TAU * 300 * t) * 0.15 * env(i, total, 0.05, 0.2)
+        for k in range(4):
+            j = i - n(0.1 * k + 0.03)
+            if j >= 0:
+                s += nz.white() * decay(j, 0.004) * 0.8 + math.sin(TAU * 1800 * j / SR) * decay(j, 0.006) * 0.4
+        out.append(s)
+    return out
+
+
 def main():
     write("amb_station_hum", station_hum(), "Ambience", 0.6)
     write("amb_ventilation", ventilation(), "Ambience", 0.5)
@@ -285,6 +343,10 @@ def main():
     write("sfx_log_start", tape_start(), peak=0.5)
     write("sfx_docking_clamp", clamp())
     write("sfx_ui", click(2000, 0.004), peak=0.25)
+    write("sfx_alarm", alarm(), peak=0.55)
+    write("sfx_valve", valve(), peak=0.6)
+    write("sfx_lift", lift(), peak=0.6)
+    write("sfx_crank", crank(), peak=0.6)
 
 
 if __name__ == "__main__":

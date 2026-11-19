@@ -121,3 +121,124 @@ MonoBehaviour:
         text: 
         item: {fileID: 0}
         failReasonKey: 
+  - id: obj_08
+    textKey: obj.obj_08
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 7
+        key: terminal_med_patient
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_09
+    textKey: obj.obj_09
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 5
+        key: 
+        value: 1
+        text: 
+        item: {fileID: 11400000, guid: b7efd8bfc0cf24e3b8cf28b86d4f1b48, type: 2}
+        failReasonKey: 
+  - id: obj_10
+    textKey: obj.obj_10
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: sector.research.visited
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_11
+    textKey: obj.obj_11
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 7
+        key: res_trial7_decode
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_12
+    textKey: obj.obj_12
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 5
+        key: 
+        value: 1
+        text: 
+        item: {fileID: 11400000, guid: c128115c359174accac8c2db18f896a3, type: 2}
+        failReasonKey: 
+  - id: obj_13
+    textKey: obj.obj_13
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: sector.reactor.visited
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_14
+    textKey: obj.obj_14
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 7
+        key: core_reactor_balance
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_14b
+    textKey: obj.obj_14b
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: story.command_reached
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_15
+    textKey: obj.obj_15
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 8
+        key: log_core_02
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_16
+    textKey: obj.obj_16
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: story.ending_reached
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_17a
+    textKey: obj.obj_17a
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: story.escaped
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 

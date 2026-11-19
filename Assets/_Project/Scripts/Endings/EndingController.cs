@@ -64,7 +64,7 @@ namespace LastSignal.Endings
             int trust = GameServices.World.GetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
             Log.Info(nameof(EndingController), $"Ending {_type}, trust {trust}.");
             yield return Fade(1f, 0f, 2f);
-            foreach (var beat in EndingScript.Lines(_type, trust))
+            foreach (var beat in EndingScript.Lines(_type, trust, GameServices.World.GetBool(EscapeSequence.EscapedFlag)))
             {
                 switch (beat.Beat)
                 {

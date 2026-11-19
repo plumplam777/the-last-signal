@@ -107,11 +107,11 @@ namespace LastSignal.Tests
         }
 
         [Test]
-        public void MedicalHatch_ExplainsItIsNotBuiltYet()
+        public void MedicalHatch_LeadsToTheBuiltMedicalBay()
         {
             var hatch = Object.FindObjectsByType<SectorHatch>(FindObjectsSortMode.None).First(h => h.TargetScene == SceneIds.Medical);
-            Assert.IsFalse(hatch.CanInteract(null, out var reason));
-            Assert.AreEqual("dev.sector_unavailable", reason);
+            Assert.IsTrue(hatch.CanInteract(null, out _), "The hatch itself has no lock; the corridor door needs routed power.");
+            Assert.IsTrue(Application.CanStreamedLevelBeLoaded(SceneIds.Medical), "Sector_Medical must be in Build Settings.");
         }
     }
 }

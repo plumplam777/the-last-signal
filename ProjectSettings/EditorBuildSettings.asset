@@ -23,5 +23,14 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Station/Sector_Engineering.unity
     guid: 2d5f2e87c1efd436890dda2ed2e82137
+  - enabled: 1
+    path: Assets/_Project/Scenes/Station/Sector_Medical.unity
+    guid: 4f4a8fa7f38f44f418f9a736294084fb
+  - enabled: 1
+    path: Assets/_Project/Scenes/Station/Sector_ReactorCommand.unity
+    guid: df53e7c8503e94ca4b6fa33417caca75
+  - enabled: 1
+    path: Assets/_Project/Scenes/Station/Sector_Research.unity
+    guid: 40ff942c40c0d4f60bdf88ddc86e5081
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

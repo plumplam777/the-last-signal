@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 755ccdaddc45f48d9aac4a2f6d65bde5, type: 3}
+  m_Name: dlg_ai_core_01
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Dialogue.DialogueGraph
+  id: ai_core_01
+  startNode: l0
+  once: 1
+  nodes:
+  - id: l0
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_01.l0
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices:
+    - id: ai_core_01_c1
+      textKey: dlg.ai_core_01.c1
+      showWhen:
+        requireAll: 1
+        conditions: []
+      effects:
+      - type: 2
+        key: ai.trust
+        value: -5
+        text: 
+        item: {fileID: 0}
+      next: r1
+    - id: ai_core_01_c2
+      textKey: dlg.ai_core_01.c2
+      showWhen:
+        requireAll: 1
+        conditions: []
+      effects:
+      - type: 2
+        key: ai.trust
+        value: 5
+        text: 
+        item: {fileID: 0}
+      next: r2
+    next: 
+  - id: r1
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_01.r1
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: 
+  - id: r2
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_01.r2
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: 

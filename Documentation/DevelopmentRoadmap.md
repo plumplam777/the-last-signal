@@ -66,9 +66,14 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [x] SaveManager JSON (atomic, .bak, checkpoints); autosave suppressed during reset/restore
 - [x] 23 EditMode + 27 PlayMode tests; clean macOS build, all 5 scenes smoke-tested without errors
 
-## Phase 6 — Content
-Sectors, puzzles (power routing, keycard security, decode sequence, reactor balance), props, lighting,
-audio, TTS voice lines, endings.
+## Phase 6 — Content ✅ (2026-11-19)
+- [x] Medical Bay: frost nameplate → PIN 0417 record → confiscated cabinet → research keycard (LOG_MED_01–03, AI_MED_01–02)
+- [x] Research Lab: Response Trials board + Trial 7 decode (mirror rule), hint by trust, safe → core keycard (LOG_RES_01–03, AI_RES_01/HINT/02)
+- [x] Reactor Core + Command: valve balance puzzle, lift, comms original warning, private archive, captain's console → decision (LOG_CORE_01–03, AI_CORE_01–03)
+- [x] Ending A played as a 120 s escape (service tunnel, crank at low trust, board the Tern)
+- [x] 14/14 audio logs, objectives OBJ_08–17A, EN+BG, TTS voices, new SFX (alarm, valve, lift, crank)
+- [x] 27 EditMode + 42 PlayMode tests
+- [ ] Real props/art (asset packs, Blender) — moved to Phase 7
 
 ## Phase 7 — Polish & testing
 Acceptance checklist from the spec §16, performance pass, builds.

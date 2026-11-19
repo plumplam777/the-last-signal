@@ -180,7 +180,8 @@ namespace LastSignal.UI
             }
         }
 
-        private void ShowEntry(int index)
+        /// <summary>Shows entry &lt;index&gt; (applies its on-read effects once). Public for tests and gamepad UI.</summary>
+        public void ShowEntry(int index)
         {
             var entry = _terminal.Entries[index];
             entryTitle.text = Loc.Get(entry.titleKey);

@@ -193,6 +193,15 @@ namespace LastSignal.EditorTools
             return t;
         }
 
+        /// <summary>World text that is not localized (numbers, symbol rows).</summary>
+        public static TextMeshPro RawText(string name, Transform parent, Vector3 pos, Quaternion rot, string text, float size, Color color)
+        {
+            var t = WorldText(name, parent, pos, rot, text, size, color);
+            Object.DestroyImmediate(t.GetComponent<LocalizedText>());
+            t.text = text;
+            return t;
+        }
+
         // ---------- UI ----------
 
         public static void SetLocalizedKey(LocalizedText lt, string key)

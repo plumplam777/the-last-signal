@@ -56,6 +56,8 @@ namespace LastSignal.Puzzles
             lockHintKey = hint;
             entries = newEntries;
         }
+
+        public void EditorSetOnUnlock(List<Effect> effects) => onUnlock = effects ?? new List<Effect>();
 #endif
     }
 }

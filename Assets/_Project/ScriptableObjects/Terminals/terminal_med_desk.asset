@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2472a5748fa3f4354a9a72a8902b7dcf, type: 3}
+  m_Name: terminal_med_desk
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Puzzles.TerminalDefinition
+  id: med_desk
+  titleKey: terminal.med_desk.title
+  subtitleKey: terminal.med_desk.subtitle
+  pinCode: 
+  lockHintKey: 
+  onUnlock: []
+  entries:
+  - titleKey: terminal.med_desk.e1.title
+    bodyKey: terminal.med_desk.e1.body
+    visibleWhen:
+      requireAll: 1
+      conditions: []
+    onRead: []

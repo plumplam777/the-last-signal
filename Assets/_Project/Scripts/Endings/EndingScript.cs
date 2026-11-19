@@ -64,12 +64,19 @@ namespace LastSignal.Endings
 
         public static bool HiddenEndingAvailable(int logsCollected) => logsCollected >= HiddenEndingLogs;
 
-        public static List<EndingLine> Lines(EndingType type, int trust)
+        /// <param name="escapedLive">Ending A: CAIRN's lines already played during the escape run, so only the
+        /// exterior event, caption and epilogue remain.</param>
+        public static List<EndingLine> Lines(EndingType type, int trust, bool escapedLive = false)
         {
             bool high = HighTrust(trust);
             var l = new List<EndingLine>();
             switch (type)
             {
+                case EndingType.Destroy when escapedLive:
+                    l.Add(new(EndingBeat.Event, null));
+                    l.Add(new(EndingBeat.Caption, "end.a.05"));
+                    l.Add(new(EndingBeat.Epilogue, high ? "epi.a_high" : "epi.a_low"));
+                    break;
                 case EndingType.Destroy:
                     l.Add(new(EndingBeat.Cairn, "end.a.01"));
                     if (high)

@@ -1,0 +1,240 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 755ccdaddc45f48d9aac4a2f6d65bde5, type: 3}
+  m_Name: dlg_ai_core_03
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Dialogue.DialogueGraph
+  id: ai_core_03
+  startNode: a
+  once: 1
+  nodes:
+  - id: a
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.a
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: b
+  - id: b
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.b
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: high
+  - id: high
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.high
+    showWhen:
+      requireAll: 1
+      conditions:
+      - type: 2
+        key: ai.trust
+        value: 65
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+    onEnter: []
+    choices: []
+    next: low
+  - id: low
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.low
+    showWhen:
+      requireAll: 1
+      conditions:
+      - type: 3
+        key: ai.trust
+        value: 36
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+    onEnter: []
+    choices: []
+    next: c
+  - id: c
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.c
+    showWhen:
+      requireAll: 1
+      conditions:
+      - type: 8
+        key: log_dock_01
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_dock_02
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_eng_01
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_eng_02
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_eng_03
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_med_01
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_med_02
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_med_03
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_res_01
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_res_02
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_res_03
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_core_01
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_core_02
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+      - type: 8
+        key: log_core_03
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+    onEnter:
+    - type: 0
+      key: story.heard_all_logs
+      value: 0
+      text: 
+      item: {fileID: 0}
+    choices: []
+    next: ask
+  - id: ask
+    speakerKey: speaker.cairn
+    lineKey: 
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices:
+    - id: ai_core_03_r1
+      textKey: dlg.ai_core_03.c1
+      showWhen:
+        requireAll: 1
+        conditions: []
+      effects: []
+      next: r1
+    - id: ai_core_03_r2a
+      textKey: dlg.ai_core_03.c2
+      showWhen:
+        requireAll: 1
+        conditions:
+        - type: 1
+          key: story.heard_all_logs
+          value: 0
+          text: 
+          item: {fileID: 0}
+          failReasonKey: 
+      effects: []
+      next: r2a
+    - id: ai_core_03_r2b
+      textKey: dlg.ai_core_03.c2
+      showWhen:
+        requireAll: 1
+        conditions:
+        - type: 0
+          key: story.heard_all_logs
+          value: 0
+          text: 
+          item: {fileID: 0}
+          failReasonKey: 
+      effects: []
+      next: r2b
+    - id: ai_core_03_c3
+      textKey: dlg.ai_core_03.c3
+      showWhen:
+        requireAll: 1
+        conditions: []
+      effects: []
+      next: 
+    next: 
+  - id: r1
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.r1
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: 
+  - id: r2a
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.r2a
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: 
+  - id: r2b
+    speakerKey: speaker.cairn
+    lineKey: dlg.ai_core_03.r2b
+    showWhen:
+      requireAll: 1
+      conditions: []
+    onEnter: []
+    choices: []
+    next: 

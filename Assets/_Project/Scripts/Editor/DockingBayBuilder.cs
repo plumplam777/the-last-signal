@@ -64,6 +64,7 @@ namespace LastSignal.EditorTools
             BuildInnerDoor(props);
             BuildEscapePodCradle(props);
             BuildDialogueTriggers(root.transform);
+            BuildEscapeExit(root.transform);
 
             var power = Group("PowerController", root.transform);
             power.AddComponent<PoweredObject>().EditorConfigure(SectorIds.Docking, poweredOn.ToArray(), poweredOff.ToArray());
@@ -373,7 +374,32 @@ namespace LastSignal.EditorTools
             door.EditorSetPanels(left.transform, right.transform, new[] { statusL.GetComponent<Renderer>(), statusR.GetComponent<Renderer>() });
         }
 
-        internal static void BuildRecorder(Transform parent, string name, Vector3 pos, Quaternion rot, LastSignal.Audio.AudioLogDefinition log)
+        /// <summary>
+        /// Ending A: the service tunnel from the Reactor Core comes out next to the airlock, and the Tern can be
+        /// boarded while the overload countdown runs (both only matter during the escape).
+        /// </summary>
+        private static void BuildEscapeExit(Transform root)
+        {
+            var spawn = Group("Spawn_FromServiceTunnel", root, new Vector3(2.6f, 0.05f, HallBack + 3.2f));
+            spawn.transform.localRotation = Quaternion.Euler(0, 200f, 0);
+            spawn.AddComponent<SpawnPoint>().EditorSetId("from_service_tunnel");
+            var tunnel = Group("ServiceTunnelHatch", root, new Vector3(HallHalfWidth - 0.06f, 1.2f, HallBack + 3.2f));
+            tunnel.transform.localRotation = Quaternion.Euler(0, 90, 0);
+            Ring("Ring", tunnel.transform, Vector3.zero, 0.8f, 0.14f, 0.15f, 24, StationMaterials.Brass);
+            Cylinder("Plate", tunnel.transform, new Vector3(0, 0, -0.02f), new Vector3(1.45f, 0.03f, 1.45f), StationMaterials.SlateDark, false, Quaternion.Euler(90, 0, 0));
+
+            var board = Group("BoardTheTern", root, new Vector3(0, 1.6f, HallBack + 0.5f));
+            var col = board.AddComponent<BoxCollider>();
+            col.size = new Vector3(3.4f, 3.2f, 0.8f);
+            var boarding = board.AddComponent<LastSignal.Endings.BoardShipInteractable>();
+            boarding.EditorConfigure("dock_board_tern", "prompt.board", null, false);
+            var marker = PointLight("BoardingLight", board.transform, new Vector3(0, 0.6f, 0.8f), SignalCyan, 2.4f, 4f);
+            Group("BoardTheTern_Toggle", root).AddComponent<ConditionToggle>().EditorSet(
+                new ConditionSet { conditions = { Condition.Flag(LastSignal.Endings.EscapeSequence.ActiveFlag) } }, new[] { board, marker.gameObject }, null);
+        }
+
+        internal static GameObject BuildRecorder(Transform parent, string name, Vector3 pos, Quaternion rot, LastSignal.Audio.AudioLogDefinition log,
+            ConditionSet requirements = null)
         {
             var go = Group(name, parent, pos);
             go.transform.localRotation = rot;
@@ -387,8 +413,9 @@ namespace LastSignal.EditorTools
             var glow = PointLight("Glow", blink.transform, Vector3.zero, SignalCyan, 0.35f, 0.8f);
             _ = glow;
             var pickup = go.AddComponent<AudioLogPickup>();
-            pickup.EditorConfigure(log.Id, "prompt.log.play", null, false);
+            pickup.EditorConfigure(log.Id, "prompt.log.play", null, false, requirements);
             pickup.EditorSetLog(log, blink);
+            return go;
         }
 
         private static void BuildBreaker(Transform props)

@@ -150,14 +150,13 @@ namespace LastSignal.EditorTools
             on.Add(PointLight("Light", c, new Vector3(x, 2.8f, mid), TealLight, 2.4f, 6f).gameObject);
             on.Add(WorldText("Sign_Medical", c, new Vector3(x, 2.7f, z1 - 0.05f), Quaternion.identity, "sector.medical.name", 3f, TealLight).gameObject);
 
-            // Medical hatch: the sector is built in a later phase, so it explains that honestly
+            // Medical hatch at the end of the corridor (the corridor door itself needs routed power)
             var hatchGo = Group("Hatch_ToMedical", c, new Vector3(x, 1.45f, z1 - 0.12f));
             Ring("Ring", hatchGo.transform, Vector3.zero, 1.1f, 0.2f, 0.2f, 28, M.Brass);
             Cylinder("Plate", hatchGo.transform, new Vector3(0, 0, 0.03f), new Vector3(2.0f, 0.04f, 2.0f), M.Ceramic, false, Quaternion.Euler(90, 0, 0));
             hatchGo.AddComponent<BoxCollider>().size = new Vector3(2.2f, 2.2f, 0.3f);
             var hatch = hatchGo.AddComponent<SectorHatch>();
-            hatch.EditorConfigure("eng_hatch_medical", "prompt.hatch.go", null, false,
-                new ConditionSet { conditions = new List<Condition> { Condition.Flag(WorldKeys.Story("dev.medical_built"), "dev.sector_unavailable") } });
+            hatch.EditorConfigure("eng_hatch_medical", "prompt.hatch.go", null, false);
             hatch.EditorSetTarget(SceneIds.Medical, "from_engineering", "sector.medical.name", SectorIds.Medical);
 
             // the door into the corridor, powered by routing
@@ -385,7 +384,7 @@ namespace LastSignal.EditorTools
             Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.3f, 0.9f, 0.55f), M.SlateDark, false);
             Box("Top", t, new Vector3(0, 0.93f, 0.05f), new Vector3(1.4f, 0.06f, 0.7f), M.Brass, false);
             Box("Screen", t, new Vector3(0, 1.35f, -0.15f), new Vector3(0.9f, 0.55f, 0.05f), M.SlateDark, false, Quaternion.Euler(-10, 0, 0));
-            var glow = Box("ScreenGlow", t, new Vector3(0, 1.35f, -0.12f), new Vector3(0.84f, 0.49f, 0.005f), _orangeLamp, false, Quaternion.Euler(-10, 0, 0), false);
+            var glow = Box("ScreenGlow", t, new Vector3(0, 1.35f, -0.18f), new Vector3(0.84f, 0.49f, 0.005f), _orangeLamp, false, Quaternion.Euler(-10, 0, 0), false);
             Box("Clipboard", t, new Vector3(0.45f, 0.97f, 0.15f), new Vector3(0.25f, 0.02f, 0.33f), M.Ceramic, false, Quaternion.Euler(0, 20, 0));
             var terminal = desk.AddComponent<TerminalInteractable>();
             terminal.EditorConfigure("eng_status", "prompt.terminal.use", null, false);
@@ -418,6 +417,9 @@ namespace LastSignal.EditorTools
 
             var spawn = Group("Spawn_FromDocking", root, new Vector3(0, 0.05f, -5.6f));
             spawn.AddComponent<SpawnPoint>().EditorSetId("from_docking");
+            var fromMed = Group("Spawn_FromMedical", root, new Vector3(-3.5f, 0.05f, 9.6f));
+            fromMed.transform.localRotation = Quaternion.Euler(0, 180, 0);
+            fromMed.AddComponent<SpawnPoint>().EditorSetId("from_medical");
             var def = Group("Spawn_Default", root, new Vector3(0, 0.05f, -5.6f));
             def.AddComponent<SpawnPoint>().EditorSetId("default");
         }

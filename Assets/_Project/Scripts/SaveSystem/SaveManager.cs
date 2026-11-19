@@ -151,8 +151,9 @@ namespace LastSignal.SaveSystem
             GameServices.SuppressCheckpoints = true;
             try
             {
-                GameServices.World.Restore(data.world);
+                // inventory first, so the world restore evaluates objectives against the saved items
                 GameServices.Inventory.Restore(data.inventory, id => GameServices.Content.FindItem(id));
+                GameServices.World.Restore(data.world);
             }
             finally
             {

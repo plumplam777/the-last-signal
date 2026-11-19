@@ -85,8 +85,10 @@ namespace LastSignal.Core
         {
             var s = Require();
             SuppressCheckpoints = true;
-            s._world.Clear();
+            // inventory first: clearing the world re-evaluates objectives, and a leftover item (flashlight)
+            // would otherwise complete obj_01 again in the fresh run
             s._inventory.Clear();
+            s._world.Clear();
             s._audioLogs.Stop();
             s._saves.BeginNewRun();
             s._dialogue.StopAll();

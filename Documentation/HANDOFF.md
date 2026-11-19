@@ -1,6 +1,6 @@
 # The Last Signal — Handoff for a new chat
 
-**Date:** 2026-11-19 · **Deadline:** ≈ 2026-12-19 · **State:** Phases 1–6 done, Phase 7 (polish & testing) next.
+**Date:** 2026-11-19 · **Deadline:** ≈ 2026-12-19 · **State:** Phases 1–6 done, Phase 7 (polish & testing) in progress — playthrough tests + §16 checklist done.
 **Last commit:** see `git log -1` (Phase 6 + this handoff). Everything is committed locally; **there is no GitHub
 remote yet** — the user will provide the URL; then add it and push.
 
@@ -72,7 +72,8 @@ Solo developer = the user; Claude = technical lead (writes code, content, docs; 
 | `Assets/_Project/Localization/Resources/Localization/{en,bg}.json` | **All player-facing text** (keys: `log.<id>.line.N`, `dlg.<id>.<node>`, `obj.<id>`, `terminal.<id>.*`, `end.*`, `epi.*`, `ui.*`) |
 | `Assets/_Project/Audio/Resources/{Voice,Sfx,Ambience}` | TTS voices (+ `voice_manifest.json` subtitle timings), procedural SFX/ambience |
 | `Tools/generate_voices.py`, `Tools/generate_sfx.py` | Regenerate audio (`python3 Tools/generate_voices.py` ≈ 5 min, macOS `say`) |
-| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 42 PlayMode tests |
+| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 49 PlayMode tests (`FullPlaythroughTests` = 4 complete runs, one per ending) |
+| `Documentation/AcceptanceChecklist.md` | Spec §16 bullets with test/screenshot evidence |
 
 **Content pipeline:** edit a builder/content class → `refresh_unity` → menu `Last Signal/Build Content/Build All Sectors`
 (regenerates all scenes, data assets and Build Settings) → run tests. Never hand-edit generated scenes.
@@ -112,7 +113,7 @@ power, open decision screen, …), `Last Signal/Diagnostics/*` (UI previews, att
 | 4 Narrative (CAIRN, cutscene, decision, endings) | ✅ |
 | 5 Database & admin (SQLite, accounts, start screen, admin CRUD, saves) | ✅ |
 | 6 Content (Medical, Research, Reactor+Command, Ending A escape, 14 logs, EN+BG, voices, SFX) | ✅ commit `4ce7238` |
-| 7 Polish & testing | **next** |
+| 7 Polish & testing | **in progress** — steps 1–2 done (automated playthroughs, §16 checklist) |
 
 **Verified at handoff:** 27/27 EditMode, 42/42 PlayMode tests pass; macOS build (134 MB) starts all 8 scenes
 (MainMenu, Cutscene_Opening, 5 sectors, Ending) without errors or missing translation keys.
@@ -120,7 +121,12 @@ power, open decision screen, …), `Last Signal/Diagnostics/*` (UI previews, att
 
 ## 7. Work to be done (Phase 7, in priority order)
 
-1. **Full playthrough by hand** (most important): New game → each ending, at high and low trust, plus Ending C with
+0. ✅ **Done 2026-11-19:** `FullPlaythroughTests` plays all four endings start → main menu through the real hatches,
+   with Load game in every sector and mid-escape, the whole run once in Bulgarian, and 14/14 logs. It found and fixed a
+   bug: New game after a previous run started with obj_01 already done (`StartNewRun`/`Continue` now reset/restore the
+   inventory before the world). `PlayerMovementTests` added. §16 evidence is in `AcceptanceChecklist.md`.
+   A by-hand playthrough by the user is still worth doing for feel (mouse look, pacing, readability).
+1. **Full playthrough by hand** (now mostly automated, see 0): New game → each ending, at high and low trust, plus Ending C with
    14/14 logs. Check objectives advance in order (`quest_main`: obj_01 … obj_17a), checkpoints/Load game resume in every
    sector, the escape after Load game, BG language throughout. Fix what breaks; add regression tests.
    Tip: `Last Signal/Debug/*` menus and `-startScene` help jump around.

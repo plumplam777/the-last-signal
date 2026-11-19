@@ -41,18 +41,63 @@ namespace LastSignal.Core
         public void EnforceCursor()
         {
             bool want = Current == GameState.Playing && Application.isFocused;
-            if (want && (Cursor.lockState != CursorLockMode.Locked || Cursor.visible))
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+
+            // A click re-applies the lock: in the Editor the lock only takes effect once the Game view has focus.
+            if (want && NeedsClick && mouse != null && mouse.leftButton.wasPressedThisFrame)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                _relockFrame = Time.frameCount + 1;
+                _movingFrames = 0;
+                _clickFrame = Time.frameCount;
+                NeedsClick = false;
+            }
+            if (want && Time.frameCount >= _relockFrame && (Cursor.lockState != CursorLockMode.Locked || Cursor.visible))
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
-            bool captured = want && Cursor.lockState == CursorLockMode.Locked;
+
+            // Detect a "fake" lock: Unity reports Locked but the pointer still moves (macOS Editor, Game view
+            // not focused). A really locked pointer stays still.
+            if (mouse != null)
+            {
+                var pos = mouse.position.ReadValue();
+                bool moved = (pos - _lastPointer).sqrMagnitude > 9f;
+                _lastPointer = pos;
+                if (want && Cursor.lockState == CursorLockMode.Locked && moved) _movingFrames++;
+                else if (!moved) _movingFrames = Mathf.Max(0, _movingFrames - 1);
+                if (_movingFrames >= 4 && !_detectionDisabled)
+                {
+                    if (_clickFrame > 0 && Time.frameCount - _clickFrame < 40)
+                    {
+                        // still "moving" right after a fresh lock: this platform reports positions while locked,
+                        // so the heuristic cannot be used — fall back to trusting Cursor.lockState.
+                        _detectionDisabled = true;
+                        Log.Warn(nameof(GameStateMachine), "Pointer moves while locked on this platform; fake-lock detection disabled.");
+                    }
+                    else NeedsClick = true;
+                    _movingFrames = 0;
+                }
+            }
+            if (!want) NeedsClick = false;
+
+            bool captured = want && Cursor.lockState == CursorLockMode.Locked && !NeedsClick;
             if (captured && !IsCursorCaptured) _capturedSinceFrame = Time.frameCount;
             IsCursorCaptured = captured;
         }
 
+        /// <summary>True when the pointer is not really captured and the player must click the game to look around.</summary>
+        public bool NeedsClick { get; private set; }
+
+        private Vector2 _lastPointer;
+        private int _movingFrames;
+        private int _relockFrame;
+        private int _clickFrame;
+        private bool _detectionDisabled;
+
         /// <summary>Mouse look should ignore the first frames after (re)capture: they carry the jump of the freed cursor.</summary>
-        public bool MouseLookReady => IsCursorCaptured && Time.frameCount > _capturedSinceFrame + 1;
+        public bool MouseLookReady => IsCursorCaptured && Time.frameCount > _capturedSinceFrame + 2;
 
         public void Set(GameState next)
         {

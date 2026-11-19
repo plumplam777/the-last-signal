@@ -168,5 +168,6 @@
   "eng.interlock_label": "ФИЗИЧЕСКА БЛОКИРОВКА: CAIRN",
   "eng.interlock_tag": "ИЗВАДЕНО ОТ П. КЕЙ\nДА НЕ СЕ ПОСТАВЯ",
   "eng.panel.title": "СТАРТ НА ГЕНЕРАТОРА",
-  "eng.board.title": "ПРЕНАСОЧВАНЕ"
+  "eng.board.title": "ПРЕНАСОЧВАНЕ",
+  "ui.hud.click_to_look": "Кликни, за да се оглеждаш"
 }

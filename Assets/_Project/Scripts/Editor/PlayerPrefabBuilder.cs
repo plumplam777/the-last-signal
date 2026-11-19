@@ -56,6 +56,7 @@ namespace LastSignal.EditorTools
 
             BuildHud(root.transform, interactor, flashlight);
             BuildSubtitles(root.transform);
+            BuildDialogue(root.transform);
             BuildInventory(root.transform);
             BuildTerminal(root.transform);
             BuildPause(root.transform);
@@ -96,6 +97,9 @@ namespace LastSignal.EditorTools
 
             var hud = canvas.gameObject.AddComponent<HudController>();
             hud.EditorBind(interactor, rootGroup, crosshair, promptGroup, promptText, reasonText, toastText, toastGroup);
+            var click = UiText("ClickToLook", canvas.transform, center, new Vector2(0, 60), new Vector2(900, 50), 30, SignalCyan, "ui.hud.click_to_look");
+            click.gameObject.SetActive(false);
+            hud.EditorBindClickPrompt(click);
 
             // objective panel (top-left)
             var obj = UiRect("Objective", canvas.transform, new Vector2(0f, 1f), new Vector2(350, -100), new Vector2(560, 110));
@@ -142,6 +146,33 @@ namespace LastSignal.EditorTools
             progress.fillMethod = Image.FillMethod.Horizontal;
             progress.fillAmount = 0f;
             canvas.gameObject.AddComponent<SubtitleHud>().EditorBind(group, speaker, line, progress);
+        }
+
+        private static void BuildDialogue(Transform parent)
+        {
+            // CAIRN comms panel, above the subtitle bar; own canvas so it shows while choices hold the cursor
+            var canvas = UiCanvas("CairnComms", parent, 30);
+            var panel = UiRect("Panel", canvas.transform, new Vector2(0.5f, 0f), new Vector2(0, 470), new Vector2(1300, 150));
+            var group = panel.gameObject.AddComponent<CanvasGroup>();
+            group.alpha = 0f;
+            var back = UiImage("Back", panel, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1300, 150), new Color(0.02f, 0.06f, 0.08f, 0.78f));
+            back.raycastTarget = false;
+            UiImage("Accent", panel, new Vector2(0.5f, 0.5f), new Vector2(0, 74), new Vector2(1300, 2), new Color(SignalCyan.r, SignalCyan.g, SignalCyan.b, 0.6f));
+            var knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+            var ring = UiImage("EyeRing", panel, new Vector2(0.5f, 0.5f), new Vector2(-575, 0), new Vector2(104, 104), SignalCyan);
+            ring.sprite = knob;
+            var ringHole = UiImage("EyeHole", ring.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(86, 86), new Color(0.02f, 0.06f, 0.08f, 1f));
+            ringHole.sprite = knob;
+            var eye = UiImage("Eye", ring.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(34, 34), SignalCyan);
+            eye.sprite = knob;
+            var speaker = UiText("Speaker", panel, new Vector2(0.5f, 0.5f), new Vector2(60, 48), new Vector2(1120, 34), 22, SignalCyan);
+            speaker.alignment = TextAlignmentOptions.Left;
+            speaker.characterSpacing = 8;
+            var line = UiText("Line", panel, new Vector2(0.5f, 0.5f), new Vector2(60, -10), new Vector2(1120, 84), 27, new Color(0.92f, 0.97f, 1f));
+            line.alignment = TextAlignmentOptions.TopLeft;
+            var list = VerticalList("Choices", panel, new Vector2(60, -170), new Vector2(1120, 200));
+            var template = ListButton("ChoiceTemplate", list, 1120, 52, 23, false);
+            canvas.gameObject.AddComponent<DialogueScreen>().EditorBind(group, eye, ring, speaker, line, list, template);
         }
 
         private static Image Panel(string name, Transform parent, Vector2 pos, Vector2 size)

@@ -23,6 +23,7 @@ namespace LastSignal.UI
         [SerializeField] private TMP_Text reasonText;
         [SerializeField] private TMP_Text toastText;
         [SerializeField] private CanvasGroup toastGroup;
+        [SerializeField] private TMP_Text clickToLook;
         [SerializeField] private Color crosshairIdle = new(1f, 1f, 1f, 0.45f);
         [SerializeField] private Color crosshairActive = new(0.37f, 0.9f, 1f, 1f);
         [SerializeField] private Color crosshairBlocked = new(0.88f, 0.27f, 0.23f, 1f);
@@ -72,6 +73,11 @@ namespace LastSignal.UI
         private void Update()
         {
             float dt = Time.unscaledDeltaTime;
+            if (clickToLook != null)
+            {
+                bool show = GameServices.State.NeedsClick;
+                if (clickToLook.gameObject.activeSelf != show) clickToLook.gameObject.SetActive(show);
+            }
             if (promptGroup != null) promptGroup.alpha = Mathf.MoveTowards(promptGroup.alpha, _promptTarget, dt * 8f);
 
             if (_deniedTimer > 0f)
@@ -162,6 +168,11 @@ namespace LastSignal.UI
         public void EditorBind(PlayerInteractor i, CanvasGroup r, Image cross, CanvasGroup pg, TMP_Text pt, TMP_Text rt, TMP_Text tt, CanvasGroup tg)
         {
             interactor = i; root = r; crosshair = cross; promptGroup = pg; promptText = pt; reasonText = rt; toastText = tt; toastGroup = tg;
+        }
+
+        public void EditorBindClickPrompt(TMP_Text label)
+        {
+            clickToLook = label;
         }
 #endif
     }

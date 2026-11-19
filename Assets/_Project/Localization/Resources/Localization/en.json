@@ -168,5 +168,6 @@
   "eng.interlock_label": "PHYSICAL CONTROL INTERLOCK: CAIRN",
   "eng.interlock_tag": "PULLED BY P. KAYE\nDO NOT REINSTALL",
   "eng.panel.title": "GENERATOR START",
-  "eng.board.title": "POWER ROUTING"
+  "eng.board.title": "POWER ROUTING",
+  "ui.hud.click_to_look": "Click to look around"
 }

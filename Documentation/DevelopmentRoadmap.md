@@ -59,10 +59,12 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [ ] Text-to-speech voices for CAIRN, logs and cutscene (subtitles already work without audio)
 - [ ] Ending A escape countdown and the finale sector (Phase 6)
 
-## Phase 5 — Database & administration
-sqlite-net integration + migrations, AuthService (PBKDF2), start screen (login/register/first-run admin),
-admin panel: Users CRUD, Sectors CRUD, Items CRUD, unlock all / teleport / grant items;
-SaveManager JSON + GameProgress summary.
+## Phase 5 — Database & administration ✅
+- [x] Own SQLite wrapper over system libsqlite3 (replaces sqlite-net), schema v1 + migrations
+- [x] AuthService (PBKDF2), start screen: first-run admin / login / register / menu / settings, EN|БГ toggle
+- [x] Admin panel: Users, Sectors, Items CRUD + read-only Progress; pause menu Save + admin tools
+- [x] SaveManager JSON (atomic, .bak, checkpoints); autosave suppressed during reset/restore
+- [x] 23 EditMode + 27 PlayMode tests; clean macOS build, all 5 scenes smoke-tested without errors
 
 ## Phase 6 — Content
 Sectors, puzzles (power routing, keycard security, decode sequence, reactor balance), props, lighting,

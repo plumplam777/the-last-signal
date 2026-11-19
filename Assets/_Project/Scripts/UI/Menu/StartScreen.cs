@@ -221,6 +221,15 @@ namespace LastSignal.UI
             GameServices.Scenes.Load(SceneIds.CutsceneOpening);
         }
 
+#if UNITY_EDITOR
+        /// <summary>Editor preview: opens the admin panel with an in-memory admin session.</summary>
+        public void PreviewAdminPanel()
+        {
+            GameServices.Auth.UseDevAdminSession();
+            OpenAdmin();
+        }
+#endif
+
         private void OpenAdmin()
         {
             if (!GameServices.Auth.IsAdmin) return;

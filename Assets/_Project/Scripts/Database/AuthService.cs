@@ -153,5 +153,14 @@ namespace LastSignal.Database
 
         /// <summary>Test/dev hook: sign in without credentials (used by -startScene runs and play-mode tests).</summary>
         public void UseGuestSession() => Current ??= new UserSession(0, "guest", UserRole.Player);
+
+#if UNITY_EDITOR
+        /// <summary>Editor-only preview hook: an admin session that exists in memory only (no database row).</summary>
+        public void UseDevAdminSession()
+        {
+            Current = new UserSession(0, "dev-admin", UserRole.Admin);
+            SessionChanged?.Invoke(Current);
+        }
+#endif
     }
 }

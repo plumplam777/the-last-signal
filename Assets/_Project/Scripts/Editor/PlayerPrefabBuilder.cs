@@ -54,7 +54,7 @@ namespace LastSignal.EditorTools
             SetRef(interactor, "viewCamera", cam);
             SetRef(flashlight, "spotLight", flash);
 
-            BuildHud(root.transform, interactor);
+            BuildHud(root.transform, interactor, flashlight);
             BuildSubtitles(root.transform);
             BuildInventory(root.transform);
             BuildTerminal(root.transform);
@@ -70,7 +70,7 @@ namespace LastSignal.EditorTools
             return prefab;
         }
 
-        private static void BuildHud(Transform parent, PlayerInteractor interactor)
+        private static void BuildHud(Transform parent, PlayerInteractor interactor, FlashlightController flashlight)
         {
             var canvas = UiCanvas("HUD", parent, 10);
             var rootGroup = canvas.gameObject.AddComponent<CanvasGroup>();
@@ -107,6 +107,21 @@ namespace LastSignal.EditorTools
             var objText = UiText("Text", obj, new Vector2(0.5f, 0.5f), new Vector2(0, -12), new Vector2(520, 60), 24, new Color(0.9f, 0.96f, 1f));
             objText.alignment = TextAlignmentOptions.TopLeft;
             canvas.gameObject.AddComponent<ObjectiveHud>().EditorBind(objGroup, objHeader, objText);
+
+            // flashlight panel (bottom-left): key hint + battery
+            var fl = UiRect("Flashlight", canvas.transform, new Vector2(0f, 0f), new Vector2(250, 80), new Vector2(420, 80));
+            var flGroup = fl.gameObject.AddComponent<CanvasGroup>();
+            flGroup.alpha = 0f;
+            UiImage("Back", fl, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(420, 80), new Color(0.05f, 0.07f, 0.11f, 0.75f));
+            var flLabel = UiText("Label", fl, new Vector2(0.5f, 0.5f), new Vector2(0, 16), new Vector2(390, 34), 21, new Color(0.9f, 0.96f, 1f));
+            flLabel.alignment = TextAlignmentOptions.Left;
+            var cellBack = UiImage("BatteryBack", fl, new Vector2(0.5f, 0.5f), new Vector2(-30, -18), new Vector2(330, 12), new Color(1, 1, 1, 0.12f));
+            var cellFill = UiImage("BatteryFill", cellBack.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(330, 12), SignalCyan);
+            cellFill.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            cellFill.type = Image.Type.Filled;
+            cellFill.fillMethod = Image.FillMethod.Horizontal;
+            var flPct = UiText("Percent", fl, new Vector2(0.5f, 0.5f), new Vector2(170, -18), new Vector2(70, 30), 18, TealLight);
+            canvas.gameObject.AddComponent<FlashlightHud>().EditorBind(flashlight, flGroup, flLabel, cellFill, flPct);
         }
 
         private static void BuildSubtitles(Transform parent)

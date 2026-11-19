@@ -26,3 +26,8 @@
 | 22 | 2026-11-19 | Audio logs can play without audio: subtitle timings come from English word counts (≈2.6 words/s). | TTS/recordings come later. |
 | 23 | 2026-11-19 | BG term for "the Murmur": „Шепотът“. | Translation consistency. |
 | 24 | 2026-11-19 | Unity MCP `execute_code` does not work with the `;` in the project path; editor automation uses menu items (`Last Signal/...`). | Tooling limitation. |
+| 25 | 2026-11-19 | Cursor is re-captured every frame while playing and mouse look ignores frames without capture. | Playtest: after closing a menu with Esc the Editor released the cursor, so a visible cursor moved independently of the camera. |
+| 26 | 2026-11-19 | Flashlight battery: 240 s on a full charge, recharges in 120 s when off; HUD panel shows [F], state and charge. Saved as `flashlight.battery`. | Playtest request: show how to use it and its power. |
+| 27 | 2026-11-19 | Engineering built ahead of Phase 6 (playtest: the hatch led nowhere). Medical hatch states honestly that the sector is not built yet. | Keep the playable path continuous. |
+| 28 | 2026-11-19 | Every MonoBehaviour lives in a file with the same name (SpawnPoint moved out of SectorRoot.cs). | A mismatch corrupted the Engineering scene in the macOS player while the Editor showed no error. Found with `Last Signal/Diagnostics`. |
+| 29 | 2026-11-19 | BG term for "the Array": „Решетката“. CAIRN stays in Latin letters in both languages. | Translation consistency. |

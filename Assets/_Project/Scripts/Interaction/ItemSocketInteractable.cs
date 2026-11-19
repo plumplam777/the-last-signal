@@ -62,8 +62,9 @@ namespace LastSignal.Interaction
         }
 
 #if UNITY_EDITOR
-        public void EditorSetSocket(ItemDefinition item, GameObject installed, GameObject empty)
+        public void EditorSetSocket(ItemDefinition item, GameObject installed, GameObject empty, string missingReasonKey = null)
         {
+            if (!string.IsNullOrEmpty(missingReasonKey)) missingItemReasonKey = missingReasonKey;
             requiredItem = item;
             installedVisual = installed;
             emptyVisual = empty;

@@ -42,6 +42,13 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [x] Docking Bay content from the story bible: OBJ_01–04, LOG_DOCK_01/02, Bay Control terminal, fuse + breaker B-2
 - [x] Tests: 12 EditMode + 10 PlayMode passing; macOS build smoke test
 
+## Phase 3b — Playtest fixes + Engineering (done 2026-11-19)
+- [x] Cursor capture fix; flashlight battery + HUD panel + longer hint
+- [x] Sector hatches (Docking ↔ Engineering) with spawn points
+- [x] Engineering: power coupling, generator start sequence (Kaye's diagram), routing board with the Array-feed temptation (`story.fed_array`), LOG_ENG_01–03, status terminal, interlock panel, Medical corridor door
+- [x] Objectives OBJ_05–07; puzzle failure feedback on the HUD
+- [x] 12 EditMode + 14 PlayMode tests; clean macOS build verified for both sectors
+
 ## Phase 4 — Narrative
 DialogueGraph + DialogueManager + UI, AI comms (speaker portrait/waveform), trust, story flags,
 audio log playback + subtitles, ending selection, opening cutscene (Timeline).

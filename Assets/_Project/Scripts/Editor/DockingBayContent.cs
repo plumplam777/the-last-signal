@@ -23,7 +23,7 @@ namespace LastSignal.EditorTools
         public const string ContentPath = "Assets/_Project/Resources/GameContent.asset";
         private const string LogsFolder = "Assets/_Project/ScriptableObjects/AudioLogs";
         private const string QuestsFolder = "Assets/_Project/ScriptableObjects/Quests";
-        private const string TerminalsFolder = "Assets/_Project/ScriptableObjects/Terminals";
+        internal const string TerminalsFolder = "Assets/_Project/ScriptableObjects/Terminals";
         private const string ItemsFolder = "Assets/_Project/ScriptableObjects/Items";
 
         public static readonly string FuseInstalledFlag = WorldKeys.Story("dock_fuse_installed");
@@ -86,9 +86,14 @@ namespace LastSignal.EditorTools
                 Objective("obj_03", new ConditionSet { conditions = { Condition.Powered(SectorIds.Docking) } }),
                 Objective("obj_04", new ConditionSet { conditions = { Condition.Flag(WorldKeys.DoorUnlocked("dock_inner")) } }),
                 Objective("obj_04b", new ConditionSet { conditions = { Condition.Flag(WorldKeys.SectorVisited(SectorIds.Engineering)) } }),
+                Objective("obj_05", new ConditionSet { conditions = { Condition.Flag(EngineeringContent.CouplingInstalledFlag) } }),
+                Objective("obj_06", new ConditionSet { conditions = { new Condition { type = ConditionType.PuzzleSolved, key = EngineeringContent.GeneratorPuzzleId } } }),
+                Objective("obj_07", new ConditionSet { conditions = { new Condition { type = ConditionType.PuzzleSolved, key = EngineeringContent.RoutingPuzzleId } } }),
+                Objective("obj_07b", new ConditionSet { conditions = { Condition.Flag(WorldKeys.SectorVisited(SectorIds.Medical)) } }),
             });
             EditorUtility.SetDirty(MainQuest);
 
+            EngineeringContent.CreateAll(registry);
             foreach (var so in new ScriptableObject[] { Flashlight, Fuse, LogDock01, LogDock02, BayTerminal, MainQuest })
                 registry.EditorRegister(so);
             EditorUtility.SetDirty(registry);
@@ -105,7 +110,7 @@ namespace LastSignal.EditorTools
         private static ObjectiveDefinition Objective(string id, ConditionSet completeWhen)
             => new() { id = id, textKey = $"obj.{id}", completeWhen = completeWhen };
 
-        private static ItemDefinition Item(string id, ItemType type, string keyPrefix)
+        internal static ItemDefinition Item(string id, ItemType type, string keyPrefix)
         {
             var item = Asset<ItemDefinition>(ItemsFolder, id);
             item.EditorInit(id, type, $"{keyPrefix}.name", $"{keyPrefix}.desc");
@@ -117,7 +122,7 @@ namespace LastSignal.EditorTools
         /// Builds a log whose subtitle timings come from the English line lengths (≈2.6 words/s), so subtitles
         /// stay readable before voice audio exists. Keys: log.&lt;id&gt;.title, log.&lt;id&gt;.line.N.
         /// </summary>
-        private static AudioLogDefinition Log(string id, string sector, string speakerKey, string dateKey, bool critical, int lineCount)
+        internal static AudioLogDefinition Log(string id, string sector, string speakerKey, string dateKey, bool critical, int lineCount)
         {
             var en = LocalizationTable("en");
             var lines = new List<SubtitleLine>();
@@ -141,7 +146,7 @@ namespace LastSignal.EditorTools
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
         }
 
-        private static T Asset<T>(string folder, string name) where T : ScriptableObject
+        internal static T Asset<T>(string folder, string name) where T : ScriptableObject
         {
             Directory.CreateDirectory(folder);
             var path = $"{folder}/{name}.asset";

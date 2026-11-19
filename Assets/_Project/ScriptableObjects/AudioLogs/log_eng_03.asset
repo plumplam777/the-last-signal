@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6216333faa7a14f4ebad499cdd71c2c2, type: 3}
+  m_Name: log_eng_03
+  m_EditorClassIdentifier: LastSignal.Runtime::LastSignal.Audio.AudioLogDefinition
+  id: log_eng_03
+  sectorId: engineering
+  titleKey: log.log_eng_03.title
+  speakerKey: speaker.kaye
+  dateKey: date.day_m6
+  englishClip: {fileID: 0}
+  bulgarianClip: {fileID: 0}
+  fallbackDuration: 36.507694
+  critical: 1
+  countsForHiddenEnding: 1
+  subtitles:
+  - start: 0.6
+    textKey: log.log_eng_03.line.1
+  - start: 2.873077
+    textKey: log.log_eng_03.line.2
+  - start: 9.376924
+    textKey: log.log_eng_03.line.3
+  - start: 13.957693
+    textKey: log.log_eng_03.line.4
+  - start: 20.846155
+    textKey: log.log_eng_03.line.5
+  - start: 23.503847
+    textKey: log.log_eng_03.line.6
+  - start: 30.39231
+    textKey: log.log_eng_03.line.7
+  - start: 32.665386
+    textKey: log.log_eng_03.line.8

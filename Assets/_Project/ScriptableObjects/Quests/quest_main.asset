@@ -77,3 +77,47 @@ MonoBehaviour:
         text: 
         item: {fileID: 0}
         failReasonKey: 
+  - id: obj_05
+    textKey: obj.obj_05
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: story.eng_coupling_installed
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_06
+    textKey: obj.obj_06
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 7
+        key: eng_generator_start
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_07
+    textKey: obj.obj_07
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 7
+        key: eng_power_routing
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 
+  - id: obj_07b
+    textKey: obj.obj_07b
+    completeWhen:
+      requireAll: 1
+      conditions:
+      - type: 0
+        key: sector.medical.visited
+        value: 0
+        text: 
+        item: {fileID: 0}
+        failReasonKey: 

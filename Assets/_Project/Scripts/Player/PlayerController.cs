@@ -55,7 +55,7 @@ namespace LastSignal.Player
         {
             if (!GameServices.State.IsGameplayActive) return;
             var player = GameServices.Input.Controls.Player;
-            Look(player.Look.ReadValue<Vector2>());
+            if (GameServices.State.MouseLookReady) Look(player.Look.ReadValue<Vector2>());
             Move(player.Move.ReadValue<Vector2>(), player.Sprint.IsPressed(), player.Jump.WasPressedThisFrame());
         }
 

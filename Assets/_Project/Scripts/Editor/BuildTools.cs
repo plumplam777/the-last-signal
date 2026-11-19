@@ -12,10 +12,14 @@ namespace LastSignal.EditorTools
         [MenuItem("Last Signal/Build/macOS")]
         public static void BuildMac() => Build(BuildTarget.StandaloneOSX, "Builds/macOS/TheLastSignal.app");
 
+        /// <summary>Clears Unity's player build cache first (use when a scene in the build looks stale or corrupted).</summary>
+        [MenuItem("Last Signal/Build/macOS (clean)")]
+        public static void BuildMacClean() => Build(BuildTarget.StandaloneOSX, "Builds/macOS/TheLastSignal.app", BuildOptions.CleanBuildCache);
+
         [MenuItem("Last Signal/Build/Windows")]
         public static void BuildWindows() => Build(BuildTarget.StandaloneWindows64, "Builds/Windows/TheLastSignal.exe");
 
-        private static void Build(BuildTarget target, string output)
+        private static void Build(BuildTarget target, string output, BuildOptions extra = BuildOptions.None)
         {
             var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
             if (scenes.Length == 0)
@@ -30,7 +34,7 @@ namespace LastSignal.EditorTools
                 scenes = scenes,
                 locationPathName = output,
                 target = target,
-                options = BuildOptions.None,
+                options = extra,
             });
             var s = report.summary;
             Debug.Log($"[BuildTools] {target}: {s.result}, {s.totalErrors} errors, {s.totalSize / (1024 * 1024)} MB, {s.totalTime}");

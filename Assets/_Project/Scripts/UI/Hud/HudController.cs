@@ -27,7 +27,8 @@ namespace LastSignal.UI
         [SerializeField] private Color crosshairActive = new(0.37f, 0.9f, 1f, 1f);
         [SerializeField] private Color crosshairBlocked = new(0.88f, 0.27f, 0.23f, 1f);
 
-        private readonly Queue<string> _toasts = new();
+        private readonly Queue<(string text, float seconds)> _toasts = new();
+        private float _toastDuration = 2.6f;
         private float _toastTimer;
         private float _deniedTimer;
         private float _promptTarget;
@@ -45,6 +46,7 @@ namespace LastSignal.UI
             GameServices.Localization.LanguageChanged += OnLanguageChanged;
             GameServices.World.Changed += OnWorldChanged;
             GameServices.AudioLogs.Collected += OnLogCollected;
+            GameServices.Puzzles.PuzzleFailed += OnPuzzleFailed;
             OnFocusChanged(null, false, null, null);
             if (toastGroup != null) toastGroup.alpha = 0f;
             OnStateChanged(GameServices.State.Current, GameServices.State.Current);
@@ -64,6 +66,7 @@ namespace LastSignal.UI
             GameServices.Localization.LanguageChanged -= OnLanguageChanged;
             GameServices.World.Changed -= OnWorldChanged;
             GameServices.AudioLogs.Collected -= OnLogCollected;
+            GameServices.Puzzles.PuzzleFailed -= OnPuzzleFailed;
         }
 
         private void Update()
@@ -81,12 +84,13 @@ namespace LastSignal.UI
             if (_toastTimer > 0f)
             {
                 _toastTimer -= dt;
-                toastGroup.alpha = Mathf.Clamp01(Mathf.Min(_toastTimer, 2.6f - _toastTimer) * 4f);
+                toastGroup.alpha = Mathf.Clamp01(Mathf.Min(_toastTimer, _toastDuration - _toastTimer) * 4f);
             }
             else if (_toasts.Count > 0)
             {
-                toastText.text = _toasts.Dequeue();
-                _toastTimer = 2.6f;
+                var next = _toasts.Dequeue();
+                toastText.text = next.text;
+                _toastDuration = _toastTimer = next.seconds;
             }
             else
             {
@@ -94,9 +98,9 @@ namespace LastSignal.UI
             }
         }
 
-        public void ShowToast(string message)
+        public void ShowToast(string message, float seconds = 2.6f)
         {
-            if (!string.IsNullOrEmpty(message)) _toasts.Enqueue(message);
+            if (!string.IsNullOrEmpty(message)) _toasts.Enqueue((message, Mathf.Max(1f, seconds)));
         }
 
         private void OnFocusChanged(IInteractable target, bool available, string prompt, string reason)
@@ -137,8 +141,13 @@ namespace LastSignal.UI
 
         private void OnWorldChanged(string key)
         {
-            if (key == Player.FlashlightController.OwnedFlag) ShowToast(Loc.Get("hint.flashlight"));
+            if (key == Player.FlashlightController.OwnedFlag) ShowToast(Loc.Get("hint.flashlight"), 7f);
             else if (key.StartsWith("power.") && GameServices.World.GetBool(key)) ShowToast(Loc.Get("toast.power_restored"));
+        }
+
+        private void OnPuzzleFailed(Puzzles.Puzzle puzzle, string feedbackKey)
+        {
+            if (!string.IsNullOrEmpty(feedbackKey)) ShowToast(Loc.Get(feedbackKey));
         }
 
         private void OnLogCollected(AudioLogDefinition log)

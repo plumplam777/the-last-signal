@@ -41,6 +41,13 @@ namespace LastSignal.Puzzles
 
         protected override void OnInteract(PlayerInteractor interactor) => puzzle.Input(stepId);
 
+#if UNITY_EDITOR
+        public void EditorSetStep(SequencePuzzle p, string id, GameObject indicator)
+        {
+            puzzle = p; stepId = id; activeIndicator = indicator;
+        }
+#endif
+
         private void Refresh()
         {
             if (activeIndicator != null && puzzle != null) activeIndicator.SetActive(puzzle.IsStepDone(stepId));

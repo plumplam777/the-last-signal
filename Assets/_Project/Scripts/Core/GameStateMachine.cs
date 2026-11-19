@@ -28,6 +28,32 @@ namespace LastSignal.Core
 
         public bool IsGameplayActive => Current == GameState.Playing;
 
+        /// <summary>True while the cursor is really captured for mouse look (frame-accurate).</summary>
+        public bool IsCursorCaptured { get; private set; }
+
+        private int _capturedSinceFrame = -1;
+
+        /// <summary>
+        /// Called every frame by GameServices. Re-captures the cursor while playing: the Unity Editor (and macOS on
+        /// focus changes) can release the lock on its own, e.g. when Esc closes a menu, which otherwise leaves a
+        /// visible system cursor moving independently of the camera.
+        /// </summary>
+        public void EnforceCursor()
+        {
+            bool want = Current == GameState.Playing && Application.isFocused;
+            if (want && (Cursor.lockState != CursorLockMode.Locked || Cursor.visible))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            bool captured = want && Cursor.lockState == CursorLockMode.Locked;
+            if (captured && !IsCursorCaptured) _capturedSinceFrame = Time.frameCount;
+            IsCursorCaptured = captured;
+        }
+
+        /// <summary>Mouse look should ignore the first frames after (re)capture: they carry the jump of the freed cursor.</summary>
+        public bool MouseLookReady => IsCursorCaptured && Time.frameCount > _capturedSinceFrame + 1;
+
         public void Set(GameState next)
         {
             if (next == Current) return;

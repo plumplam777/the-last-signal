@@ -42,6 +42,7 @@ namespace LastSignal.EditorTools
         private static void GiveAll()
         {
             foreach (var item in GameServices.Content.Items) GameServices.Inventory.Add(item);
+            GameServices.World.SetBool(Player.FlashlightController.OwnedFlag, true);
         }
 
         [MenuItem(Root + "Restore Sector Power")]

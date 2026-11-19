@@ -61,7 +61,7 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 
 ## Phase 5 — Database & administration ✅
 - [x] Own SQLite wrapper over system libsqlite3 (replaces sqlite-net), schema v1 + migrations
-- [x] AuthService (PBKDF2), start screen: first-run admin / login / register / menu / settings, EN|БГ toggle
+- [x] AuthService (PBKDF2), start screen: New game / Load game / Settings / Quit (admin setup and login inside Settings), EN|БГ toggle
 - [x] Admin panel: Users, Sectors, Items CRUD + read-only Progress; pause menu Save + admin tools
 - [x] SaveManager JSON (atomic, .bak, checkpoints); autosave suppressed during reset/restore
 - [x] 23 EditMode + 27 PlayMode tests; clean macOS build, all 5 scenes smoke-tested without errors

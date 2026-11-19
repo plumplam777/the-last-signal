@@ -21,7 +21,7 @@ Save/load then only has to serialise: world state + inventory + quests + player 
 | Scene | Purpose |
 |---|---|
 | `Bootstrap` | Build index 0. Creates the persistent `GameServices` root (DontDestroyOnLoad), then loads `MainMenu`. |
-| `MainMenu` | Start screen: login / register / first-run admin setup, language, settings, continue / new game, admin panel. |
+| `MainMenu` | Start screen: New game (register/sign in) / Load game (sign in → continue or restart) / Settings (with administrator setup + login → admin panel) / Quit. |
 | `Cutscene_Opening` | Timeline cutscene; ends by loading the first sector. |
 | `Sector_DockingBay` | Tutorial area. |
 | `Sector_Engineering` | Power routing. |

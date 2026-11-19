@@ -16,6 +16,18 @@ namespace LastSignal.EditorTools
             AttachCanvasesToCamera();
         }
 
+        [MenuItem("Last Signal/Diagnostics/Preview Settings Page (Play Mode)")]
+        public static void PreviewSettings() { Click("Main/Settings"); AttachCanvasesToCamera(); }
+
+        [MenuItem("Last Signal/Diagnostics/Preview Administrator Page (Play Mode)")]
+        public static void PreviewAdminPage() { Click("Main/Settings"); Click("Settings/Administrator"); AttachCanvasesToCamera(); }
+
+        private static void Click(string path)
+        {
+            var go = GameObject.Find(path);
+            if (go != null && go.activeInHierarchy) go.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+        }
+
         /// <summary>
         /// Overlay canvases are skipped by camera renders, and the unfocused editor renders no frames for
         /// ScreenCapture, so for screenshots move every canvas onto the main camera (play-mode only, not saved).
@@ -35,6 +47,8 @@ namespace LastSignal.EditorTools
             }
         }
 
+        [MenuItem("Last Signal/Diagnostics/Preview Settings Page (Play Mode)", true)]
+        [MenuItem("Last Signal/Diagnostics/Preview Administrator Page (Play Mode)", true)]
         [MenuItem("Last Signal/Diagnostics/Attach UI To Camera (Play Mode)", true)]
         [MenuItem("Last Signal/Diagnostics/Preview Admin Panel (Play Mode)", true)]
         private static bool Validate() => Application.isPlaying;

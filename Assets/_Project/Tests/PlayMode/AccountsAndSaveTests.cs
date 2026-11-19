@@ -13,7 +13,7 @@ using UnityEngine.TestTools;
 
 namespace LastSignal.Tests
 {
-    /// <summary>Start screen first-run flow, save → continue round trip, admin-only overrides. Uses a temporary DB and save folder.</summary>
+    /// <summary>Start screen flows (new game / load game / admin in settings), save → continue round trip, admin-only overrides. Uses a temporary DB and save folder.</summary>
     public class AccountsAndSaveTests
     {
         private string _dir;
@@ -52,17 +52,97 @@ namespace LastSignal.Tests
             yield return null;
         }
 
-        [UnityTest]
-        public IEnumerator FirstStart_AsksForAdministrator()
+        private static void Click(string path) => GameObject.Find(path).GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+        /// <summary>Path-based GameObject.Find also returns inactive children, so check visibility explicitly.</summary>
+        private static bool Visible(string path) { var go = GameObject.Find(path); return go != null && go.activeInHierarchy; }
+        private static void Type(string path, string text) => GameObject.Find(path).GetComponent<TMPro.TMP_InputField>().text = text;
+
+        private static IEnumerator OpenMainMenu()
         {
             SceneManager.LoadScene(SceneIds.MainMenu);
             yield return null;
             yield return null;
             Assert.IsNotNull(Object.FindAnyObjectByType<StartScreen>());
+        }
+
+        [UnityTest]
+        public IEnumerator FirstStart_ShowsPlayerMenu_NotAdminSetup()
+        {
+            yield return OpenMainMenu();
             Assert.IsTrue(GameServices.Auth.NeedsFirstAdmin);
-            var page = GameObject.Find("FirstAdmin");
-            Assert.IsNotNull(page, "First-run administrator page should be shown on an empty database.");
-            Assert.IsNull(GameObject.Find("Login"), "Login page hidden until an admin exists.");
+            foreach (var b in new[] { "Main/NewGame", "Main/LoadGame", "Main/Settings", "Main/Quit" })
+                Assert.IsTrue(Visible(b), $"{b} should be on the start screen.");
+            Assert.IsFalse(Visible("Admin"), "Administrator setup stays inside Settings.");
+            Assert.IsFalse(Visible("Main/Logout"), "No log-out button before anyone signs in.");
+        }
+
+        [UnityTest]
+        public IEnumerator NewGame_CreatesPlayerAccount_AndStartsOpening()
+        {
+            yield return OpenMainMenu();
+            Click("Main/NewGame");
+            Assert.IsTrue(Visible("Register"), "New game asks for an account first.");
+            Type("Register/Username", "newpilot");
+            Type("Register/Password", "secret1");
+            Type("Register/Confirm", "secret1");
+            Click("Register/Create");
+            Assert.IsTrue(GameServices.Auth.IsLoggedIn);
+            Assert.IsFalse(GameServices.Auth.IsAdmin, "Accounts made from New game are players.");
+            yield return WaitForScene(SceneIds.CutsceneOpening);
+            Assert.AreEqual(SceneIds.CutsceneOpening, SceneManager.GetActiveScene().name);
+        }
+
+        [UnityTest]
+        public IEnumerator LoadGame_SignIn_ShowsContinueAndRestart()
+        {
+            Assert.IsNull(GameServices.Auth.Register("pilot", "secret1", "secret1", UserRole.Player, out _));
+            yield return OpenMainMenu();
+            Click("Main/LoadGame");
+            Type("Login/Username", "pilot");
+            Type("Login/Password", "secret1");
+            Click("Login/Login");
+            Assert.IsTrue(Visible("Load"), "After signing in, the load page is shown.");
+            Assert.IsFalse(GameObject.Find("Load/Continue").GetComponent<UnityEngine.UI.Button>().interactable, "No save yet → nothing to continue.");
+            Assert.IsTrue(Visible("Load/Restart"));
+        }
+
+        [UnityTest]
+        public IEnumerator Settings_AdminLogin_RejectsPlayers_AcceptsAdmins()
+        {
+            var auth = GameServices.Auth;
+            Assert.IsNull(auth.Register("boss", "secret1", "secret1", UserRole.Admin, out _));
+            Assert.IsNull(auth.Register("pilot", "secret1", "secret1", UserRole.Player, out _));
+            yield return OpenMainMenu();
+            Click("Main/Settings");
+            Click("Settings/Administrator");
+            Assert.IsTrue(Visible("Admin/Form"), "Admin login form inside Settings.");
+            Assert.IsFalse(Visible("Admin/Form/Confirm"), "No 'repeat password' once an admin exists.");
+
+            Type("Admin/Form/Username", "pilot");
+            Type("Admin/Form/Password", "secret1");
+            Click("Admin/Form/Submit");
+            Assert.IsFalse(auth.IsLoggedIn, "A player account cannot sign in as administrator.");
+
+            Type("Admin/Form/Username", "boss");
+            Type("Admin/Form/Password", "secret1");
+            Click("Admin/Form/Submit");
+            Assert.IsTrue(auth.IsAdmin);
+            Assert.IsTrue(Visible("Admin/OpenPanel"));
+        }
+
+        [UnityTest]
+        public IEnumerator Settings_FirstAdmin_CanBeCreatedThere()
+        {
+            yield return OpenMainMenu();
+            Click("Main/Settings");
+            Click("Settings/Administrator");
+            Assert.IsTrue(Visible("Admin/Form/Confirm"), "Empty database → create-administrator form.");
+            Type("Admin/Form/Username", "boss");
+            Type("Admin/Form/Password", "secret1");
+            Type("Admin/Form/Confirm", "secret1");
+            Click("Admin/Form/Submit");
+            Assert.IsTrue(GameServices.Auth.IsAdmin);
+            Assert.IsFalse(GameServices.Auth.NeedsFirstAdmin);
         }
 
         [UnityTest]

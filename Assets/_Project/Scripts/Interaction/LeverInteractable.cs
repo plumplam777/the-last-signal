@@ -24,7 +24,11 @@ namespace LastSignal.Interaction
             Apply();
         }
 
-        protected override void OnInteract(PlayerInteractor interactor) => _on = true;
+        protected override void OnInteract(PlayerInteractor interactor)
+        {
+            _on = true;
+            GameServices.Audio.SfxAt("sfx_breaker", transform.position);
+        }
 
         protected override void RestoreUsedState()
         {

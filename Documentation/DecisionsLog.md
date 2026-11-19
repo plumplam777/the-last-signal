@@ -36,3 +36,4 @@
 | 32 | 2026-11-19 | `story.fed_array` is set by the player's answer in AI_ENG_03, not by plugging the Array-feed cable. | Matches StoryBible §7.2; the plug only triggers the conversation. |
 | 33 | 2026-11-19 | The player docks at Bay 2 (cutscene); the bay terminal now says "Docking Bay 2". | Consistency with StoryBible §10. |
 | 34 | 2026-11-19 | Editor-only fake-cursor-lock detection with a "Click to look around" prompt. | macOS Editor reports Locked before the Game view has focus. |
+| 35 | 2026-11-19 | Audio: placeholder TTS voices (macOS `say`) + procedural SFX/ambience, loaded from Resources by name (`Voice/<lang>/<key>`, `Sfx/<name>`, `Ambience/<name>`). Dialogue lines last as long as their voice clip; audio-log subtitles use per-language timings from `voice_manifest.json`. | Free, offline, reproducible; real recordings replace files 1:1. |

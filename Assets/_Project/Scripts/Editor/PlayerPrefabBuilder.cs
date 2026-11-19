@@ -53,6 +53,7 @@ namespace LastSignal.EditorTools
             SetRef(controller, "cameraPivot", pivot.transform);
             SetRef(interactor, "viewCamera", cam);
             SetRef(flashlight, "spotLight", flash);
+            root.AddComponent<PlayerAudio>().EditorBind(controller, flashlight, interactor);
 
             BuildHud(root.transform, interactor, flashlight);
             BuildSubtitles(root.transform);

@@ -26,6 +26,8 @@ namespace LastSignal.Cutscene
         public float fadeOut;
         [Tooltip("Keep the screen black for the whole shot (cards on black).")]
         public bool black;
+        [Tooltip("Sound effect played when the shot starts (Resources/Sfx name).")]
+        public string sfx;
         [Tooltip("Objects switched on when the shot starts (e.g. docking lights).")]
         public GameObject[] activate = Array.Empty<GameObject>();
     }

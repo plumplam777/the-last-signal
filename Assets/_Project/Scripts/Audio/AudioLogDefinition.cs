@@ -7,8 +7,10 @@ namespace LastSignal.Audio
     [Serializable]
     public sealed class SubtitleLine
     {
-        [Tooltip("Seconds from the start of the log.")]
+        [Tooltip("Seconds from the start of the English recording.")]
         public float start;
+        [Tooltip("Seconds from the start of the Bulgarian recording (negative = use English timing).")]
+        public float startBg = -1f;
         [Tooltip("Localization key of the line.")]
         public string textKey;
     }
@@ -47,6 +49,21 @@ namespace LastSignal.Audio
 
         public AudioClip ClipFor(Core.Language language)
             => language == Core.Language.Bulgarian && bulgarianClip != null ? bulgarianClip : englishClip;
+
+        public float StartOf(int line, Core.Language language)
+        {
+            var l = subtitles[line];
+            bool bg = language == Core.Language.Bulgarian && bulgarianClip != null && l.startBg >= 0f;
+            return bg ? l.startBg : l.start;
+        }
+
+#if UNITY_EDITOR
+        public void EditorSetClips(AudioClip en, AudioClip bg)
+        {
+            englishClip = en;
+            bulgarianClip = bg;
+        }
+#endif
 
         public float DurationFor(Core.Language language)
         {

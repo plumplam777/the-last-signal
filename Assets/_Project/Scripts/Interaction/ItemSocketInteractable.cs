@@ -50,6 +50,7 @@ namespace LastSignal.Interaction
         protected override void OnInteract(PlayerInteractor interactor)
         {
             if (consumeItem) GameServices.Inventory.Remove(requiredItem);
+            GameServices.Audio.SfxAt("sfx_fuse_insert", transform.position);
             ApplyVisual(true);
         }
 

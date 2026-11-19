@@ -41,7 +41,10 @@ namespace LastSignal.Puzzles
             return Loc.Get(board != null && board.IsPlugged(socketId) ? "prompt.routing.unplug" : "prompt.routing.plug", label, board != null ? board.FreeCables : 0);
         }
 
-        protected override void OnInteract(PlayerInteractor interactor) => board.Toggle(socketId, out _);
+        protected override void OnInteract(PlayerInteractor interactor)
+        {
+            if (board.Toggle(socketId, out _)) GameServices.Audio.SfxAt("sfx_cable_plug", transform.position);
+        }
 
         public override bool CanInteract(PlayerInteractor interactor, out string reasonKey)
         {

@@ -60,6 +60,12 @@ namespace LastSignal.EditorTools
             foreach (var go in on) go.SetActive(false);
 
             DockingBayBuilder.SetupLightingAndPost(root.transform, dockingProbes: false);
+            root.AddComponent<LastSignal.Audio.SectorAmbience>().EditorSet(new List<LastSignal.Audio.AmbienceLoop>
+            {
+                new() { clip = "amb_station_hum", volume = 0.45f },
+                new() { clip = "amb_generator", volume = 0.6f, whileFlag = EngineeringContent.GeneratorRunningFlag },
+                new() { clip = "amb_ventilation", volume = 0.3f, whileFlag = WorldKeys.Power(SectorIds.Engineering) },
+            });
             // warmer, more industrial ambience than the bay
             RenderSettings.ambientSkyColor = Color.Lerp(Navy, Hex("#FF8F3F"), 0.08f) * 0.6f;
             RenderSettings.ambientEquatorColor = Color.Lerp(Navy, Terracotta, 0.15f) * 0.5f;
@@ -228,6 +234,7 @@ namespace LastSignal.EditorTools
             puzzle.EditorConfigurePuzzle(EngineeringContent.GeneratorPuzzleId, SectorIds.Engineering,
                 new List<Effect> { Effect.Power(SectorIds.Engineering), Effect.Flag(EngineeringContent.GeneratorRunningFlag) });
             puzzle.EditorSetOrder(new List<string> { "coolant", "fuel", "ignition", "load" });
+            puzzle.EditorSetSolvedSfx("sfx_generator_start");
 
             // physical layout deliberately differs from the correct order: read Kaye's diagram
             var layout = new[] { "ignition", "coolant", "load", "fuel" };

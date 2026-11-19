@@ -39,7 +39,11 @@ namespace LastSignal.Puzzles
             return base.CanInteract(interactor, out reasonKey);
         }
 
-        protected override void OnInteract(PlayerInteractor interactor) => puzzle.Input(stepId);
+        protected override void OnInteract(PlayerInteractor interactor)
+        {
+            GameServices.Audio.SfxAt("sfx_switch", transform.position);
+            puzzle.Input(stepId);
+        }
 
 #if UNITY_EDITOR
         public void EditorSetStep(SequencePuzzle p, string id, GameObject indicator)

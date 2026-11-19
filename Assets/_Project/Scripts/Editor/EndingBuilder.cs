@@ -66,6 +66,11 @@ namespace LastSignal.EditorTools
 
             var controller = new GameObject("EndingController").AddComponent<EndingController>();
             controller.transform.SetParent(root, false);
+            controller.gameObject.AddComponent<LastSignal.Audio.SectorAmbience>().EditorSet(new List<LastSignal.Audio.AmbienceLoop>
+            {
+                new() { clip = "amb_murmur", volume = 0.4f },
+                new() { clip = "amb_station_hum", volume = 0.15f },
+            });
             controller.EditorBind(cam, station.transform, CutsceneBuilder.Station + new Vector3(0, -20f, 30f), station, boom.transform, lightsOn, dish,
                 pulses, fade, speaker, line, caption, epilogue, credits);
 

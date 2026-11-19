@@ -135,10 +135,35 @@ namespace LastSignal.EditorTools
                 int words = en.TryGetValue(key, out var text) ? Regex.Matches(text, @"\S+").Count : 8;
                 t += Mathf.Max(1.8f, words / 2.6f) + 0.35f;
             }
+            // generated voice recordings (Tools/generate_voices.py): use their exact per-line timings
+            var manifest = VoiceManifest();
+            AudioClip enClip = null, bgClip = null;
+            if (manifest != null && manifest["logs"]?[id] is Newtonsoft.Json.Linq.JObject entry)
+            {
+                enClip = AssetDatabase.LoadAssetAtPath<AudioClip>($"{VoiceFolder}/en/log_{id}.wav");
+                bgClip = AssetDatabase.LoadAssetAtPath<AudioClip>($"{VoiceFolder}/bg/log_{id}.wav");
+                var enStarts = entry["en"]?["starts"]?.ToObject<float[]>();
+                var bgStarts = entry["bg"]?["starts"]?.ToObject<float[]>();
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    if (enStarts != null && i < enStarts.Length) lines[i].start = enStarts[i];
+                    if (bgStarts != null && i < bgStarts.Length) lines[i].startBg = bgStarts[i];
+                }
+                if (entry["en"]?["duration"] != null) t = (float)entry["en"]["duration"] - 0.8f;
+            }
             var log = Asset<AudioLogDefinition>(LogsFolder, id);
             log.EditorInit(id, sector, $"log.{id}.title", speakerKey, dateKey, critical, t + 0.8f, lines);
+            log.EditorSetClips(enClip, bgClip);
             EditorUtility.SetDirty(log);
             return log;
+        }
+
+        public const string VoiceFolder = "Assets/_Project/Audio/Resources/Voice";
+
+        private static Newtonsoft.Json.Linq.JObject VoiceManifest()
+        {
+            var path = $"{VoiceFolder}/voice_manifest.json";
+            return File.Exists(path) ? Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(path)) : null;
         }
 
         public static Dictionary<string, string> LocalizationTable(string code)

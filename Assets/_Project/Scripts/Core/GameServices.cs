@@ -30,6 +30,7 @@ namespace LastSignal.Core
         private AudioLogManager _audioLogs;
         private GameContent _content;
         private DialogueManager _dialogue;
+        private AudioManager _audio;
 
         public static bool IsReady => _instance != null;
 
@@ -45,6 +46,7 @@ namespace LastSignal.Core
         public static AudioLogManager AudioLogs => Require()._audioLogs;
         public static GameContent Content => Require()._content;
         public static DialogueManager Dialogue => Require()._dialogue;
+        public static AudioManager Audio => Require()._audio;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateOnStartup()
@@ -98,6 +100,7 @@ namespace LastSignal.Core
             _puzzles = new PuzzleManager(_world);
             _audioLogs = gameObject.AddComponent<AudioLogManager>();
             _dialogue = gameObject.AddComponent<DialogueManager>();
+            _audio = gameObject.AddComponent<AudioManager>();
             _audioLogs.RegisterCatalog(_content.AudioLogs);
             _quests = new QuestManager(_world, _inventory);
             foreach (var quest in _content.Quests) _quests.Register(quest);

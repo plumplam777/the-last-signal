@@ -18,6 +18,8 @@ namespace LastSignal.Puzzles
         [Tooltip("Applied once when the puzzle is solved (e.g. restore power, unlock a door).")]
         [SerializeField] protected List<Effect> onSolvedEffects = new();
         [SerializeField] protected UnityEvent onSolved = new();
+        [Tooltip("Sound played at the puzzle when solved (Resources/Sfx name, optional).")]
+        [SerializeField] protected string solvedSfx;
 
         public string PuzzleId => puzzleId;
         public string SectorId => sectorId;
@@ -46,6 +48,7 @@ namespace LastSignal.Puzzles
             GameServices.World.SetBool(WorldKeys.PuzzleSolved(puzzleId), true);
             Effects.ApplyAll(onSolvedEffects);
             ApplySolvedState();
+            if (!string.IsNullOrEmpty(solvedSfx)) GameServices.Audio.SfxAt(solvedSfx, transform.position, 1f, 0f);
             onSolved.Invoke();
             Solved?.Invoke(this);
             GameServices.Puzzles.NotifySolved(this);
@@ -61,6 +64,8 @@ namespace LastSignal.Puzzles
         protected virtual void ApplySolvedState() { }
 
 #if UNITY_EDITOR
+        public void EditorSetSolvedSfx(string sfx) => solvedSfx = sfx;
+
         public void EditorConfigurePuzzle(string id, string sector, List<Effect> effects)
         {
             puzzleId = id;

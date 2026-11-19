@@ -71,7 +71,8 @@ namespace LastSignal.Endings
                     case EndingBeat.Cairn:
                         speaker.text = Loc.Get("speaker.cairn");
                         line.text = Loc.Get(beat.Key);
-                        yield return Hold(Dialogue.DialogueManager.ReadingTime(line.text) + 0.6f);
+                        float voice = GameServices.Audio.PlayVoice(beat.Key);
+                        yield return Hold(Mathf.Max(voice + 0.8f, voice > 0f ? 1.5f : Dialogue.DialogueManager.ReadingTime(line.text) + 0.6f));
                         speaker.text = line.text = string.Empty;
                         break;
                     case EndingBeat.Caption:
@@ -119,6 +120,7 @@ namespace LastSignal.Endings
                     explosion.gameObject.SetActive(false);
                     break;
                 case EndingType.Restore:
+                    GameServices.Audio.Sfx("sfx_power_up");
                     stationLightsOn.SetActive(true);
                     _turnDish = true;
                     yield return Hold(2f);

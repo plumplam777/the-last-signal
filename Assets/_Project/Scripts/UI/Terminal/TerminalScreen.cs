@@ -63,6 +63,7 @@ namespace LastSignal.UI
 
         protected override void OnOpened()
         {
+            GameServices.Audio.Sfx("sfx_terminal_open", 0.8f);
             title.text = Loc.Get(_terminal.TitleKey);
             subtitle.text = string.IsNullOrEmpty(_terminal.SubtitleKey) ? string.Empty : Loc.Get(_terminal.SubtitleKey);
             bool locked = !_terminal.IsUnlocked(GameServices.World);
@@ -99,13 +100,22 @@ namespace LastSignal.UI
         public void PressKey(string key)
         {
             if (_lock == null) return;
+            GameServices.Audio.Sfx("sfx_terminal_key", 0.7f);
             switch (key)
             {
                 case "Back": _lock.Backspace(); break;
                 case "Clear": _lock.Clear(); break;
                 case "Enter":
-                    if (_lock.Submit()) Unlock();
-                    else ShowFeedback("terminal.pin.wrong");
+                    if (_lock.Submit())
+                    {
+                        GameServices.Audio.Sfx("sfx_terminal_ok");
+                        Unlock();
+                    }
+                    else
+                    {
+                        GameServices.Audio.Sfx("sfx_terminal_error");
+                        ShowFeedback("terminal.pin.wrong");
+                    }
                     break;
                 default:
                     if (key.Length == 1) _lock.Press(key[0]);
@@ -175,6 +185,7 @@ namespace LastSignal.UI
             var entry = _terminal.Entries[index];
             entryTitle.text = Loc.Get(entry.titleKey);
             entryBody.text = Loc.Get(entry.bodyKey);
+            GameServices.Audio.Sfx("sfx_terminal_key", 0.5f);
             var readKey = TerminalDefinition.ReadKey(_terminal.Id, index);
             if (!GameServices.World.GetBool(readKey))
             {

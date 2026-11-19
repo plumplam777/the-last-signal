@@ -73,6 +73,11 @@ namespace LastSignal.EditorTools
             spawn.AddComponent<SpawnPoint>().EditorSetId("default");
 
             SetupLightingAndPost(root.transform);
+            root.AddComponent<LastSignal.Audio.SectorAmbience>().EditorSet(new List<LastSignal.Audio.AmbienceLoop>
+            {
+                new() { clip = "amb_station_hum", volume = 0.5f },
+                new() { clip = "amb_ventilation", volume = 0.35f, whileFlag = WorldKeys.Power(SectorIds.Docking) },
+            });
 
             Directory.CreateDirectory(Path.GetDirectoryName(ProjectSetup.DockingBayPath)!);
             EditorSceneManager.SaveScene(scene, ProjectSetup.DockingBayPath);

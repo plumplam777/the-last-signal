@@ -69,13 +69,16 @@ namespace LastSignal.Dialogue
         /// <summary>Finishes the current line now (Enter / click). Does nothing while choices are waiting.</summary>
         public void SkipLine()
         {
-            if (IsRunning && !_awaitingChoice) _lineTimer = 0f;
+            if (!IsRunning || _awaitingChoice) return;
+            _lineTimer = 0f;
+            GameServices.Audio.StopVoice();
         }
 
         /// <summary>Ends the current conversation immediately (scene change, cutscene).</summary>
         public void StopAll()
         {
             _queue.Clear();
+            if (GameServices.IsReady) GameServices.Audio.StopVoice();
             if (IsRunning) Finish();
         }
 
@@ -116,7 +119,8 @@ namespace LastSignal.Dialogue
                 _lineTimer = 0f;
                 return;
             }
-            _lineTimer = ReadingTime(GameServices.Localization.Get(node.lineKey));
+            float voice = GameServices.Audio.PlayVoice(node.lineKey);
+            _lineTimer = Mathf.Max(ReadingTime(GameServices.Localization.Get(node.lineKey)) * (voice > 0f ? 0.6f : 1f), voice + 0.45f);
             LineShown?.Invoke(node);
         }
 

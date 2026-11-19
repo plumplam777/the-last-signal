@@ -90,6 +90,11 @@ namespace LastSignal.EditorTools
             var director = new GameObject("CutsceneDirector").AddComponent<CutsceneDirector>();
             director.transform.SetParent(root, false);
             director.EditorBind(cam, Shots(dockLights), fade, subtitle, card, skip, skipFill, display);
+            director.gameObject.AddComponent<LastSignal.Audio.SectorAmbience>().EditorSet(new List<LastSignal.Audio.AmbienceLoop>
+            {
+                new() { clip = "amb_ventilation", volume = 0.3f },
+                new() { clip = "amb_murmur", volume = 0.35f },
+            });
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath)!);
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -265,11 +270,11 @@ namespace LastSignal.EditorTools
                     fromPosition = Ext + new Vector3(-40, 8, 170), fromEuler = new Vector3(-8, 22, 0), toPosition = Ext + new Vector3(-36, 6, 180), toEuler = new Vector3(-10, 28, 0), fieldOfView = 50f },
                 new() { name = "09a Status", duration = 3f, displayKey = "cut.display.status",
                     fromPosition = new Vector3(0.35f, 1.5f, -0.55f), fromEuler = new Vector3(12, -4, 0), toPosition = new Vector3(0.32f, 1.48f, -0.48f), toEuler = new Vector3(12, -3, 0), fieldOfView = 50f },
-                new() { name = "09b Guidance", duration = 3.5f, displayKey = "cut.display.guidance", subtitleKey = "cut.open.06",
+                new() { name = "09b Guidance", duration = 3.5f, displayKey = "cut.display.guidance", subtitleKey = "cut.open.06", sfx = "sfx_terminal_ok",
                     fromPosition = new Vector3(0.32f, 1.48f, -0.48f), fromEuler = new Vector3(12, -3, 0), toPosition = new Vector3(0.3f, 1.46f, -0.4f), toEuler = new Vector3(13, -2, 0), fieldOfView = 50f },
                 new() { name = "10 I didn't request guidance", duration = 4f, subtitleKey = "cut.open.07",
                     fromPosition = new Vector3(-0.85f, 1.42f, 0.28f), fromEuler = new Vector3(4, 114, 0), toPosition = new Vector3(-0.8f, 1.42f, 0.24f), toEuler = new Vector3(5, 116, 0), fieldOfView = 38f },
-                new() { name = "11 Docking", duration = 9f, activate = new[] { dockLights },
+                new() { name = "11 Docking", duration = 9f, activate = new[] { dockLights }, sfx = "sfx_docking_clamp",
                     fromPosition = Tern + new Vector3(14, 4, 4), fromEuler = new Vector3(5, -41, 0), toPosition = Tern + new Vector3(16, 5, 30), toEuler = new Vector3(4, -36, 0), fieldOfView = 50f },
                 new() { name = "12 Standby", duration = 6f, displayKey = "cut.display.standby", subtitleKey = "cut.open.08",
                     fromPosition = new Vector3(0, 1.62f, -1.25f), fromEuler = new Vector3(6, 0, 0), toPosition = new Vector3(0, 1.6f, -1.05f), toEuler = new Vector3(5, 0, 0), fieldOfView = 60f },

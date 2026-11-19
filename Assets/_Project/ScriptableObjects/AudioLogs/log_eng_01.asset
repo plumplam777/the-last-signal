@@ -17,25 +17,33 @@ MonoBehaviour:
   titleKey: log.log_eng_01.title
   speakerKey: speaker.kaye
   dateKey: date.day_m33
-  englishClip: {fileID: 0}
-  bulgarianClip: {fileID: 0}
-  fallbackDuration: 35.23077
+  englishClip: {fileID: 8300000, guid: e1624cd42cb7e4f48815cece77a6f013, type: 3}
+  bulgarianClip: {fileID: 8300000, guid: ad49a4dce7fe6464ab0af0b21e73f72c, type: 3}
+  fallbackDuration: 28.574
   critical: 0
   countsForHiddenEnding: 1
   subtitles:
   - start: 0.6
+    startBg: 0.6
     textKey: log.log_eng_01.line.1
-  - start: 2.873077
+  - start: 3.425
+    startBg: 3.645
     textKey: log.log_eng_01.line.2
-  - start: 8.223077
+  - start: 8.108
+    startBg: 9.447
     textKey: log.log_eng_01.line.3
-  - start: 10.373076
+  - start: 9.995
+    startBg: 11.265
     textKey: log.log_eng_01.line.4
-  - start: 16.492308
+  - start: 14.216
+    startBg: 15.431
     textKey: log.log_eng_01.line.5
-  - start: 19.919231
+  - start: 17.459
+    startBg: 18.934
     textKey: log.log_eng_01.line.6
-  - start: 24.115385
+  - start: 20.725
+    startBg: 22.42
     textKey: log.log_eng_01.line.7
-  - start: 31.003847
+  - start: 25.74
+    startBg: 26.847
     textKey: log.log_eng_01.line.8

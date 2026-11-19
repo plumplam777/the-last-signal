@@ -58,6 +58,8 @@ namespace LastSignal.Cutscene
                 if (!string.IsNullOrEmpty(shot.displayKey)) _displayKey = shot.displayKey;
                 RefreshTexts();
                 shotCamera.fieldOfView = shot.fieldOfView;
+                if (!string.IsNullOrEmpty(shot.subtitleKey)) GameServices.Audio.PlayVoice(shot.subtitleKey);
+                if (!string.IsNullOrEmpty(shot.sfx)) GameServices.Audio.Sfx(shot.sfx);
 
                 float t = 0f;
                 while (t < shot.duration && !_finished)

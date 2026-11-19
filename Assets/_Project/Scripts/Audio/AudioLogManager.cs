@@ -114,8 +114,9 @@ namespace LastSignal.Audio
             float t = Elapsed;
             var lines = Current.Subtitles;
             int index = -1;
+            var language = GameServices.Localization.Current;
             for (int i = 0; i < lines.Count; i++)
-                if (t >= lines[i].start) index = i;
+                if (t >= Current.StartOf(i, language)) index = i;
             if (index != _lineIndex)
             {
                 _lineIndex = index;

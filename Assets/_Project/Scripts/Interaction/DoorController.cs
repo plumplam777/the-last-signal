@@ -112,6 +112,8 @@ namespace LastSignal.Interaction
         {
             if (next == State) return;
             State = next;
+            if (next == DoorState.Opening) GameServices.Audio.SfxAt("sfx_door_open", transform.position + Vector3.up * 1.5f);
+            else if (next == DoorState.Closing) GameServices.Audio.SfxAt("sfx_door_close", transform.position + Vector3.up * 1.5f);
             StateChanged?.Invoke(next);
         }
 

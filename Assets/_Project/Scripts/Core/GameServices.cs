@@ -78,15 +78,20 @@ namespace LastSignal.Core
         }
 
         /// <summary>Clears all run state (world facts, inventory) for a brand-new game.</summary>
+        /// <summary>True while world/inventory are being reset or restored; autosaves must not capture that state.</summary>
+        public static bool SuppressCheckpoints { get; set; }
+
         public static void StartNewRun()
         {
             var s = Require();
+            SuppressCheckpoints = true;
             s._world.Clear();
             s._inventory.Clear();
             s._audioLogs.Stop();
             s._saves.BeginNewRun();
             s._dialogue.StopAll();
             s._world.SetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
+            SuppressCheckpoints = false;
             Log.Info(nameof(GameServices), "New run started.");
         }
 
@@ -149,7 +154,8 @@ namespace LastSignal.Core
         public static void Checkpoint()
         {
             var s = Require();
-            if (!s._auth.IsLoggedIn || s._auth.Current.UserId <= 0) return;
+            if (SuppressCheckpoints || !s._auth.IsLoggedIn || s._auth.Current.UserId <= 0) return;
+            if (s._state.Current != GameState.Playing && s._state.Current != GameState.InMenu && s._state.Current != GameState.Paused) return;
             var player = FindAnyObjectByType<Player.PlayerController>();
             if (player == null || s._state.Current == GameState.Ending) return;
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;

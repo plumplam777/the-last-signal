@@ -148,8 +148,16 @@ namespace LastSignal.SaveSystem
             }
             var data = Read(_auth.Current.UserId);
             if (data == null) return false;
-            GameServices.World.Restore(data.world);
-            GameServices.Inventory.Restore(data.inventory, id => GameServices.Content.FindItem(id));
+            GameServices.SuppressCheckpoints = true;
+            try
+            {
+                GameServices.World.Restore(data.world);
+                GameServices.Inventory.Restore(data.inventory, id => GameServices.Content.FindItem(id));
+            }
+            finally
+            {
+                GameServices.SuppressCheckpoints = false;
+            }
             _loadedPlaytime = data.playtimeSeconds;
             _sessionStart = Time.realtimeSinceStartup;
             PendingRestore = data;

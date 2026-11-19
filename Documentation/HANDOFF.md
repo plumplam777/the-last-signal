@@ -15,9 +15,9 @@ Read first: `The_Last_Signal_Master_Plan.md` (spec), `Documentation/TechnicalArc
   `AdminPanel` (CRUD), pause menu Save + Admin tools, `MainMenuBuilder` scene.
 
 ## In progress at handoff
-- Just fixed a startup-order bug in `GameServices.Awake` (quest subscription before creation) that broke PlayMode tests;
-  re-run PlayMode tests (expect 27) and fix any remaining failures. New tests: `AccountsAndSaveTests`.
-- Then: screenshot start screen + admin panel, clean macOS build (`Last Signal/Build/macOS (clean)`), smoke-test every
+- All 27 PlayMode + 23 EditMode tests pass (fixed: startup order; autosave during reset/restore now suppressed).
+- Not yet verified by hand: the new start screen and admin panel visuals.
+- Next steps: screenshot start screen + admin panel, clean macOS build (`Last Signal/Build/macOS (clean)`), smoke-test every
   scene with `-batchmode -startScene <Scene> -quitAfterSeconds 8` (never kill the player), update docs, commit.
 
 ## Next

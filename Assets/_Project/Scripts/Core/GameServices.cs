@@ -1,3 +1,4 @@
+using LastSignal.Inventory;
 using UnityEngine;
 
 namespace LastSignal.Core
@@ -18,6 +19,7 @@ namespace LastSignal.Core
         private LocalizationService _localization;
         private InputService _input;
         private SceneLoader _scenes;
+        private InventoryManager _inventory;
 
         public static bool IsReady => _instance != null;
 
@@ -26,6 +28,7 @@ namespace LastSignal.Core
         public static LocalizationService Localization => Require()._localization;
         public static InputService Input => Require()._input;
         public static SceneLoader Scenes => Require()._scenes;
+        public static InventoryManager Inventory => Require()._inventory;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateOnStartup()
@@ -45,6 +48,16 @@ namespace LastSignal.Core
             return _instance;
         }
 
+        /// <summary>Clears all run state (world facts, inventory) for a brand-new game.</summary>
+        public static void StartNewRun()
+        {
+            var s = Require();
+            s._world.Clear();
+            s._inventory.Clear();
+            s._world.SetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
+            Log.Info(nameof(GameServices), "New run started.");
+        }
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -61,6 +74,7 @@ namespace LastSignal.Core
             _localization.Initialize();
             _input = new InputService();
             _scenes = gameObject.AddComponent<SceneLoader>();
+            _inventory = new InventoryManager();
 
             _state.Changed += (_, next) => _input.ApplyState(next);
             Log.Info(nameof(GameServices), "Services initialised.");

@@ -11,19 +11,24 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 | 4 | Dec 10–16 | **P7 Polish & testing** | Lighting/audio/UI polish, BG translation pass, bug fixing, macOS build, Windows build. |
 | — | Dec 17–19 | Buffer | Diploma documentation, demo script, recorded voices if desired. |
 
-## Phase 1 — Foundation (in progress)
+## Phase 1 — Foundation (done 2026-11-19, GitHub remote pending)
 - [x] Unity 6.3 URP project, Input System only
 - [x] MCP for Unity + Blender MCP set up
-- [ ] Folder structure, assembly definitions
-- [ ] Input actions asset (Player / Interaction / UI)
-- [ ] Core services: GameServices, SceneLoader, GameStateMachine, LocalizationService (EN/BG), WorldState, Log
-- [ ] Scenes: Bootstrap, MainMenu, Sector_DockingBay in Build Settings
+- [x] Folder structure, assembly definitions
+- [x] Input actions asset (Player / Interaction / UI)
+- [x] Core services: GameServices, SceneLoader, GameStateMachine, LocalizationService (EN/BG), WorldState, Log
+- [x] Scenes: Bootstrap, MainMenu, Sector_DockingBay in Build Settings
 - [ ] Git + Unity .gitignore + GitHub remote
-- [ ] macOS build launches
+- [x] macOS build launches
 
-## Phase 2 — First playable
-PlayerController, PlayerInteractor + prompt UI, FlashlightController, pickup interactable,
-minimal InventoryManager, fuse box (power restore), powered Door, Docking Bay greybox.
+## Phase 2 — First playable (done 2026-11-19)
+- [x] PlayerController (walk/sprint/jump/look), FlashlightController (pickup-gated, F)
+- [x] PlayerInteractor + HUD prompt/reason/toasts, pause menu (Esc)
+- [x] ItemDefinition + InventoryManager, Condition/Effect system (pulled forward from Phase 3)
+- [x] Pickup, ItemSocket (fuse box), PoweredObject, DoorController
+- [x] Docking Bay greybox in the Brass & Signal art direction (code-built, see `DockingBayBuilder`)
+- [x] EditMode (9) + PlayMode (4) tests, macOS build starts in the sector without errors
+- [ ] Footstep/door/flashlight audio (needs audio assets)
 
 ## Phase 3 — Core gameplay systems
 Inventory UI + inspection, Condition/Effect system, Door/access levels/keycards, Puzzle base +

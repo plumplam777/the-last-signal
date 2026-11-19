@@ -51,6 +51,7 @@ All managers are components under the persistent `GameServices` object and are r
 | `LocalizationService` | Core/Localization | EN/BG string tables, `Get(key, args)`, `LanguageChanged` event, persists choice. | Store gameplay text in code. |
 | `InputService` | Core/Input | Owns the single generated `LastSignalControls` instance; switches Player/UI maps. | — |
 | `WorldState` | Core/State | Typed flags (`bool`/`int`/`string`) with change event. Keys are namespaced strings (see §5). | Know about doors, quests… |
+| `SectorRoot` / `SpawnPoint` | Player | One per sector scene: spawns the player prefab at `SceneLoader.PendingSpawnId`, marks the sector visited, enters Playing. | — |
 | `PlayerController` | Player | CharacterController movement, look, sprint, optional jump, footstep events. | Interaction, flashlight. |
 | `PlayerInteractor` | Interaction | Raycast from camera, finds `IInteractable`, raises prompt events, calls `Interact`. | Item-specific logic. |
 | `FlashlightController` | Player | Toggle, battery (optional), flicker. | — |
@@ -125,14 +126,16 @@ Sector ids: `docking`, `engineering`, `medical`, `research`, `reactor`.
 ### 5.3 Interaction
 ```csharp
 public interface IInteractable {
-    string PromptKey { get; }                    // localization key, e.g. "prompt.pickup"
-    bool CanInteract(PlayerInteractor who, out string reasonKey);
+    string GetPromptText();                      // already localized, e.g. "Pick up Fuse"
+    bool CanInteract(PlayerInteractor who, out string reasonKey);   // reasonKey = localization key or null
     void Interact(PlayerInteractor who);
-    Transform PromptAnchor { get; }
+    bool IsInteractionEnabled { get; }           // false = invisible to the interactor (used one-shot)
 }
 ```
 Base component `Interactable : MonoBehaviour, IInteractable` with `ConditionSet requirements`,
-`List<Effect> onInteract`, and `UnityEvent onInteracted` — most props need no custom script.
+`List<Effect> effects`, `oneShot` (remembered via `story.used.<id>`) and `UnityEvent onInteracted` — most props need no custom script.
+Implemented subclasses: `PickupInteractable` (item → inventory), `ItemSocketInteractable` (insert/consume item, e.g. fuse box),
+`DoorController` (sliding door; unlock remembered in `door.<id>.unlocked`). `PoweredObject` toggles objects on `power.<sector>`.
 
 ### 5.4 Definitions (ScriptableObjects, all with stable string `Id`)
 `ItemDefinition` (Id, NameKey, DescriptionKey, Icon, InspectPrefab, ItemType, AccessLevel),

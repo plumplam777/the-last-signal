@@ -1,8 +1,12 @@
+using System;
 using UnityEngine;
 
 namespace LastSignal.Core
 {
-    /// <summary>Lives in the Bootstrap scene (build index 0): services are already up, go to the main menu.</summary>
+    /// <summary>
+    /// Lives in the Bootstrap scene (build index 0): services are already up, go to the main menu.
+    /// Development builds/Editor accept "-startScene &lt;SceneName&gt;" to jump straight into a scene for testing.
+    /// </summary>
     public sealed class BootstrapEntry : MonoBehaviour
     {
         [SerializeField] private string firstScene = SceneIds.MainMenu;
@@ -10,7 +14,23 @@ namespace LastSignal.Core
         private void Start()
         {
             GameServices.State.Set(GameState.Boot);
-            GameServices.Scenes.Load(firstScene);
+            var target = firstScene;
+            var overrideScene = ReadArg("-startScene");
+            if (!string.IsNullOrEmpty(overrideScene))
+            {
+                Log.Info(nameof(BootstrapEntry), $"Command line start scene: {overrideScene}");
+                GameServices.StartNewRun();
+                target = overrideScene;
+            }
+            GameServices.Scenes.Load(target);
+        }
+
+        private static string ReadArg(string name)
+        {
+            var args = Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length - 1; i++)
+                if (string.Equals(args[i], name, StringComparison.OrdinalIgnoreCase)) return args[i + 1];
+            return null;
         }
     }
 }

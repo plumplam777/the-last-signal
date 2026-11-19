@@ -33,8 +33,7 @@ namespace LastSignal.UI
 
         private void OnStart()
         {
-            GameServices.World.Clear();
-            GameServices.World.SetInt(WorldKeys.AiTrust, WorldKeys.AiTrustDefault);
+            GameServices.StartNewRun();
             GameServices.Scenes.Load(firstGameplayScene);
         }
 

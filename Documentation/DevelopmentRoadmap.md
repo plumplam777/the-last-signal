@@ -49,15 +49,15 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [x] Objectives OBJ_05–07; puzzle failure feedback on the HUD
 - [x] 12 EditMode + 14 PlayMode tests; clean macOS build verified for both sectors
 
-## Phase 4 — Narrative (done 2026-11-19, voices pending)
+## Phase 4 — Narrative (done 2026-11-19)
 - [x] DialogueGraph / DialogueManager / DialogueTrigger (sector start, flag, volume) + CAIRN comms panel (eye, typewriter, choices 1–3, trust flash)
 - [x] CAIRN conversations AI_DOCK_01/02, AI_ENG_01/02/03 with scripted trust deltas and flags (EN/BG)
 - [x] Trust: 0–100 from 50; add-on lines at ≥65 / ≤35; epilogues split at 50
 - [x] Opening cutscene "The Call": 14 shots, cockpit + exterior sets (Nereth, the Murmur, Lantern Station, Tern), hold Space to skip
 - [x] Decision screen (A / B / hidden C with all 14 logs, confirmation) + Ending scene (events, lines, epilogue, credits → main menu)
 - [x] 16 EditMode + 20 PlayMode tests; clean macOS build, all 5 scenes load without errors
-- [ ] Text-to-speech voices for CAIRN, logs and cutscene (subtitles already work without audio)
-- [ ] Ending A escape countdown and the finale sector (Phase 6)
+- [x] Text-to-speech voices for CAIRN, logs and cutscene (placeholder macOS TTS, `Tools/generate_voices.py`)
+- [x] Ending A escape countdown and the finale sector (done in Phase 6)
 
 ## Phase 5 — Database & administration ✅
 - [x] Own SQLite wrapper over system libsqlite3 (replaces sqlite-net), schema v1 + migrations
@@ -75,8 +75,18 @@ Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core & 
 - [x] 27 EditMode + 42 PlayMode tests
 - [ ] Real props/art (asset packs, Blender) — moved to Phase 7
 
-## Phase 7 — Polish & testing
-Acceptance checklist from the spec §16, performance pass, builds.
+## Phase 7 — Polish & testing (next, Dec 10–16 planned; can start now)
+- [ ] Full playthrough by hand: every ending, high and low trust, Ending C with 14/14 logs, Load game in every sector, BG language
+- [ ] Spec §16 acceptance checklist with evidence (test or screenshot per bullet)
+- [ ] Art pass: replace greybox hero props (asset packs / Blender), keep ArtDirection palette, log assets in AssetRegister.md
+- [ ] Lighting / audio balance; known nits (flat Nereth in windows, floating pod numbers, admin form outlines)
+- [ ] BG translation pass with the user
+- [ ] Performance pass on the M4
+- [ ] Clean macOS build + smoke test; Windows build (ask before downloading sqlite3.dll)
+- [ ] Push to GitHub once the user provides the remote URL
+
+## Buffer — Diploma documentation (Dec 17–19)
+Demo script, architecture and database diagrams, screenshots; optional recorded voices.
 
 ## Cut list if behind schedule (in this order)
 1. Hidden ending C  2. Item combination  3. Drag-and-drop inventory  4. Jump

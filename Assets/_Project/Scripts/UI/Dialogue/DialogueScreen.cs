@@ -72,7 +72,7 @@ namespace LastSignal.UI
         private void Refresh()
         {
             var node = GameServices.Dialogue.CurrentNode;
-            if (node == null) return;
+            if (node == null || string.IsNullOrEmpty(node.lineKey)) return;
             speaker.text = Loc.Get(node.speakerKey);
             line.text = Loc.Get(node.lineKey);
             line.maxVisibleCharacters = Mathf.FloorToInt(_reveal);

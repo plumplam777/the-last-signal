@@ -53,6 +53,7 @@ namespace LastSignal.EditorTools
             BuildInterlockPanel(props);
             BuildStatusDesk(props);
             BuildHatches(props, root.transform);
+            BuildDialogueTriggers(root.transform);
 
             var power = Group("PowerController", root.transform);
             power.AddComponent<PoweredObject>().EditorConfigure(SectorIds.Engineering, on.ToArray(), off.ToArray());
@@ -268,7 +269,7 @@ namespace LastSignal.EditorTools
                 new() { id = "medical", labelKey = "eng.socket.medical", required = true },
                 new() { id = "life_support", labelKey = "eng.socket.life_support", required = true },
                 new() { id = "lighting", labelKey = "eng.socket.lighting", required = true },
-                new() { id = "array_feed", labelKey = "eng.socket.array_feed", required = false, firstPlugFlag = EngineeringContent.FedArrayFlag },
+                new() { id = "array_feed", labelKey = "eng.socket.array_feed", required = false },
             };
             board.EditorSetSockets(3, sockets);
 
@@ -383,6 +384,17 @@ namespace LastSignal.EditorTools
             terminal.EditorConfigure("eng_status", "prompt.terminal.use", null, false);
             terminal.EditorSetTerminal(EngineeringContent.StatusTerminal, glow);
             DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng02", new Vector3(5.2f, 0.98f, -2.65f), Quaternion.Euler(0, -100, 0), EngineeringContent.LogEng02);
+        }
+
+        private static void BuildDialogueTriggers(Transform root)
+        {
+            var t = Group("DialogueTriggers", root).transform;
+            Group("AI_ENG_01", t).AddComponent<LastSignal.Dialogue.DialogueTrigger>()
+                .EditorSet(DialogueContent.AiEng01, LastSignal.Dialogue.DialogueTriggerMode.OnSectorStart, null, null, 2.5f);
+            Group("AI_ENG_02", t).AddComponent<LastSignal.Dialogue.DialogueTrigger>()
+                .EditorSet(DialogueContent.AiEng02, LastSignal.Dialogue.DialogueTriggerMode.OnFlag, LastSignal.Audio.AudioLogManager.PlayedKey("log_eng_03"), null, 1.0f);
+            Group("AI_ENG_03", t).AddComponent<LastSignal.Dialogue.DialogueTrigger>()
+                .EditorSet(DialogueContent.AiEng03, LastSignal.Dialogue.DialogueTriggerMode.OnFlag, $"routing.{EngineeringContent.RoutingPuzzleId}.array_feed", null, 0.4f);
         }
 
         private static void BuildHatches(Transform props, Transform root)

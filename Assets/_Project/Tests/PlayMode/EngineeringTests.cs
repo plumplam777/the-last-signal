@@ -76,7 +76,7 @@ namespace LastSignal.Tests
             Assert.IsFalse(door.CanInteract(null, out reason));
             Assert.AreEqual("eng.door.medical_no_power", reason);
             Assert.IsTrue(board.Toggle("array_feed", out _));
-            Assert.IsTrue(world.GetBool(WorldKeys.Story("fed_array")));
+            Assert.IsFalse(world.GetBool(WorldKeys.Story("fed_array")), "Feeding the Array is decided in AI_ENG_03, not by the plug.");
             board.Toggle("medical", out _);
             board.Toggle("lighting", out _);
             Assert.IsFalse(board.Toggle("life_support", out var feedback), "Fourth cable must be refused.");

@@ -66,6 +66,12 @@ namespace LastSignal.Dialogue
             GoTo(choice.next);
         }
 
+        /// <summary>Finishes the current line now (Enter / click). Does nothing while choices are waiting.</summary>
+        public void SkipLine()
+        {
+            if (IsRunning && !_awaitingChoice) _lineTimer = 0f;
+        }
+
         /// <summary>Ends the current conversation immediately (scene change, cutscene).</summary>
         public void StopAll()
         {
@@ -103,8 +109,14 @@ namespace LastSignal.Dialogue
             _node = node;
             Effects.ApplyAll(node.onEnter);
             _choices = node.choices.Where(c => c.showWhen.Evaluate()).ToList();
-            _lineTimer = ReadingTime(GameServices.Localization.Get(node.lineKey));
             _awaitingChoice = false;
+            if (string.IsNullOrEmpty(node.lineKey))
+            {
+                // choice-only node: keep the previous line on screen and go straight to the choices
+                _lineTimer = 0f;
+                return;
+            }
+            _lineTimer = ReadingTime(GameServices.Localization.Get(node.lineKey));
             LineShown?.Invoke(node);
         }
 
@@ -120,6 +132,8 @@ namespace LastSignal.Dialogue
                 return;
             }
 
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame)) SkipLine();
             _lineTimer -= Time.unscaledDeltaTime;
             if (_lineTimer > 0f) return;
             if (_choices.Count > 0)

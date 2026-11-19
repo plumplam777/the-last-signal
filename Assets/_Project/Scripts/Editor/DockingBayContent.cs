@@ -94,6 +94,7 @@ namespace LastSignal.EditorTools
             EditorUtility.SetDirty(MainQuest);
 
             EngineeringContent.CreateAll(registry);
+            DialogueContent.CreateAll();
             foreach (var so in new ScriptableObject[] { Flashlight, Fuse, LogDock01, LogDock02, BayTerminal, MainQuest })
                 registry.EditorRegister(so);
             EditorUtility.SetDirty(registry);

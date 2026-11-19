@@ -62,6 +62,8 @@ namespace LastSignal.EditorTools
             BuildBreaker(props);
             BuildLanderConsole(props, poweredOn);
             BuildInnerDoor(props);
+            BuildEscapePodCradle(props);
+            BuildDialogueTriggers(root.transform);
 
             var power = Group("PowerController", root.transform);
             power.AddComponent<PoweredObject>().EditorConfigure(SectorIds.Docking, poweredOn.ToArray(), poweredOff.ToArray());
@@ -433,6 +435,33 @@ namespace LastSignal.EditorTools
             terminal.EditorSetTerminal(DockingBayContent.BayTerminal, glow);
 
             BuildRecorder(props, "Recorder_LogDock02", new Vector3(-4.2f, 0.98f, 2.05f), Quaternion.Euler(0, 100, 0), DockingBayContent.LogDock02);
+        }
+
+        private static void BuildEscapePodCradle(Transform props)
+        {
+            // Escape Pod 1 cradle (empty, umbilicals cut) — looking here makes CAIRN explain the evacuation (AI_DOCK_02)
+            var c = Group("EscapePod1Cradle_Empty", props, new Vector3(2.3f, 0, 3.9f)).transform;
+            Ring("CradleRing", c, new Vector3(0, 1.3f, 0), 1.2f, 0.2f, 0.25f, 28, StationMaterials.Brass);
+            Box("Clamp_L", c, new Vector3(-1.25f, 0.6f, 0), new Vector3(0.2f, 1.2f, 0.4f), StationMaterials.SlateDark);
+            Box("Clamp_R", c, new Vector3(1.25f, 0.6f, 0), new Vector3(0.2f, 1.2f, 0.4f), StationMaterials.SlateDark);
+            Cylinder("CutUmbilical_A", c, new Vector3(-0.3f, 3.2f, 0.1f), new Vector3(0.07f, 1.1f, 0.07f), StationMaterials.Rubber, false, Quaternion.Euler(0, 0, -6));
+            Cylinder("CutUmbilical_B", c, new Vector3(0.35f, 3.3f, -0.1f), new Vector3(0.07f, 0.9f, 0.07f), StationMaterials.Rubber, false, Quaternion.Euler(0, 0, 9));
+            var label = WorldText("Label", c, new Vector3(0, 2.75f, -0.15f), Quaternion.identity, "dock.pod_label", 2.0f, EmergencyRed);
+            label.characterSpacing = 6;
+
+            var volume = Group("Trigger_AI_DOCK_02", c, new Vector3(0, 1f, -1.6f));
+            var box = volume.AddComponent<BoxCollider>();
+            box.isTrigger = true;
+            box.size = new Vector3(3.6f, 2.2f, 2.6f);
+            volume.AddComponent<LastSignal.Dialogue.DialogueTrigger>().EditorSet(DialogueContent.AiDock02, LastSignal.Dialogue.DialogueTriggerMode.OnEnterVolume, null,
+                new ConditionSet { conditions = new List<Condition> { Condition.Flag(DialogueContent.AiDock01.PlayedKey) } }, 0.3f);
+        }
+
+        private static void BuildDialogueTriggers(Transform root)
+        {
+            var t = Group("DialogueTriggers", root).transform;
+            Group("AI_DOCK_01", t).AddComponent<LastSignal.Dialogue.DialogueTrigger>()
+                .EditorSet(DialogueContent.AiDock01, LastSignal.Dialogue.DialogueTriggerMode.OnFlag, WorldKeys.Power(SectorIds.Docking), null, 1.4f);
         }
 
         private const string InspectFolder = "Assets/_Project/Prefabs/Interactables/Inspect";

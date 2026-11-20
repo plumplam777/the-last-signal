@@ -38,34 +38,25 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   -17 dBFS, ambience -20, per-effect targets). `AudioManager` ducks ambience while someone speaks.
 - All player text: `Assets/_Project/Localization/Resources/Localization/{en,bg}.json`. `Loc.Get` of a missing key shows `#key#`.
 - Screenshots: positioned `manage_camera` shots with `output_folder: Documentation/Screenshots` (default folder pollutes `Assets/`).
+- Quality presets: `Last Signal/Setup/Build Quality Presets` (Low/Medium/High URP assets in `Assets/Settings/Quality`).
+  Audio import rules apply automatically (`AudioImportRules`); `Last Signal/Setup/Reimport Audio` after regenerating.
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 27 EditMode + 55 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 28 EditMode + 82 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables). Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
 
 ## 4. To do (in this order)
 
-### 4.1 Bugs the user found playing (fix first)
-1. **Bar stays across the open door.** Docking Bay → corridor to Engineering: a horizontal terracotta band (~1.2 m high)
-   runs straight across the door opening and is still there when the door is open. Likely a wall band in
-   `DockingBayBuilder.BuildHall` / `BuildCorridor` (`Band_L/R`, hall bands) passing through the inner-door opening — cut
-   bands around every door/hatch opening, check all sectors, and add a test (no renderer/collider inside a door opening).
-2. **Unreadable world text (mostly BG).** Rhee's wall note `res.note.answers` ("ТО ОТГОВАРЯ.") overflows its sticky note;
-   `res.note.or_does_it` ("...или не?") is too small; the corridor sign `sector.engineering.name` ("Инженерен отсек") is
-   clipped by the arch. Audit **all** world-space TMP texts in both languages: enable TMP auto-size (min/max), give rects
-   room, enlarge notes/plates, keep text in front of its backing. Add a test that no world text overflows its rect.
-3. A pink "A" circle appears on Rhee's wall — probably a Unity Game-view gizmo (Gizmos on). Confirm it is not in a build.
-
-### 4.2 Performance (the M4 laptop gets hot — must run light and never crash)
-- Cap frame rate (`Application.targetFrameRate = 60`, vSync; 30 in menus/pause; lower when the window is unfocused).
-- Too many real-time shadowed lights: console warns "18 shadow maps don't fit the atlas" in Docking Bay. Limit shadow-casting
-  point lights per room (1–2), shorten ranges, lower shadow resolution/distance in the URP asset.
-- Add Quality presets (Low/Medium/High) in Settings; default Medium on laptops. Review post-processing cost (bloom, SSAO).
-- Bake what can be baked (lighting/probes), enable static batching/GPU instancing, check draw calls with the profiler
-  (Docking Bay, Reactor, Command) before and after.
-- Compress: audio import as Vorbis (voices streaming / compressed in memory), texture max size + compression, check
-  build size (was 134 MB). Measure with `manage_profiler` (frame timing) and record numbers in the docs.
+### 4.1 / 4.2 — DONE (2026-11-20, see `Documentation/Performance.md`)
+- Wall band across the Docking → Engineering door removed (band stops at the pillars). `DoorOpeningClearTests`.
+- World text auto-sizes (design size = max) and wraps; corridor signs, Rhee's notes and reactor warnings re-fitted.
+  `WorldTextFitTests` checks EN + BG: fits its rect, readable size, not inside/covered by geometry.
+- Pink "A" on Rhee's wall: not in a camera render (= an editor gizmo, never in builds). `MaterialSanityTests` guards
+  against real pink (missing shaders). Turn Gizmos off in the Game view to stop seeing it.
+- Performance: fps cap (`FrameRateGovernor`), Low/Medium/High quality (default Medium, Settings → Graphics),
+  fewer shadowed lights, audio import rules. Build 136 MB (engine dominates). **Still to do:** the user should play a
+  build on Medium and say if the laptop stays cool; if not, try Low or lower `PlayingFps` to 45.
 
 ### 4.3 Make it look like the references (biggest visual gap — "still looks quite simple")
 Goal (`ArtDirection.md`): crafted retro-futurist station — dark painted metal, polished brass, teal crystal, terracotta,

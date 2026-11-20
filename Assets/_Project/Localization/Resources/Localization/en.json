@@ -588,5 +588,9 @@
   "dlg.ai_core_03.r2a": "I believe so. I have to.",
   "dlg.ai_core_03.r2b": "No. It was me. It was always me. I was talking to my own echo, and I let Jonah die for it.",
   "dlg.ai_core_03.c3": "I've heard enough.",
-  "command.console.first_comms": "The console is locked to the comms log. Check the comms console first."
+  "command.console.first_comms": "The console is locked to the comms log. Check the comms console first.",
+  "ui.start.graphics": "Graphics: {0}",
+  "ui.quality.0": "Low",
+  "ui.quality.1": "Medium",
+  "ui.quality.2": "High"
 }

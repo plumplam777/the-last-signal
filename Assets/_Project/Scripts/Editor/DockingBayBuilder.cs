@@ -165,7 +165,7 @@ namespace LastSignal.EditorTools
                 Cylinder($"Lamp_{i}_DiscOff", hall, new Vector3(0, HallHeight - 0.35f, z), new Vector3(0.75f, 0.02f, 0.75f), StationMaterials.LampOff, false);
                 var lit = Cylinder($"Lamp_{i}_DiscOn", hall, new Vector3(0, HallHeight - 0.36f, z), new Vector3(0.76f, 0.02f, 0.76f), StationMaterials.AmberLamp, false, null, false);
                 var light = PointLight($"Lamp_{i}_Light", hall, new Vector3(0, HallHeight - 0.6f, z), Amber, 5.2f, 7.5f,
-                    i % 2 == 0 ? LightShadows.Soft : LightShadows.None);
+                    i == 1 ? LightShadows.Soft : LightShadows.None); // performance: one shadowed point light per room
                 on.Add(lit);
                 on.Add(light.gameObject);
                 i++;
@@ -243,7 +243,7 @@ namespace LastSignal.EditorTools
             ((RectTransform)sign.transform).sizeDelta = new Vector2(2.7f, 0.42f); // corridor is 3.2 m wide, ceiling at 3.2 m
             on.Add(sign.gameObject);
             on.Add(PointLight("Corridor_Light_A", c, new Vector3(0, h - 0.4f, z0 + 2f), Amber, 3f, 6f).gameObject);
-            on.Add(PointLight("Corridor_Light_B", c, new Vector3(0, h - 0.4f, z1 - 1.5f), Teal, 2.5f, 5f, LightShadows.Soft).gameObject);
+            on.Add(PointLight("Corridor_Light_B", c, new Vector3(0, h - 0.4f, z1 - 1.5f), Teal, 2.5f, 5f).gameObject);
             on.Add(Box("Corridor_Strip_L", c, new Vector3(-1.5f, 0.03f, midZ), new Vector3(0.04f, 0.03f, len), StationMaterials.CyanStrip, false));
             on.Add(Box("Corridor_Strip_R", c, new Vector3(1.5f, 0.03f, midZ), new Vector3(0.04f, 0.03f, len), StationMaterials.CyanStrip, false));
         }

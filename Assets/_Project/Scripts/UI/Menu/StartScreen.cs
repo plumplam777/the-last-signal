@@ -23,6 +23,7 @@ namespace LastSignal.UI
         private TMP_Text _feedback, _signedIn, _loadWelcome, _loadHint, _loginHeading, _adminHeading, _adminHint;
         private TMP_Text _dbBanner;
         private TMP_InputField _loginUser, _loginPass, _regUser, _regPass, _regConfirm, _adminUser, _adminPass, _adminConfirm;
+        private Button _quality;
         private Button _continue, _mainLogout, _adminSubmit, _adminOpenPanel, _adminLogout;
         private GameObject _restartConfirm, _adminForm;
         private AdminPanel _admin;
@@ -51,6 +52,7 @@ namespace LastSignal.UI
         private void RefreshTexts()
         {
             if (IsAdminPanelOpen) return;
+            UpdateQualityLabel();
             var keep = _feedback.text;
             bool confirmOpen = _restartConfirm.activeSelf;
             Show(_current);
@@ -119,15 +121,17 @@ namespace LastSignal.UI
             // settings (+ a low-key way into administration)
             var sp = Page_(Page.Settings, frame);
             Text("Heading", sp, new Vector2(0, 205), new Vector2(600, 40), 28, Cyan, "ui.start.settings");
-            Text("SensLabel", sp, new Vector2(-150, 120), new Vector2(260, 40), 22, TextColor, "ui.pause.sensitivity", TextAlignmentOptions.Left);
-            Slider("Sensitivity", sp, new Vector2(120, 120), 240, SettingsService.SensitivityMin, SettingsService.SensitivityMax,
+            Text("SensLabel", sp, new Vector2(-150, 140), new Vector2(260, 40), 22, TextColor, "ui.pause.sensitivity", TextAlignmentOptions.Left);
+            Slider("Sensitivity", sp, new Vector2(120, 140), 240, SettingsService.SensitivityMin, SettingsService.SensitivityMax,
                 GameServices.Settings.MouseSensitivity, GameServices.Settings.SetMouseSensitivity);
-            Text("VolLabel", sp, new Vector2(-150, 55), new Vector2(260, 40), 22, TextColor, "ui.start.volume", TextAlignmentOptions.Left);
-            Slider("Volume", sp, new Vector2(120, 55), 240, 0f, 1f, GameServices.Settings.MasterVolume, GameServices.Settings.SetMasterVolume);
-            Toggle("InvertY", sp, new Vector2(0, -10), "ui.pause.invert_y", GameServices.Settings.InvertY, GameServices.Settings.SetInvertY);
-            Button("Language", sp, new Vector2(0, -80), new Vector2(480, 56), "ui.menu.language", () => GameServices.Localization.ToggleLanguage());
-            Button("Back", sp, new Vector2(0, -155), new Vector2(220, 46), "ui.dec.back", () => Show(Page.Main), 20);
-            var adminLink = Button("Administrator", sp, new Vector2(0, -215), new Vector2(260, 34), "ui.start.admin_link", () => Show(Page.Admin), 16);
+            Text("VolLabel", sp, new Vector2(-150, 80), new Vector2(260, 40), 22, TextColor, "ui.start.volume", TextAlignmentOptions.Left);
+            Slider("Volume", sp, new Vector2(120, 80), 240, 0f, 1f, GameServices.Settings.MasterVolume, GameServices.Settings.SetMasterVolume);
+            Toggle("InvertY", sp, new Vector2(0, 25), "ui.pause.invert_y", GameServices.Settings.InvertY, GameServices.Settings.SetInvertY);
+            _quality = Button("Graphics", sp, new Vector2(0, -40), new Vector2(480, 56), null, CycleQuality);
+            UpdateQualityLabel();
+            Button("Language", sp, new Vector2(0, -105), new Vector2(480, 56), "ui.menu.language", () => GameServices.Localization.ToggleLanguage());
+            Button("Back", sp, new Vector2(0, -170), new Vector2(220, 46), "ui.dec.back", () => Show(Page.Main), 20);
+            var adminLink = Button("Administrator", sp, new Vector2(0, -222), new Vector2(260, 34), "ui.start.admin_link", () => Show(Page.Admin), 16);
             adminLink.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
 
             // administrator: create the first admin, or log in as one, then open the admin panel
@@ -146,6 +150,21 @@ namespace LastSignal.UI
             _admin = new GameObject("AdminPanel").AddComponent<AdminPanel>();
             _admin.transform.SetParent(transform, false);
             _admin.Closed += () => Show(Page.Admin);
+        }
+
+        /// <summary>Graphics quality: Low → Medium → High → Low (Medium is the default; Low for hot laptops).</summary>
+        private void CycleQuality()
+        {
+            int count = Mathf.Max(1, QualitySettings.names.Length);
+            GameServices.Settings.SetQualityLevel((GameServices.Settings.QualityLevel + 1) % count);
+            UpdateQualityLabel();
+        }
+
+        private void UpdateQualityLabel()
+        {
+            if (_quality == null) return;
+            string level = Loc.Get($"ui.quality.{GameServices.Settings.QualityLevel}");
+            SetButtonText(_quality, Loc.Get("ui.start.graphics", level));
         }
 
         private Transform Page_(Page page, Transform parent)

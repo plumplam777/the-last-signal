@@ -122,7 +122,7 @@ namespace LastSignal.EditorTools
                 Box($"Lamp_{i}_Cage", r, p + Vector3.up * 0.15f, new Vector3(0.7f, 0.12f, 0.35f), M.Brass, false);
                 Box($"Lamp_{i}_Off", r, p, new Vector3(0.6f, 0.06f, 0.28f), M.LampOff, false);
                 on.Add(Box($"Lamp_{i}_On", r, p + Vector3.down * 0.01f, new Vector3(0.61f, 0.06f, 0.29f), _orangeLamp, false, null, false));
-                on.Add(PointLight($"Lamp_{i}_Light", r, p + Vector3.down * 0.3f, Hex("#FF9A4D"), 5.5f, 8.5f, i < 2 ? LightShadows.Soft : LightShadows.None).gameObject);
+                on.Add(PointLight($"Lamp_{i}_Light", r, p + Vector3.down * 0.3f, Hex("#FF9A4D"), 5.5f, 8.5f, i == 0 ? LightShadows.Soft : LightShadows.None).gameObject);
                 i++;
             }
             on.Add(PointLight("Fill_Teal", r, new Vector3(3.5f, 2.5f, 5.5f), Teal, 1.4f, 7f).gameObject);

@@ -120,6 +120,7 @@ namespace LastSignal.Core
             _audioLogs = gameObject.AddComponent<AudioLogManager>();
             _dialogue = gameObject.AddComponent<DialogueManager>();
             _audio = gameObject.AddComponent<AudioManager>();
+            gameObject.AddComponent<FrameRateGovernor>();
 
             _database = new DatabaseManager();
             if (_database.Open(System.IO.Path.Combine(Application.persistentDataPath, "lastsignal.db")))

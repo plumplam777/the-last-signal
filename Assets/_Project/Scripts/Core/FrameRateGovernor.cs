@@ -4,7 +4,7 @@ namespace LastSignal.Core
 {
     /// <summary>
     /// Keeps the laptop cool: vSync off (on a 120 Hz ProMotion screen vSync would mean 120 fps) and an explicit cap —
-    /// 60 fps while playing, 30 in menus / pause / dialogue screens, 10 when the window is not focused.
+    /// 60 fps (game and main menu), 30 on the pause screen, 10 when the window is not focused.
     /// </summary>
     public sealed class FrameRateGovernor : MonoBehaviour
     {
@@ -31,7 +31,8 @@ namespace LastSignal.Core
         public static int TargetFor(GameState state, bool focused)
         {
             if (!focused && !Application.isEditor) return BackgroundFps; // the editor is often unfocused during tests
-            return state is GameState.Playing or GameState.Cutscene or GameState.Ending ? PlayingFps : MenuFps;
+            // only the frozen pause screen drops to 30; the main menu has a moving 3D backdrop and looked choppy at 30
+            return state == GameState.Paused ? MenuFps : PlayingFps;
         }
 
         private void Apply()

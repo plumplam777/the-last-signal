@@ -40,9 +40,12 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
 - Screenshots: positioned `manage_camera` shots with `output_folder: Documentation/Screenshots` (default folder pollutes `Assets/`).
 - Quality presets: `Last Signal/Setup/Build Quality Presets` (Low/Medium/High URP assets in `Assets/Settings/Quality`).
   Audio import rules apply automatically (`AudioImportRules`); `Last Signal/Setup/Reimport Audio` after regenerating.
+- **Bulgarian font:** Cyrillic comes from the dynamic `LiberationSans SDF - Fallback` asset. Its "Clear Dynamic Data On
+  Build" must stay **off** — a build wiped it once and the whole BG UI went blank (TMP exceptions every frame).
+  `GlyphRenderTests` catches it. Never commit that asset with an empty `m_GlyphTable`.
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 28 EditMode + 82 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 28 EditMode + 88 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables). Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
 
@@ -54,7 +57,7 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   `WorldTextFitTests` checks EN + BG: fits its rect, readable size, not inside/covered by geometry.
 - Pink "A" on Rhee's wall: not in a camera render (= an editor gizmo, never in builds). `MaterialSanityTests` guards
   against real pink (missing shaders). Turn Gizmos off in the Game view to stop seeing it.
-- Performance: fps cap (`FrameRateGovernor`), Low/Medium/High quality (default Medium, Settings → Graphics),
+- Performance: fps cap (`FrameRateGovernor`: 60, pause 30, unfocused 10), Low/Medium/High quality (default Medium, Settings → Graphics),
   fewer shadowed lights, audio import rules. Build 136 MB (engine dominates). **Still to do:** the user should play a
   build on Medium and say if the laptop stays cool; if not, try Low or lower `PlayingFps` to 45.
 

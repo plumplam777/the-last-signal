@@ -6,13 +6,13 @@ namespace LastSignal.Tests
     public class FrameRateGovernorTests
     {
         [Test]
-        public void GameplayRunsAt60_MenusAt30()
+        public void GameplayAndMenuRunAt60_PauseAt30()
         {
             Assert.AreEqual(60, FrameRateGovernor.TargetFor(GameState.Playing, true));
             Assert.AreEqual(60, FrameRateGovernor.TargetFor(GameState.Cutscene, true));
-            Assert.AreEqual(30, FrameRateGovernor.TargetFor(GameState.MainMenu, true));
+            Assert.AreEqual(60, FrameRateGovernor.TargetFor(GameState.MainMenu, true));
             Assert.AreEqual(30, FrameRateGovernor.TargetFor(GameState.Paused, true));
-            Assert.AreEqual(30, FrameRateGovernor.TargetFor(GameState.InMenu, true));
+            Assert.AreEqual(60, FrameRateGovernor.TargetFor(GameState.InMenu, true));
         }
     }
 }

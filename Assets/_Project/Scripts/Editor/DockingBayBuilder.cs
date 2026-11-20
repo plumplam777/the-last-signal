@@ -249,10 +249,15 @@ namespace LastSignal.EditorTools
         private static void BuildBenchWithFlashlight(Transform props, ItemDefinition flashlightItem)
         {
             var bench = Group("Workbench", props, new Vector3(-4.2f, 0, -5.6f)).transform;
-            Box("Top", bench, new Vector3(0, 0.88f, 0), new Vector3(1.1f, 0.08f, 2.4f), StationMaterials.SlateDark);
-            Box("TopTrim", bench, new Vector3(0, 0.84f, 0), new Vector3(1.14f, 0.03f, 2.44f), StationMaterials.Brass, false);
-            foreach (var p in new[] { new Vector3(-0.45f, 0.42f, -1.1f), new Vector3(0.45f, 0.42f, -1.1f), new Vector3(-0.45f, 0.42f, 1.1f), new Vector3(0.45f, 0.42f, 1.1f) })
-                Box("Leg", bench, p, new Vector3(0.08f, 0.84f, 0.08f), StationMaterials.Brass);
+            if (PropModels.Place("prop_workbench", bench, Vector3.zero) != null)
+                PropModels.Solid(bench, new Vector3(0, 0.46f, 0), new Vector3(1.1f, 0.92f, 2.4f));
+            else
+            {
+                Box("Top", bench, new Vector3(0, 0.88f, 0), new Vector3(1.1f, 0.08f, 2.4f), StationMaterials.SlateDark);
+                Box("TopTrim", bench, new Vector3(0, 0.84f, 0), new Vector3(1.14f, 0.03f, 2.44f), StationMaterials.Brass, false);
+                foreach (var p in new[] { new Vector3(-0.45f, 0.42f, -1.1f), new Vector3(0.45f, 0.42f, -1.1f), new Vector3(-0.45f, 0.42f, 1.1f), new Vector3(0.45f, 0.42f, 1.1f) })
+                    Box("Leg", bench, p, new Vector3(0.08f, 0.84f, 0.08f), StationMaterials.Brass);
+            }
             Box("Toolbox", bench, new Vector3(0.1f, 1.04f, 0.75f), new Vector3(0.5f, 0.24f, 0.32f), StationMaterials.Terracotta);
             Box("Datapad", bench, new Vector3(0.15f, 0.93f, -0.7f), new Vector3(0.28f, 0.02f, 0.2f), StationMaterials.Rubber, false);
             Box("Datapad_Screen", bench, new Vector3(0.15f, 0.945f, -0.7f), new Vector3(0.24f, 0.005f, 0.16f), StationMaterials.CyanStrip, false);
@@ -303,6 +308,7 @@ namespace LastSignal.EditorTools
 
         private static void Crate(Transform parent, Vector3 pos, float size, float yaw)
         {
+            if (PropModels.Crate(parent, "Crate", pos, Vector3.one * size, yaw) != null) return;
             var crate = Box("Crate", parent, pos, Vector3.one * size, StationMaterials.SlateDark, true, Quaternion.Euler(0, yaw, 0));
             var t = crate.transform;
             // brass corner bands and a terracotta label (children inherit the crate's scale, so use unit-space sizes)
@@ -318,14 +324,17 @@ namespace LastSignal.EditorTools
             var col = box.AddComponent<BoxCollider>();
             col.size = new Vector3(0.7f, 1.0f, 0.35f);
             var t = box.transform;
-            Box("Housing", t, Vector3.zero, new Vector3(0.62f, 0.92f, 0.22f), StationMaterials.SlateDark, false);
-            Box("Frame_T", t, new Vector3(0, 0.47f, 0.06f), new Vector3(0.7f, 0.06f, 0.1f), StationMaterials.Brass, false);
-            Box("Frame_B", t, new Vector3(0, -0.47f, 0.06f), new Vector3(0.7f, 0.06f, 0.1f), StationMaterials.Brass, false);
-            Box("Frame_L", t, new Vector3(-0.33f, 0, 0.06f), new Vector3(0.06f, 0.98f, 0.1f), StationMaterials.Brass, false);
-            Box("Frame_R", t, new Vector3(0.33f, 0, 0.06f), new Vector3(0.06f, 0.98f, 0.1f), StationMaterials.Brass, false);
-            Box("Plaque", t, new Vector3(0, 0.33f, 0.115f), new Vector3(0.4f, 0.1f, 0.01f), StationMaterials.Terracotta, false);
-            Box("Socket", t, new Vector3(0, 0, 0.115f), new Vector3(0.34f, 0.16f, 0.02f), StationMaterials.Rubber, false);
-            Cylinder("Gauge", t, new Vector3(0.18f, -0.28f, 0.12f), new Vector3(0.12f, 0.01f, 0.12f), StationMaterials.Brass, false, Quaternion.Euler(90, 0, 0));
+            if (PropModels.Place("prop_fuse_box", t, Vector3.zero) == null)
+            {
+                Box("Housing", t, Vector3.zero, new Vector3(0.62f, 0.92f, 0.22f), StationMaterials.SlateDark, false);
+                Box("Frame_T", t, new Vector3(0, 0.47f, 0.06f), new Vector3(0.7f, 0.06f, 0.1f), StationMaterials.Brass, false);
+                Box("Frame_B", t, new Vector3(0, -0.47f, 0.06f), new Vector3(0.7f, 0.06f, 0.1f), StationMaterials.Brass, false);
+                Box("Frame_L", t, new Vector3(-0.33f, 0, 0.06f), new Vector3(0.06f, 0.98f, 0.1f), StationMaterials.Brass, false);
+                Box("Frame_R", t, new Vector3(0.33f, 0, 0.06f), new Vector3(0.06f, 0.98f, 0.1f), StationMaterials.Brass, false);
+                Box("Plaque", t, new Vector3(0, 0.33f, 0.115f), new Vector3(0.4f, 0.1f, 0.01f), StationMaterials.Terracotta, false);
+                Box("Socket", t, new Vector3(0, 0, 0.115f), new Vector3(0.34f, 0.16f, 0.02f), StationMaterials.Rubber, false);
+                Cylinder("Gauge", t, new Vector3(0.18f, -0.28f, 0.12f), new Vector3(0.12f, 0.01f, 0.12f), StationMaterials.Brass, false, Quaternion.Euler(90, 0, 0));
+            }
             Box("Conduit", props, new Vector3(4.9f, 3.1f, 3.6f), new Vector3(0.12f, 2.4f, 0.12f), StationMaterials.Brass, false);
 
             var installed = Group("Installed", t, new Vector3(0, 0, 0.14f));
@@ -455,11 +464,17 @@ namespace LastSignal.EditorTools
             var col = console.AddComponent<BoxCollider>();
             col.size = new Vector3(1.3f, 1.4f, 0.8f);
             col.center = new Vector3(0, 0.7f, 0);
-            Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.2f, 0.9f, 0.55f), StationMaterials.SlateDark, false);
-            Box("Desk", t, new Vector3(0, 0.93f, 0.08f), new Vector3(1.3f, 0.06f, 0.7f), StationMaterials.Brass, false, Quaternion.Euler(-12, 0, 0));
-            Box("Screen", t, new Vector3(0, 1.32f, -0.12f), new Vector3(0.9f, 0.55f, 0.05f), StationMaterials.SlateDark, false, Quaternion.Euler(-12, 0, 0));
-            Box("ScreenFrame", t, new Vector3(0, 1.32f, -0.15f), new Vector3(0.98f, 0.63f, 0.03f), StationMaterials.Brass, false, Quaternion.Euler(-12, 0, 0));
-            var glow = Box("ScreenGlow", t, new Vector3(0, 1.32f, -0.09f), new Vector3(0.84f, 0.49f, 0.005f), StationMaterials.CyanStrip, false, Quaternion.Euler(-12, 0, 0), false);
+            GameObject glow;
+            if (PropModels.Place("prop_terminal_kiosk", t, Vector3.zero) != null)
+                glow = Box("ScreenGlow", t, new Vector3(0, 1.38f, -0.18f), new Vector3(0.88f, 0.53f, 0.005f), StationMaterials.CyanStrip, false, Quaternion.Euler(-10, 0, 0), false);
+            else
+            {
+                Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.2f, 0.9f, 0.55f), StationMaterials.SlateDark, false);
+                Box("Desk", t, new Vector3(0, 0.93f, 0.08f), new Vector3(1.3f, 0.06f, 0.7f), StationMaterials.Brass, false, Quaternion.Euler(-12, 0, 0));
+                Box("Screen", t, new Vector3(0, 1.32f, -0.12f), new Vector3(0.9f, 0.55f, 0.05f), StationMaterials.SlateDark, false, Quaternion.Euler(-12, 0, 0));
+                Box("ScreenFrame", t, new Vector3(0, 1.32f, -0.15f), new Vector3(0.98f, 0.63f, 0.03f), StationMaterials.Brass, false, Quaternion.Euler(-12, 0, 0));
+                glow = Box("ScreenGlow", t, new Vector3(0, 1.32f, -0.09f), new Vector3(0.84f, 0.49f, 0.005f), StationMaterials.CyanStrip, false, Quaternion.Euler(-12, 0, 0), false);
+            }
             var light = PointLight("ScreenLight", glow.transform, new Vector3(0, 0, 1.5f), SignalCyan, 0.6f, 2.2f);
             _ = light;
             var terminal = console.AddComponent<TerminalInteractable>();

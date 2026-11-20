@@ -225,9 +225,17 @@ namespace LastSignal.EditorTools
             var panel = Group("GeneratorStartPanel", props, new Vector3(3.6f, 0, -0.6f));
             // front (local -Z) faces the player coming from the south
             var t = panel.transform;
-            Box("Pedestal", t, new Vector3(0, 0.5f, 0), new Vector3(1.6f, 1.0f, 0.5f), M.SlateDark);
-            Box("Desk", t, new Vector3(0, 1.05f, -0.05f), new Vector3(1.7f, 0.08f, 0.6f), M.Brass, false, Quaternion.Euler(-15, 0, 0));
-            WorldText("Title", t, new Vector3(0, 1.45f, 0.26f), Quaternion.identity, "eng.panel.title", 2.2f, Brass);
+            if (PropModels.Place("prop_decode_console", t, Vector3.zero, scale: new Vector3(0.89f, 1f, 1f)) != null)
+            {
+                PropModels.Solid(t, new Vector3(0, 0.5f, 0), new Vector3(1.6f, 1.0f, 0.5f));
+                WorldText("Title", t, new Vector3(0, 1.45f, 0.2f), Quaternion.identity, "eng.panel.title", 2.2f, Brass); // in front of the display housing
+            }
+            else
+            {
+                Box("Pedestal", t, new Vector3(0, 0.5f, 0), new Vector3(1.6f, 1.0f, 0.5f), M.SlateDark);
+                Box("Desk", t, new Vector3(0, 1.05f, -0.05f), new Vector3(1.7f, 0.08f, 0.6f), M.Brass, false, Quaternion.Euler(-15, 0, 0));
+                WorldText("Title", t, new Vector3(0, 1.45f, 0.26f), Quaternion.identity, "eng.panel.title", 2.2f, Brass);
+            }
 
             var puzzle = panel.AddComponent<SequencePuzzle>();
             puzzle.EditorConfigurePuzzle(EngineeringContent.GeneratorPuzzleId, SectorIds.Engineering,
@@ -309,9 +317,15 @@ namespace LastSignal.EditorTools
         private static void BuildWorkbench(Transform props)
         {
             var bench = Group("KayeWorkbench", props, new Vector3(-5.3f, 0, -2.5f)).transform;
-            Box("Top", bench, new Vector3(0, 0.9f, 0), new Vector3(1.1f, 0.08f, 2.6f), M.SlateDark);
-            Box("Trim", bench, new Vector3(0, 0.86f, 0), new Vector3(1.14f, 0.03f, 2.64f), M.Brass, false);
-            Box("Cabinet", bench, new Vector3(0, 0.42f, 0), new Vector3(1.0f, 0.84f, 2.5f), _rust);
+            bool benchModel = PropModels.Place("prop_workbench", bench, Vector3.zero, scale: new Vector3(1f, 1.02f, 2.6f / 2.4f)) != null;
+            if (benchModel)
+                PropModels.Solid(bench, new Vector3(0, 0.47f, 0), new Vector3(1.1f, 0.94f, 2.6f));
+            else
+            {
+                Box("Top", bench, new Vector3(0, 0.9f, 0), new Vector3(1.1f, 0.08f, 2.6f), M.SlateDark);
+                Box("Trim", bench, new Vector3(0, 0.86f, 0), new Vector3(1.14f, 0.03f, 2.64f), M.Brass, false);
+                Box("Cabinet", bench, new Vector3(0, 0.42f, 0), new Vector3(1.0f, 0.84f, 2.5f), _rust);
+            }
             // tools laid out neatly
             for (int i = 0; i < 4; i++)
                 Box($"Tool_{i}", bench, new Vector3(0.1f, 0.95f, -0.9f + i * 0.18f), new Vector3(0.4f, 0.02f, 0.05f), i % 2 == 0 ? M.Brass : M.Rubber, false);
@@ -330,7 +344,7 @@ namespace LastSignal.EditorTools
 
             // parts drawer with the spare coupling
             var drawer = Group("PartsDrawer", props, new Vector3(-4.75f, 0.62f, -1.6f));
-            Box("DrawerFront", drawer.transform, Vector3.zero, new Vector3(0.05f, 0.25f, 0.6f), M.Brass, false, null, false);
+            if (!benchModel) Box("DrawerFront", drawer.transform, Vector3.zero, new Vector3(0.05f, 0.25f, 0.6f), M.Brass, false, null, false);
             var pickupGo = Group("Pickup_Coupling", props, new Vector3(-5.0f, 0.97f, -1.6f));
             pickupGo.AddComponent<BoxCollider>().size = new Vector3(0.4f, 0.25f, 0.4f);
             Cylinder("Coupling", pickupGo.transform, Vector3.zero, new Vector3(0.14f, 0.12f, 0.14f), M.Brass, false, Quaternion.Euler(0, 0, 90), false);
@@ -370,7 +384,8 @@ namespace LastSignal.EditorTools
                 ((RectTransform)tag.transform).sizeDelta = new Vector2(0.22f, 0.14f);
                 tag.characterSpacing = 0;
             }
-            Box("Crate", props, new Vector3(-5.3f, 0.3f, 3.0f), new Vector3(0.7f, 0.6f, 0.7f), M.SlateDark);
+            if (PropModels.Crate(props, "Crate", new Vector3(-5.3f, 0.3f, 3.0f), new Vector3(0.7f, 0.6f, 0.7f), 90f) == null)
+                Box("Crate", props, new Vector3(-5.3f, 0.3f, 3.0f), new Vector3(0.7f, 0.6f, 0.7f), M.SlateDark);
             DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng03", new Vector3(-5.3f, 0.62f, 3.0f), Quaternion.Euler(0, 60, 0), EngineeringContent.LogEng03);
         }
 
@@ -381,10 +396,16 @@ namespace LastSignal.EditorTools
             var t = desk.transform;
             desk.AddComponent<BoxCollider>().size = new Vector3(1.4f, 1.5f, 0.8f);
             desk.GetComponent<BoxCollider>().center = new Vector3(0, 0.75f, 0);
-            Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.3f, 0.9f, 0.55f), M.SlateDark, false);
-            Box("Top", t, new Vector3(0, 0.93f, 0.05f), new Vector3(1.4f, 0.06f, 0.7f), M.Brass, false);
-            Box("Screen", t, new Vector3(0, 1.35f, -0.15f), new Vector3(0.9f, 0.55f, 0.05f), M.SlateDark, false, Quaternion.Euler(-10, 0, 0));
-            var glow = Box("ScreenGlow", t, new Vector3(0, 1.35f, -0.18f), new Vector3(0.84f, 0.49f, 0.005f), _orangeLamp, false, Quaternion.Euler(-10, 0, 0), false);
+            GameObject glow;
+            if (PropModels.Place("prop_terminal_kiosk", t, Vector3.zero) != null)
+                glow = Box("ScreenGlow", t, new Vector3(0, 1.38f, -0.18f), new Vector3(0.88f, 0.53f, 0.005f), _orangeLamp, false, Quaternion.Euler(-10, 0, 0), false);
+            else
+            {
+                Box("Base", t, new Vector3(0, 0.45f, 0), new Vector3(1.3f, 0.9f, 0.55f), M.SlateDark, false);
+                Box("Top", t, new Vector3(0, 0.93f, 0.05f), new Vector3(1.4f, 0.06f, 0.7f), M.Brass, false);
+                Box("Screen", t, new Vector3(0, 1.35f, -0.15f), new Vector3(0.9f, 0.55f, 0.05f), M.SlateDark, false, Quaternion.Euler(-10, 0, 0));
+                glow = Box("ScreenGlow", t, new Vector3(0, 1.35f, -0.18f), new Vector3(0.84f, 0.49f, 0.005f), _orangeLamp, false, Quaternion.Euler(-10, 0, 0), false);
+            }
             Box("Clipboard", t, new Vector3(0.45f, 0.97f, 0.15f), new Vector3(0.25f, 0.02f, 0.33f), M.Ceramic, false, Quaternion.Euler(0, 20, 0));
             var terminal = desk.AddComponent<TerminalInteractable>();
             terminal.EditorConfigure("eng_status", "prompt.terminal.use", null, false);

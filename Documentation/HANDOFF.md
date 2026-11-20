@@ -140,9 +140,11 @@ power, open decision screen, …), `Last Signal/Diagnostics/*` (UI previews, att
    Done: cryo pods (Medical), bridge workstations + comms console, captain's chair (Command), valve wheels/bodies
    (Reactor). **Batch 2 (2026-11-20):** captain's console, patient terminal kiosk, decode console, Okafor + Rhee
    desks, office chairs, cabinet + safe shells (colliders stay on invisible `HollowCase`), ceiling pipe runs
-   (`PropModels.PipeRun`) on Medical W/E, Research W/S, Command W/E walls. User chose **Blender only, no paid generation**. Every new prop collider must keep interactables
-   reachable — `InteractableReachabilityTests` enforces it. Next candidates: Docking Bay/Engineering props, listening booth, map table,
-   lift cabins, hatch frames; then lighting/audio polish.
+   (`PropModels.PipeRun`) on Medical W/E, Research W/S, Command W/E walls.
+   **Batch 3 (2026-11-20):** crates (`PropModels.Crate`, any size), workbench (Docking + Kaye's), fuse box, bay console
+   and Engineering status desk (kiosk), generator start panel (decode console scaled 0.89 in X). User chose **Blender only, no paid generation**. Every new prop collider must keep interactables
+   reachable — `InteractableReachabilityTests` enforces it. Next candidates: listening booth, map table, lift cabins, hatch frames, lander cradle;
+   then lighting/audio polish (HANDOFF §7 item 4).
    Old note: Medical/Research/Command props are greybox primitives. Replace hero props with
    asset-pack or Blender models (Blender MCP available; `generate_3d` may cost the user credits — ask). Keep the palette
    in `ArtDirection.md`. Record every external asset in `Documentation/AssetRegister.md` (licence!).

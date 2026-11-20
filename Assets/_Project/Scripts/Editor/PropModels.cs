@@ -74,6 +74,19 @@ namespace LastSignal.EditorTools
                 Place("prop_pipe_run", group, from + dir * (start + i * 2f), Quaternion.Euler(0, yaw, 0), name: $"Pipe_{i}");
         }
 
+        /// <summary>Cargo crate of any size (centre at <paramref name="center"/>) with its collider; null when the model is missing.</summary>
+        public static GameObject Crate(Transform parent, string name, Vector3 center, Vector3 size, float yaw)
+        {
+            if (!Exists("prop_crate")) return null;
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = center;
+            go.transform.localRotation = Quaternion.Euler(0, yaw, 0);
+            go.AddComponent<BoxCollider>().size = size;
+            Place("prop_crate", go.transform, Vector3.zero, scale: size);
+            return go;
+        }
+
         private static Material _steel;
 
         private static Material Remap(Material m, IDictionary<string, Material> overrides)

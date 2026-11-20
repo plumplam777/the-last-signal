@@ -392,6 +392,54 @@ def pipe_run():
     cyl(0.085, 0.06, (0.98, 0.11, -0.22), "Steel", axis="x", verts=20, bevel=0.005)  # flange at the joint
 
 
+def crate():
+    """Cargo crate, 1 m cube centred on the origin (scaled per crate by the builder). Label faces -Z."""
+    box((0.94, 0.94, 0.94), (0, 0, 0), "Slate", 0.03)
+    for y in (-0.44, 0.44):                                                  # brass edge rims
+        for z in (-0.47, 0.47):
+            box((1.0, 0.08, 0.08), (0, y, z), "Brass", 0.015)
+        for x in (-0.47, 0.47):
+            box((0.08, 0.08, 1.0), (x, y, 0), "Brass", 0.015)
+    for x in (-1, 1):                                                        # corner posts
+        for z in (-1, 1):
+            box((0.09, 0.82, 0.09), (x * 0.47, 0, z * 0.47), "Steel", 0.015)
+    for z in (-1, 1):                                                        # side ribs
+        box((0.86, 0.06, 0.03), (0, 0.0, z * 0.48), "Steel", 0.008)
+    box((0.42, 0.26, 0.02), (0, 0.18, -0.485), "Terracotta", 0.006)          # label plate
+    for x in (-0.15, 0.15):
+        box((0.12, 0.05, 0.02), (x, -0.2, -0.485), "Rubber", 0.006)          # grab slots
+
+
+def workbench():
+    """Workbench along Z (2.4 m), top at y 0.88, user side = +X. Lower shelf; brass legs."""
+    box((1.1, 0.07, 2.4), (0, 0.885, 0), "Slate", 0.015)
+    box((1.14, 0.03, 2.44), (0, 0.84, 0), "Brass", 0.008)
+    for x in (-0.47, 0.47):
+        for z in (-1.12, 1.12):
+            box((0.07, 0.84, 0.07), (x, 0.42, z), "Brass", 0.012)
+    box((1.0, 0.04, 2.3), (0, 0.2, 0), "Steel", 0.008)                       # lower shelf
+    box((0.04, 0.5, 2.3), (-0.5, 0.5, 0), "Slate", 0.008)                    # back panel (wall side)
+    box((0.06, 0.12, 2.3), (0.52, 0.8, 0), "Steel", 0.008)                   # front apron
+    box((0.5, 0.26, 0.4), (-0.15, 0.36, -0.7), "Terracotta", 0.02)           # parts bin on the shelf
+    box((0.4, 0.2, 0.5), (-0.1, 0.32, 0.6), "Rubber", 0.02)
+
+
+def fuse_box():
+    """Wall fuse box, front = +Z (the builder turns it to face the hall). Socket recess at the centre."""
+    box((0.62, 0.92, 0.2), (0, 0, 0), "Slate", 0.02)
+    box((0.7, 0.07, 0.1), (0, 0.47, 0.06), "Brass", 0.015)
+    box((0.7, 0.07, 0.1), (0, -0.47, 0.06), "Brass", 0.015)
+    box((0.07, 0.98, 0.1), (-0.33, 0, 0.06), "Brass", 0.015)
+    box((0.07, 0.98, 0.1), (0.33, 0, 0.06), "Brass", 0.015)
+    box((0.42, 0.24, 0.03), (0, 0, 0.1), "Rubber", 0.006)                    # socket recess surround
+    box((0.4, 0.1, 0.012), (0, 0.33, 0.105), "Terracotta", 0.003)            # plaque
+    cyl(0.07, 0.03, (0.18, -0.28, 0.11), "Brass", axis="z", verts=24, bevel=0.006)
+    cyl(0.055, 0.01, (0.18, -0.28, 0.13), "Ceramic", axis="z", verts=24, bevel=0.0)
+    for x in (-0.33, 0.33):                                                  # bolts
+        for y in (-0.47, 0.47):
+            cyl(0.02, 0.03, (x, y, 0.12), "Steel", axis="z", verts=8, bevel=0.0)
+
+
 PROPS = [
     ("prop_cryo_pod_base", cryo_pod_base),
     ("prop_cryo_pod_canopy", cryo_pod_canopy),
@@ -407,6 +455,9 @@ PROPS = [
     ("prop_cabinet_case", cabinet_case),
     ("prop_safe_case", safe_case),
     ("prop_pipe_run", pipe_run),
+    ("prop_crate", crate),
+    ("prop_workbench", workbench),
+    ("prop_fuse_box", fuse_box),
 ]
 
 

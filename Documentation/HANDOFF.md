@@ -1,182 +1,104 @@
 # The Last Signal — Handoff for a new chat
 
-**Date:** 2026-11-19 · **Deadline:** ≈ 2026-12-19 · **State:** Phases 1–6 done, Phase 7 (polish & testing) in progress — playthrough tests + §16 checklist done.
-**Last commit:** see `git log -1` (Phase 6 + this handoff). Everything is committed locally; **there is no GitHub
-remote yet** — the user will provide the URL; then add it and push.
+**Updated:** 2026-11-20 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
+Phase 7 (polish) is in progress. Everything is committed on `main`; **no GitHub remote yet** (user will give the URL →
+`git remote add origin <url>` → push).
 
-> **New chat: read this file first**, then skim `DecisionsLog.md` (42 decisions) and the parts of
-> `Narrative/StoryBible.md` you need. Do not re-ask the user anything listed under "User decisions".
+> New chat: read this file, then `Documentation/ArtDirection.md` (+ the two images in `Documentation/ArtReference/`).
+> Do not re-ask the user anything under "User decisions". Work through **§4 To do** top to bottom.
 
----
+## 1. The project in short
 
-## 1. What the project is
-
-A diploma-project 3D first-person narrative puzzle game in **Unity 6.3 (6000.3.10f1), URP, Input System only**, on macOS
-(Apple Silicon). The player (Noa Varden, relay technician) answers a distress call from Lantern Station above the ice
-world Nereth. The only voice aboard is the station AI **CAIRN**. Five linear areas:
-**Docking Bay → Engineering → Medical Bay → Research Lab → Reactor Core + Command Center (finale)**,
-14 audio logs, CAIRN dialogue with a 0–100 trust value, final decision with 3 endings (C hidden, needs all 14 logs).
-Also required by the diploma: real local accounts (SQLite), admin login + admin panel with CRUD, save/load, EN + BG.
-
-Solo developer = the user; Claude = technical lead (writes code, content, docs; decides when to use subagents).
+Diploma 3D first-person narrative puzzle game, **Unity 6.3 (6000.3.10f1), URP, Input System**, macOS (Apple Silicon M4).
+Noa Varden answers a distress call from Lantern Station above the ice world Nereth; the station AI **CAIRN** is the only
+voice. Docking Bay → Engineering → Medical → Research → Reactor + Command → decision (A destroy & escape / B restore /
+C silence, C needs all 14 logs). CAIRN trust 0–100 changes lines, not endings. SQLite accounts, admin panel, saves, EN + BG.
+User = solo developer; Claude = technical lead (code, content, docs, decides on subagents).
 
 ## 2. User decisions (do not re-ask)
 
-- Deadline ~1 month (≈ 2026-12-19). Languages **English + Bulgarian**, switchable in game.
-- Story/names/anomaly drafted by Claude, approved by the user (StoryBible v1.0 is approved).
-- Art: mix of asset packs + Blender props. Style = **stylized brass/teal/terracotta (BioShock Infinite) mixed with dark
-  sci-fi console rooms**; dark navy bases, medium saturation, **never neon-bright** (`Documentation/ArtDirection.md`).
-- Voices: AI TTS placeholders now; the user may record real voices later (drop-in WAV replacement).
-- Real local accounts (SQLite), polished start screen. Start screen = **New game / Load game / Settings / Quit**;
-  administrator create/login is a small link **inside Settings** (user request, decision 36).
-- Final choice is always free; trust only changes dialogue/epilogue lines.
-- Opening = non-interactive cutscene. GitHub: user connects it; Claude commits and pushes.
+- Languages EN + BG. Story/StoryBible v1.0 approved. Start screen: New game / Load game / Settings / Quit (admin link in Settings).
+- **Art:** look like the references — stylized painterly **brass / teal / terracotta (BioShock Infinite)** mixed with
+  **dark sci-fi console rooms**; dark navy bases, medium saturation, never neon. Images in `Documentation/ArtReference/`.
+- **3D models: Blender only, built by script — no paid AI generation / credits.**
+- Voices: macOS TTS placeholders (user may record real ones later, same file names).
+- Ask before downloading anything (Windows build needs `sqlite3.dll`).
 
-## 3. How to work on this machine (important)
+## 3. How to work on this machine (gotchas)
 
-- Project path: `/Users/plami/diplomna;3/Last_signal` — **the `;` in the path breaks Unity MCP `execute_code`**.
-  Drive the editor with **menu items** (`Last Signal/...`), `refresh_unity`, `run_tests`, `manage_scene`, `manage_camera`.
-- Unity editor is usually open with **MCP for Unity** connected (`.mcp.json`: `unity` and `blender` via
-  `~/Library/Python/3.9/bin/uvx`). No Homebrew, no `gh`, no git-lfs, no node. `curl | sh` installers are blocked.
-- **New C# files need a full refresh** (`refresh_unity` scope `all`, mode `force`); scope `scripts` does not import them.
-- Editor unfocused ⇒ no frames rendered: MCP screenshots of overlay UI need
-  `Last Signal/Diagnostics/Attach UI To Camera (Play Mode)` + screenshot with `camera`. For rooms, use positioned
-  screenshots (`view_position` + `view_target`), which render a temp camera.
-- Time-based PlayMode tests speed up `Time.timeScale`; the editor throttles unfocused play mode.
-- **Every MonoBehaviour must live in a file with the same name** (otherwise player-only scene corruption).
-- **Smoke-testing the built player:** never `kill` it (the user got blocking macOS "Reopen" dialogs). Always:
-  ```bash
-  "Builds/macOS/TheLastSignal.app/Contents/MacOS/The Last Signal" -batchmode -startScene Sector_Medical -quitAfterSeconds 8 -logFile <scratch>/smoke.log
-  ```
-  `-startScene` starts a fresh run in that scene; `-quitAfterSeconds` quits cleanly.
-- Windows build needs a `sqlite3.dll` — **ask the user before downloading anything**.
-- Commit style: one commit per finished step, message ends with the `Co-Authored-By` line the session gives.
+- Path `/Users/plami/diplomna;3/Last_signal` — the `;` breaks Unity MCP `execute_code`. Use **menu items**
+  (`Last Signal/...`), `refresh_unity` (new C# files need scope `all`, mode `force`), `run_tests`, `manage_scene`, `manage_camera`.
+- **All content is generated by code.** Edit a builder → refresh → menu `Last Signal/Build Content/Build All Sectors` →
+  run tests. Never hand-edit scenes. Builders: `Assets/_Project/Scripts/Editor/*Builder.cs`, data in `*Content.cs`.
+- **Props:** `Tools/blender/build_props.py` (headless Blender 5.1, parts authored in Unity coordinates) →
+  `Art/Models/Props/*.fbx` → placed by `PropModels.Place(...)` (greybox fallback). Run:
+  `/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python Tools/blender/build_props.py -- [--preview <dir>] [--only a,b]`
+- **Sky:** `SkyArt.cs` generates Nereth + starfield PNGs (`Art/Textures/Sky`, delete a PNG to regenerate).
+- **Audio:** `Tools/generate_voices.py`, `Tools/generate_sfx.py` (both end with `Tools/normalize_audio.py`: voices
+  -17 dBFS, ambience -20, per-effect targets). `AudioManager` ducks ambience while someone speaks.
+- All player text: `Assets/_Project/Localization/Resources/Localization/{en,bg}.json`. `Loc.Get` of a missing key shows `#key#`.
+- Screenshots: positioned `manage_camera` shots with `output_folder: Documentation/Screenshots` (default folder pollutes `Assets/`).
+- Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
+- Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
+- Tests: 27 EditMode + 55 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
+  sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables). Spec §16 evidence:
+  `Documentation/AcceptanceChecklist.md`.
 
-## 4. Repository map
+## 4. To do (in this order)
+
+### 4.1 Bugs the user found playing (fix first)
+1. **Bar stays across the open door.** Docking Bay → corridor to Engineering: a horizontal terracotta band (~1.2 m high)
+   runs straight across the door opening and is still there when the door is open. Likely a wall band in
+   `DockingBayBuilder.BuildHall` / `BuildCorridor` (`Band_L/R`, hall bands) passing through the inner-door opening — cut
+   bands around every door/hatch opening, check all sectors, and add a test (no renderer/collider inside a door opening).
+2. **Unreadable world text (mostly BG).** Rhee's wall note `res.note.answers` ("ТО ОТГОВАРЯ.") overflows its sticky note;
+   `res.note.or_does_it` ("...или не?") is too small; the corridor sign `sector.engineering.name` ("Инженерен отсек") is
+   clipped by the arch. Audit **all** world-space TMP texts in both languages: enable TMP auto-size (min/max), give rects
+   room, enlarge notes/plates, keep text in front of its backing. Add a test that no world text overflows its rect.
+3. A pink "A" circle appears on Rhee's wall — probably a Unity Game-view gizmo (Gizmos on). Confirm it is not in a build.
+
+### 4.2 Performance (the M4 laptop gets hot — must run light and never crash)
+- Cap frame rate (`Application.targetFrameRate = 60`, vSync; 30 in menus/pause; lower when the window is unfocused).
+- Too many real-time shadowed lights: console warns "18 shadow maps don't fit the atlas" in Docking Bay. Limit shadow-casting
+  point lights per room (1–2), shorten ranges, lower shadow resolution/distance in the URP asset.
+- Add Quality presets (Low/Medium/High) in Settings; default Medium on laptops. Review post-processing cost (bloom, SSAO).
+- Bake what can be baked (lighting/probes), enable static batching/GPU instancing, check draw calls with the profiler
+  (Docking Bay, Reactor, Command) before and after.
+- Compress: audio import as Vorbis (voices streaming / compressed in memory), texture max size + compression, check
+  build size (was 134 MB). Measure with `manage_profiler` (frame timing) and record numbers in the docs.
+
+### 4.3 Make it look like the references (biggest visual gap — "still looks quite simple")
+Goal (`ArtDirection.md`): crafted retro-futurist station — dark painted metal, polished brass, teal crystal, terracotta,
+lit like a painting. Ideas, highest impact first:
+- **Materials/textures:** hand-painted style albedo with soft gradients, edge-wear on brass, grime in corners, trim sheets
+  and panel lines (generate procedurally like `SkyArt`, or bake in Blender). Right now most surfaces are flat colours.
+- **Architecture modules in Blender:** wall panels with brass ribs and rivet rows, ornate arch/ring door frames, domed
+  ceilings, floor grates, meander trim bands — replace the flat box rooms.
+- **Lighting & post:** stronger warm amber vs cold teal contrast, colour grading + vignette, bloom on emissives, light
+  shafts/fog in big rooms, emissive signal lines. Keep it cheap (see 4.2).
+- **Set dressing:** cables, pipes, signage, decals, a hero machine per sector (generator, cryo pods, reactor core, …).
+- Remaining greybox props: listening booth, map table, lift cabins, hatch frames, lander cradle, Okafor/Rhee clutter.
+- Compare every pass with the reference images; take before/after screenshots into `Documentation/Screenshots/`.
+
+### 4.4 Then
+- Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.
+- BG translation pass with the user (tone, gender forms; Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).
+- Builds: clean macOS build + smoke test of all 8 scenes; Windows build (ask before downloading `sqlite3.dll`).
+- GitHub push when the user gives the URL.
+- Diploma docs (Dec 17–19): demo script, architecture/DB diagrams (`TechnicalArchitecture.md`, `DatabaseSchema.md`),
+  screenshots. Cut list if late: hidden Ending C → item combination → Windows build.
+
+## 5. Where things are
 
 | Path | What |
 |---|---|
 | `The_Last_Signal_Master_Plan.md` | Original spec (§16 = acceptance criteria) |
-| `Documentation/` | `TechnicalArchitecture.md`, `DevelopmentRoadmap.md`, `DecisionsLog.md`, `DatabaseSchema.md`, `ArtDirection.md`, `AssetRegister.md`, `Narrative/StoryBible.md`, `Screenshots/` |
-| `Assets/_Project/Scripts/Core` | `GameServices` (service locator, created before first scene), `WorldState` + `WorldKeys`, `Conditions`/`Effects`, `SceneLoader` + `SceneIds`, `LocalizationService` (`Loc.Get`), `SettingsService`, `GameStateMachine`, `BootstrapEntry` (`-startScene`, `-quitAfterSeconds`) |
-| `Scripts/Player` | `PlayerController`, `FlashlightController` (battery), `SectorRoot` (spawns player at spawn id), `SpawnPoint` |
-| `Scripts/Interaction` | `Interactable` base (requirements, effects, one-shot), `DoorController`, `SectorHatch`, `PickupInteractable`, `ItemSocketInteractable`, `LeverInteractable`, `PoweredObject`, `AudioLogPickup`, `ConditionToggle`, `LiftInteractable`, `CrankInteractable` |
-| `Scripts/Puzzles` | `Puzzle` base (solved = `puzzle.<id>.solved`), `SequencePuzzle`, `RoutingBoard`, `CodeLock` + terminals, `SymbolSequenceLock` + `SymbolDecodePuzzle` + `SymbolKeyInteractable`, `ReactorBalance` + `ReactorBalancePuzzle` + `ValveInteractable` |
-| `Scripts/Dialogue` | `DialogueGraph` (nodes with trust/flag conditions), `DialogueManager`, `DialogueTrigger` (OnSectorStart / OnFlag / OnEnterVolume), `ConsoleDialogueInteractable` |
-| `Scripts/Endings` | `EndingScript` (lines per ending/trust), `EndingController` (Ending scene), `EscapeSequence` (Ending A countdown), `BoardShipInteractable` |
-| `Scripts/Database` | Own SQLite wrapper over system `libsqlite3` (`Sqlite.cs`), schema v1, repositories (Users/Sectors/Items/Progress), `AuthService` (PBKDF2) |
-| `Scripts/SaveSystem` | `SaveManager` (JSON per user, atomic write + .bak, checkpoints) |
-| `Scripts/Admin` | `AdminManager` (session-only overrides: unlock sectors, teleport, give items) |
-| `Scripts/UI` | `RuntimeUi` (code-built uGUI helpers), `StartScreen`, `AdminPanel`, pause menu, HUD, inventory, terminal, dialogue, decision screens |
-| `Scripts/Editor` | **All content is generated by code**: `DockingBayBuilder`, `EngineeringBuilder`, `MedicalBuilder`, `ResearchBuilder`, `ReactorCommandBuilder`, `CutsceneBuilder`, `EndingBuilder`, `MainMenuBuilder`, `PlayerPrefabBuilder`, `ContentPipeline` (Build All Sectors); data: `DockingBayContent` (items, logs, quest objectives, registry), `EngineeringContent`, `StationContent` (Phase 6 items/logs/terminals/flags), `DialogueContent` (all CAIRN graphs); tools: `BuildTools`, `DebugMenu`, `UiPreview`, `ProjectSetup` |
-| `Assets/_Project/Localization/Resources/Localization/{en,bg}.json` | **All player-facing text** (keys: `log.<id>.line.N`, `dlg.<id>.<node>`, `obj.<id>`, `terminal.<id>.*`, `end.*`, `epi.*`, `ui.*`) |
-| `Assets/_Project/Audio/Resources/{Voice,Sfx,Ambience}` | TTS voices (+ `voice_manifest.json` subtitle timings), procedural SFX/ambience |
-| `Tools/generate_voices.py`, `Tools/generate_sfx.py` | Regenerate audio (`python3 Tools/generate_voices.py` ≈ 5 min, macOS `say`) |
-| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 55 PlayMode tests (`FullPlaythroughTests` = 4 complete runs, one per ending) |
-| `Documentation/AcceptanceChecklist.md` | Spec §16 bullets with test/screenshot evidence |
+| `Documentation/` | `ArtDirection.md` + `ArtReference/`, `AcceptanceChecklist.md`, `TechnicalArchitecture.md`, `DatabaseSchema.md`, `DecisionsLog.md`, `AssetRegister.md` (licence of every asset), `Narrative/StoryBible.md`, `Screenshots/` |
+| `Assets/_Project/Scripts/` | `Core` (GameServices, WorldState, scenes, localization, settings), `Player`, `Interaction`, `Puzzles`, `Dialogue`, `Endings`, `Audio`, `Database` (SQLite), `SaveSystem`, `Admin`, `UI`, `Editor` (all builders, `PropModels`, `SkyArt`, debug menus) |
+| `Tools/` | `blender/build_props.py`, `generate_voices.py`, `generate_sfx.py`, `normalize_audio.py` |
+| Menus | `Last Signal/Build Content/*`, `Last Signal/Build/macOS`, `Last Signal/Debug/*` (give items, restore power, open decision), `Last Signal/Diagnostics/*` (UI previews, Report Prop Models) |
 
-**Content pipeline:** edit a builder/content class → `refresh_unity` → menu `Last Signal/Build Content/Build All Sectors`
-(regenerates all scenes, data assets and Build Settings) → run tests. Never hand-edit generated scenes.
-If localization/voice text changes: run `Tools/generate_voices.py`, refresh, then Build All Sectors again (logs read
-`voice_manifest.json` at build time).
-
-**Useful menus:** `Last Signal/Build/macOS` (`(clean)` variant), `Last Signal/Debug/*` (give all items, restore sector
-power, open decision screen, …), `Last Signal/Diagnostics/*` (UI previews, attach UI to camera).
-
-## 5. Gameplay flow as implemented (spoiler map)
-
-1. **Opening cutscene** "The Call" (skippable) → Docking Bay.
-2. **Docking Bay:** flashlight → 30A fuse under a tarp → fuse box + breaker B-2 → inner door. LOG_DOCK_01/02, AI_DOCK_01/02.
-3. **Engineering:** power coupling → generator start order coolant→fuel→ignition→load (Kaye's diagram) → routing board
-   (Medical, Life support, Lighting; Array feed = temptation AI_ENG_03) → Medical corridor door. LOG_ENG_01–03, AI_ENG_01–03.
-4. **Medical Bay:** wipe frost on Pod 3 nameplate → PIN **0417** on the patient terminal → entry "Release secured items"
-   → cabinet → research keycard → hatch to Research. LOG_MED_01–03 (03 appears after unlocking), AI_MED_01 (near pod), AI_MED_02 (after LOG_MED_03).
-5. **Research Lab:** board shows trials 2/4/6 (answer = sent row reversed); enter Trial 7 = **■ ● ▲ ● ■ ◆** on the decode
-   console. 2 misses → AI_RES_HINT (high/mid/low by trust). Solved → LOG_RES_02 + safe → core keycard → hatch to Reactor.
-   First-try solve (or high hint) sets `noticed_mirror`. LOG_RES_01/03, AI_RES_01/02.
-6. **Reactor Core:** 3 coolant valves (Low/Mid/High, start Mid). Stable (output and temperature both 40–60%) ⇔ every valve
-   on a different setting. Output > 75% = alarm, valves reset to Mid after 4 s. Stable → power → lift to Command. AI_CORE_01.
-7. **Command:** captain's chair log (LOG_CORE_01), comms console original warning (LOG_CORE_02, critical → AI_CORE_02),
-   CAIRN private archive (LOG_CORE_03, only after LOG_RES_03 was heard), captain's console (needs LOG_CORE_02) → AI_CORE_03 → decision.
-8. **Decision:** A destroy / B restore / C silence (only with 14/14 logs).
-   - **A** is played: 120 s countdown, lift down → emergency service tunnel (trust ≥ 50 CAIRN opens it; < 50 sealed →
-     manual crank 6 turns) → Docking Bay next to the airlock → "Board the Tern" → Ending scene. Timeout → reload checkpoint.
-   - **B / C** go straight to the Ending scene (exterior event, lines, epilogue by trust ≥ 50 / < 50, credits → main menu).
-
-## 6. Status by phase
-
-| Phase | Status |
-|---|---|
-| 1 Foundation | ✅ (GitHub remote still missing) |
-| 2 First playable | ✅ |
-| 3 Core systems (quests, puzzles, terminals, inventory, logs) | ✅ |
-| 4 Narrative (CAIRN, cutscene, decision, endings) | ✅ |
-| 5 Database & admin (SQLite, accounts, start screen, admin CRUD, saves) | ✅ |
-| 6 Content (Medical, Research, Reactor+Command, Ending A escape, 14 logs, EN+BG, voices, SFX) | ✅ commit `4ce7238` |
-| 7 Polish & testing | **in progress** — steps 1–2 done (automated playthroughs, §16 checklist) |
-
-**Verified at handoff:** 27/27 EditMode, 42/42 PlayMode tests pass; macOS build (134 MB) starts all 8 scenes
-(MainMenu, Cutscene_Opening, 5 sectors, Ending) without errors or missing translation keys.
-**Not verified:** nobody has played the complete game start → ending by hand yet.
-
-## 7. Work to be done (Phase 7, in priority order)
-
-0. ✅ **Done 2026-11-19:** `FullPlaythroughTests` plays all four endings start → main menu through the real hatches,
-   with Load game in every sector and mid-escape, the whole run once in Bulgarian, and 14/14 logs. It found and fixed a
-   bug: New game after a previous run started with obj_01 already done (`StartNewRun`/`Continue` now reset/restore the
-   inventory before the world). `PlayerMovementTests` added. §16 evidence is in `AcceptanceChecklist.md`.
-   A by-hand playthrough by the user is still worth doing for feel (mouse look, pacing, readability).
-1. **Full playthrough by hand** (now mostly automated, see 0): New game → each ending, at high and low trust, plus Ending C with
-   14/14 logs. Check objectives advance in order (`quest_main`: obj_01 … obj_17a), checkpoints/Load game resume in every
-   sector, the escape after Load game, BG language throughout. Fix what breaks; add regression tests.
-   Tip: `Last Signal/Debug/*` menus and `-startScene` help jump around.
-2. **Spec §16 acceptance checklist** (`The_Last_Signal_Master_Plan.md`): go through every bullet and record evidence
-   (test name or screenshot) — useful for the diploma documentation. Admin bullets: admin can unlock sectors/bypass
-   progression and manage records; ordinary players cannot.
-3. **Art pass** (biggest visual gap) — **started 2026-11-19**: `Tools/blender/build_props.py` builds hero props
-   headlessly (`/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python
-   Tools/blender/build_props.py -- [--preview <dir>] [--only name,…]`); author parts in *Unity* coords (script converts).
-   Builders place them with `PropModels.Place(id, parent, pos, rot, overrides)` and keep the greybox as fallback.
-   Done: cryo pods (Medical), bridge workstations + comms console, captain's chair (Command), valve wheels/bodies
-   (Reactor). **Batch 2 (2026-11-20):** captain's console, patient terminal kiosk, decode console, Okafor + Rhee
-   desks, office chairs, cabinet + safe shells (colliders stay on invisible `HollowCase`), ceiling pipe runs
-   (`PropModels.PipeRun`) on Medical W/E, Research W/S, Command W/E walls.
-   **Batch 3 (2026-11-20):** crates (`PropModels.Crate`, any size), workbench (Docking + Kaye's), fuse box, bay console
-   and Engineering status desk (kiosk), generator start panel (decode console scaled 0.89 in X). User chose **Blender only, no paid generation**. Every new prop collider must keep interactables
-   reachable — `InteractableReachabilityTests` enforces it. Next candidates: listening booth, map table, lift cabins, hatch frames, lander cradle;
-   then lighting/audio polish (HANDOFF §7 item 4).
-   Old note: Medical/Research/Command props are greybox primitives. Replace hero props with
-   asset-pack or Blender models (Blender MCP available; `generate_3d` may cost the user credits — ask). Keep the palette
-   in `ArtDirection.md`. Record every external asset in `Documentation/AssetRegister.md` (licence!).
-   Known nits: (fixed: Nereth flat/bright); pod numbers float slightly; admin form input outlines faint on
-   the right; admin form background blends into the dim layer.
-4. ✅ **Lighting/audio pass 1 (2026-11-20):** `Tools/normalize_audio.py` sets every clip to a target loudness
-   (voices -17 dBFS RMS in both languages, ambience beds -20, per-effect targets; peaks ≤ -1 dBFS; idempotent; both
-   generators call it). `AudioManager` ducks ambience to 55% while a voice or audio log plays (test
-   `Ambience_DucksUnderVoice_AndRecovers`). Windows: `SkyArt` generates Nereth (dark ice + glowing fracture lines that
-   carry the Murmur pulse) and a starfield, used in Research + Command (delete the PNGs in Art/Textures/Sky to
-   regenerate). Still open: hearing it in a real playthrough (levels were measured, not listened to); music stingers.
-   Original note: per-sector ambience balance, footsteps volume, voice levels; maybe music stingers.
-5. **BG translation pass** with the user (all keys exist in `bg.json`; check tone, gender forms, terms:
-   Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).
-6. **Performance pass** on the M4 (profiler in Docking Bay and Reactor; reflection probes are baked per scene).
-7. **Builds:** clean macOS build + smoke test; Windows build (ask before downloading `sqlite3.dll`).
-8. **GitHub:** when the user gives the URL → `git remote add origin <url>` → push `main`.
-9. **Diploma docs** (buffer week Dec 17–19): demo script, architecture/DB diagrams from `TechnicalArchitecture.md` and
-   `DatabaseSchema.md`, screenshots in `Documentation/Screenshots/`.
-
-**Cut list if behind schedule:** hidden Ending C → item combination → drag-and-drop inventory → jump →
-merge Medical into Research → Windows build verification.
-
-## 8. Gotchas learned the hard way
-
-- Path-based `GameObject.Find("A/B")` also returns **inactive** children — tests check `activeInHierarchy`.
-- `Loc.Get` of an unknown key shows `#key#`; use `BuilderKit.RawText` for non-localized world text (numbers, symbols).
-- LiberationSans lacks ◆ (U+25C6); the diamond is `<rotate=45>■</rotate>` (`SymbolDecodePuzzle.Glyph`).
-- Hatches: `MedicalBuilder.Hatch(yaw)` — local +Z points out through the wall (south 180, north 0, east 90).
-  World text is readable from its local −Z side.
-- Wall screen glows must sit **in front** of the screen box (an earlier bug hid them behind).
-- Autosaves are suppressed during new-run reset/restore (`GameServices.SuppressCheckpoints`).
-- `say` output differs slightly between runs; regenerating voices may touch a few old WAVs (harmless).
-- `Assets/TextMesh Pro/.../LiberationSans SDF - Fallback.asset` and `ProjectSettings/EditorSettings.asset` change by
-  themselves in the editor (dynamic glyphs incl. Cyrillic); committing them is fine.
+Spoiler walkthrough (for testing): Docking — flashlight, 30A fuse under the tarp → fuse box → breaker → door.
+Engineering — coupling → generator coolant→fuel→ignition→load → route Medical, Life support, Lighting. Medical — wipe
+Pod 3 → PIN 0417 → "Release secured items" → keycard. Research — Trial 7 = ■ ● ▲ ● ■ ◆ → safe → core keycard.
+Reactor — valves High/Mid/Low (all different) → lift → Command: comms log → captain's console → decision.

@@ -166,3 +166,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    import normalize_audio  # Phase 7 mix: keep regenerated clips at the agreed loudness
+    normalize_audio.main()

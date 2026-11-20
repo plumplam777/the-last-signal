@@ -145,6 +145,12 @@ namespace LastSignal.Audio
         }
 
         private bool _wasPaused;
+        private float _duck = 1f;
+
+        /// <summary>Ambience level while CAIRN, a log or a cutscene voice is speaking (keeps words on top of the hum).</summary>
+        public const float DuckLevel = 0.55f;
+
+        public float CurrentDuck => _duck;
 
         private void Update()
         {
@@ -155,11 +161,14 @@ namespace LastSignal.Audio
                 PauseVoice(paused);
             }
             float dt = Time.unscaledDeltaTime;
+            bool speaking = IsVoicePlaying || (GameServices.AudioLogs != null && GameServices.AudioLogs.IsPlaying);
+            // duck fast (0.25 s), recover slowly (1.5 s) so the bed does not pump between lines
+            _duck = Mathf.MoveTowards(_duck, speaking ? DuckLevel : 1f, dt * (speaking ? 1.8f : 0.3f));
             for (int i = _ambience.Count - 1; i >= 0; i--)
             {
                 var ch = _ambience[i];
-                float target = ch.Target * AmbienceVolume * (paused ? 0.4f : 1f);
-                ch.Source.volume = Mathf.MoveTowards(ch.Source.volume, target, dt * 0.6f);
+                float target = ch.Target * AmbienceVolume * _duck * (paused ? 0.4f : 1f);
+                ch.Source.volume = Mathf.MoveTowards(ch.Source.volume, target, dt * (speaking ? 1.2f : 0.6f));
                 if (ch.Target <= 0f && ch.Source.volume <= 0.001f)
                 {
                     Destroy(ch.Source);

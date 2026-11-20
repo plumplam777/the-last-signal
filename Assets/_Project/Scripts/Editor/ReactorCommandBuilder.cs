@@ -298,9 +298,9 @@ namespace LastSignal.EditorTools
             Box("Glass", r, new Vector3(0, 2.15f, CmdHalfL + 0.1f), new Vector3(CmdHalfW * 2, 2.5f, 0.06f), M.GlassTeal);
             for (float x = -5.25f; x <= 5.3f; x += 3.5f)
                 Box($"Mullion_{x:0.0}", r, new Vector3(x, 2.15f, CmdHalfL + 0.02f), new Vector3(0.12f, 2.5f, 0.14f), M.Brass, false);
-            Box("Space", r, new Vector3(0, 2f, CmdHalfL + 80f), new Vector3(300f, 180f, 0.2f), M.SlateDark, false);
-            var planet = Sphere("Nereth", r, new Vector3(0, -14f, CmdHalfL + 26f), new Vector3(48f, 48f, 48f),
-                Emissive("M_Nereth_Night", Hex("#1E4E7A"), 0.5f, Hex("#0B1A2A")));
+            Box("Space", r, new Vector3(0, 2f, CmdHalfL + 80f), new Vector3(300f, 180f, 0.2f), SkyArt.Starfield(), false);
+            var planet = Sphere("Nereth", r, new Vector3(0, -14f, CmdHalfL + 26f), new Vector3(48f, 48f, 48f), SkyArt.Nereth());
+            planet.transform.localRotation = Quaternion.Euler(10f, 160f, 0f);
             planet.AddComponent<EmissionPulse>().EditorSet(Hex("#2F8FD8"), 0.15f, 1.2f, 40f / 6f, 0.3f);
             Box("Band", r, new Vector3(0, 1.0f, -CmdHalfL + 0.03f), new Vector3(CmdHalfW * 2, 0.18f, 0.05f), M.Terracotta, false);
             PropModels.PipeRun(r, "Pipes_W", new Vector3(-CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(-CmdHalfW, CmdH - 0.55f, CmdHalfL), -90f);

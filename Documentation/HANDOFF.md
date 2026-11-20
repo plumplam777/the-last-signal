@@ -72,7 +72,7 @@ Solo developer = the user; Claude = technical lead (writes code, content, docs; 
 | `Assets/_Project/Localization/Resources/Localization/{en,bg}.json` | **All player-facing text** (keys: `log.<id>.line.N`, `dlg.<id>.<node>`, `obj.<id>`, `terminal.<id>.*`, `end.*`, `epi.*`, `ui.*`) |
 | `Assets/_Project/Audio/Resources/{Voice,Sfx,Ambience}` | TTS voices (+ `voice_manifest.json` subtitle timings), procedural SFX/ambience |
 | `Tools/generate_voices.py`, `Tools/generate_sfx.py` | Regenerate audio (`python3 Tools/generate_voices.py` ≈ 5 min, macOS `say`) |
-| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 54 PlayMode tests (`FullPlaythroughTests` = 4 complete runs, one per ending) |
+| `Assets/_Project/Tests/{EditMode,PlayMode}` | 27 EditMode + 55 PlayMode tests (`FullPlaythroughTests` = 4 complete runs, one per ending) |
 | `Documentation/AcceptanceChecklist.md` | Spec §16 bullets with test/screenshot evidence |
 
 **Content pipeline:** edit a builder/content class → `refresh_unity` → menu `Last Signal/Build Content/Build All Sectors`
@@ -148,9 +148,15 @@ power, open decision screen, …), `Last Signal/Diagnostics/*` (UI previews, att
    Old note: Medical/Research/Command props are greybox primitives. Replace hero props with
    asset-pack or Blender models (Blender MCP available; `generate_3d` may cost the user credits — ask). Keep the palette
    in `ArtDirection.md`. Record every external asset in `Documentation/AssetRegister.md` (licence!).
-   Known nits: Nereth through windows looks flat/bright; pod numbers float slightly; admin form input outlines faint on
+   Known nits: (fixed: Nereth flat/bright); pod numbers float slightly; admin form input outlines faint on
    the right; admin form background blends into the dim layer.
-4. **Lighting/audio polish:** per-sector ambience balance, footsteps volume, voice levels; maybe music stingers.
+4. ✅ **Lighting/audio pass 1 (2026-11-20):** `Tools/normalize_audio.py` sets every clip to a target loudness
+   (voices -17 dBFS RMS in both languages, ambience beds -20, per-effect targets; peaks ≤ -1 dBFS; idempotent; both
+   generators call it). `AudioManager` ducks ambience to 55% while a voice or audio log plays (test
+   `Ambience_DucksUnderVoice_AndRecovers`). Windows: `SkyArt` generates Nereth (dark ice + glowing fracture lines that
+   carry the Murmur pulse) and a starfield, used in Research + Command (delete the PNGs in Art/Textures/Sky to
+   regenerate). Still open: hearing it in a real playthrough (levels were measured, not listened to); music stingers.
+   Original note: per-sector ambience balance, footsteps volume, voice levels; maybe music stingers.
 5. **BG translation pass** with the user (all keys exist in `bg.json`; check tone, gender forms, terms:
    Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).
 6. **Performance pass** on the M4 (profiler in Docking Bay and Reactor; reflection probes are baked per scene).

@@ -41,6 +41,27 @@ namespace LastSignal.Tests
             }
         }
 
+        /// <summary>Phase 7 mix: the ambience bed dips while someone speaks, then comes back.</summary>
+        [UnityTest]
+        public IEnumerator Ambience_DucksUnderVoice_AndRecovers()
+        {
+            yield return null;
+            var audio = GameServices.Audio;
+            float t = 0f;
+            while (audio.CurrentDuck < 0.99f && t < 5f) { t += Time.unscaledDeltaTime; yield return null; }
+            Assert.GreaterOrEqual(audio.CurrentDuck, 0.99f, "No speech → no ducking.");
+
+            Assert.Greater(audio.PlayVoice("dlg.ai_dock_01.l0"), 1f);
+            t = 0f;
+            while (audio.CurrentDuck > LastSignal.Audio.AudioManager.DuckLevel + 0.01f && t < 1.5f) { t += Time.unscaledDeltaTime; yield return null; }
+            Assert.LessOrEqual(audio.CurrentDuck, LastSignal.Audio.AudioManager.DuckLevel + 0.01f, "Ambience ducks within a moment of speech.");
+
+            audio.StopVoice();
+            t = 0f;
+            while (audio.CurrentDuck < 0.99f && t < 4f) { t += Time.unscaledDeltaTime; yield return null; }
+            Assert.GreaterOrEqual(audio.CurrentDuck, 0.99f, "Ambience recovers after the line.");
+        }
+
         [Test]
         public void EffectsAndAmbience_Load()
         {

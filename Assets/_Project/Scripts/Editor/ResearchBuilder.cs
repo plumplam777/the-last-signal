@@ -128,9 +128,10 @@ namespace LastSignal.EditorTools
         {
             var w = Group("Window_Nereth", env).transform;
             Box("Glass", w, new Vector3(0, 2.2f, HalfL + 0.12f), new Vector3(10.4f, 2.4f, 0.04f), M.GlassTeal, false);
-            Box("Space", w, new Vector3(0, 2.2f, HalfL + 70f), new Vector3(260f, 160f, 0.2f), M.SlateDark, false);
-            // the night side of Nereth: a dark disc with blue pulses under the "ice"
-            var planet = Sphere("Nereth", w, new Vector3(0, -9f, HalfL + 18f), new Vector3(34f, 34f, 34f), _planetGlow);
+            Box("Space", w, new Vector3(0, 2.2f, HalfL + 70f), new Vector3(260f, 160f, 0.2f), SkyArt.Starfield(), false);
+            // the night side of Nereth: dark ice whose fracture lines pulse blue (procedural textures, SkyArt)
+            var planet = Sphere("Nereth", w, new Vector3(0, -9f, HalfL + 18f), new Vector3(34f, 34f, 34f), SkyArt.Nereth());
+            planet.transform.localRotation = Quaternion.Euler(18f, 40f, 0f);
             var pulse = PointLight("MurmurPulse", w, new Vector3(0, 1.2f, HalfL + 1.2f), SignalCyan, 2f, 9f);
             planet.AddComponent<EmissionPulse>().EditorSet(Hex("#2F8FD8"), 0.15f, 1.4f, 40f / 6f, 0f, pulse);
             for (int i = 0; i < 5; i++)

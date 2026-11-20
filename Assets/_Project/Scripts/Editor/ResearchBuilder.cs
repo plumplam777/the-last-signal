@@ -259,13 +259,13 @@ namespace LastSignal.EditorTools
                 var p = new Vector3(-1.1f + (i % 5) * 0.5f + (i / 5) * 0.2f, 0.45f - (i / 5) * 0.55f, 0);
                 Box($"Note_{i}", wall.transform, p, new Vector3(0.18f, 0.18f, 0.005f), _note, false, Quaternion.Euler(0, 0, (i * 7 % 11) - 5f));
             }
-            Box("BigNote", wall.transform, new Vector3(0.1f, -0.05f, -0.005f), new Vector3(0.6f, 0.38f, 0.005f), _note, false, Quaternion.Euler(0, 0, -2));
-            var big = WorldText("BigNoteText", wall.transform, new Vector3(0.1f, -0.05f, -0.01f), Quaternion.Euler(0, 0, -2), "res.note.answers", 1.5f, Navy);
-            ((RectTransform)big.transform).sizeDelta = new Vector2(0.58f, 0.3f);
+            Box("BigNote", wall.transform, new Vector3(0.1f, -0.05f, -0.005f), new Vector3(0.78f, 0.46f, 0.005f), _note, false, Quaternion.Euler(0, 0, -2));
+            var big = WorldText("BigNoteText", wall.transform, new Vector3(0.1f, -0.05f, -0.012f), Quaternion.Euler(0, 0, -2), "res.note.answers", 1.5f, Navy);
+            ((RectTransform)big.transform).sizeDelta = new Vector2(0.68f, 0.36f);
             big.characterSpacing = 2;
-            Box("SmallNote", wall.transform, new Vector3(0.62f, -0.35f, 0.002f), new Vector3(0.2f, 0.16f, 0.005f), _note, false, Quaternion.Euler(0, 0, 9));
-            var small = WorldText("SmallNoteText", wall.transform, new Vector3(0.64f, -0.36f, -0.003f), Quaternion.Euler(0, 0, 9), "res.note.or_does_it", 0.45f, Navy);
-            ((RectTransform)small.transform).sizeDelta = new Vector2(0.2f, 0.14f);
+            Box("SmallNote", wall.transform, new Vector3(0.74f, -0.4f, 0.002f), new Vector3(0.34f, 0.24f, 0.005f), _note, false, Quaternion.Euler(0, 0, 9));
+            var small = WorldText("SmallNoteText", wall.transform, new Vector3(0.75f, -0.4f, -0.004f), Quaternion.Euler(0, 0, 9), "res.note.or_does_it", 0.9f, Navy);
+            ((RectTransform)small.transform).sizeDelta = new Vector2(0.3f, 0.2f);
             small.characterSpacing = 0;
 
             DockingBayBuilder.BuildRecorder(props, "Recorder_LogRes01", new Vector3(-5.75f, 0.84f, -2.6f), Quaternion.Euler(0, 80, 0), StationContent.LogRes01);

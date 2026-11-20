@@ -144,8 +144,12 @@ namespace LastSignal.EditorTools
             var barrier = Cylinder("RailBarrier", s, new Vector3(0, 1.5f, 0), new Vector3(5.3f, 1.5f, 5.3f), M.SlateDark);
             Object.DestroyImmediate(barrier.GetComponent<Renderer>());
 
-            WorldText("Warning_N", s, new Vector3(0, 2.6f, R - 0.05f), Quaternion.identity, "reactor.warning", 1.6f, Amber);
-            WorldText("Warning_S", s, new Vector3(0, 3.2f, -R + 0.05f), Quaternion.Euler(0, 180, 0), "reactor.warning", 1.6f, Amber);
+            // the shaft is a 12-sided polygon: each flat wall face is only ~3.75 m wide, so the warnings wrap onto two
+            // lines inside one face instead of running into the neighbouring (angled) walls
+            var warnN = WorldText("Warning_N", s, new Vector3(0, 2.7f, R - 0.08f), Quaternion.identity, "reactor.warning", 1.6f, Amber);
+            ((RectTransform)warnN.transform).sizeDelta = new Vector2(3.3f, 0.75f);
+            var warnS = WorldText("Warning_S", s, new Vector3(0, 3.3f, -R + 0.08f), Quaternion.Euler(0, 180, 0), "reactor.warning", 1.6f, Amber);
+            ((RectTransform)warnS.transform).sizeDelta = new Vector2(3.3f, 0.75f);
 
             // lamps: dim emergency until stable, then working lights
             for (int i = 0; i < 4; i++)
@@ -260,8 +264,9 @@ namespace LastSignal.EditorTools
             MedicalBuilder.Hatch(t, "Hatch_ServiceTunnel", dir * (R - 0.12f) + Vector3.up * 1.45f, yaw, SceneIds.DockingBay, "from_service_tunnel",
                 "sector.docking.name", SectorIds.Docking,
                 new ConditionSet { conditions = { choiceDestroy, Condition.Flag(EscapeSequence.TunnelOpenFlag, "reactor.tunnel.cairn_sealed") } }, M.SlateDark);
-            var label = WorldText("TunnelLabel", t, dir * (R - 0.08f) + Vector3.up * 3.0f, Quaternion.Euler(0, yaw, 0), "reactor.tunnel.label", 1.3f, EmergencyRed);
-            ((RectTransform)label.transform).sizeDelta = new Vector2(3.6f, 0.3f);
+            // 225° is a corner of the 12-sided shaft: keep the flat label narrow and off the two angled faces
+            var label = WorldText("TunnelLabel", t, dir * (R - 0.3f) + Vector3.up * 3.1f, Quaternion.Euler(0, yaw, 0), "reactor.tunnel.label", 1.3f, EmergencyRed);
+            ((RectTransform)label.transform).sizeDelta = new Vector2(3.0f, 0.6f);
             label.characterSpacing = 2;
 
             // manual crank beside the tunnel (only while escaping and CAIRN keeps it sealed)

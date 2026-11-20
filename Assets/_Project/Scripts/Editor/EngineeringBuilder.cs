@@ -148,7 +148,9 @@ namespace LastSignal.EditorTools
             Box("Wall_End", c, new Vector3(x, 1.6f, z1 + 0.1f), new Vector3(3.4f, 3.2f, 0.2f), M.Wall);
             Box("Band_L", c, new Vector3(x - 1.58f, 1.2f, mid), new Vector3(0.04f, 0.22f, len), M.Ceramic, false);
             on.Add(PointLight("Light", c, new Vector3(x, 2.8f, mid), TealLight, 2.4f, 6f).gameObject);
-            on.Add(WorldText("Sign_Medical", c, new Vector3(x, 2.7f, z1 - 0.05f), Quaternion.identity, "sector.medical.name", 3f, TealLight).gameObject);
+            var medSign = WorldText("Sign_Medical", c, new Vector3(x, 2.8f, z1 - 0.05f), Quaternion.identity, "sector.medical.name", 3f, TealLight);
+            ((RectTransform)medSign.transform).sizeDelta = new Vector2(2.7f, 0.5f); // corridor is 3.2 m wide
+            on.Add(medSign.gameObject);
 
             // Medical hatch at the end of the corridor (the corridor door itself needs routed power)
             var hatchGo = Group("Hatch_ToMedical", c, new Vector3(x, 1.45f, z1 - 0.12f));

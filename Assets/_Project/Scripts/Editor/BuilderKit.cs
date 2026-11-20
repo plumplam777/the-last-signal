@@ -214,6 +214,12 @@ namespace LastSignal.EditorTools
             t.alignment = TextAlignmentOptions.Center;
             t.color = color;
             t.characterSpacing = 8f;
+            // auto-size: the design size is the maximum; longer translations (BG) shrink to fit their rect instead
+            // of spilling over notes, plates and arches. Callers set sizeDelta to the space actually available.
+            t.enableAutoSizing = true;
+            t.fontSizeMax = size;
+            t.fontSizeMin = size * 0.35f;
+            t.textWrappingMode = TextWrappingModes.Normal;
             ((RectTransform)go.transform).sizeDelta = new Vector2(6f, 1.2f);
             SetLocalizedKey(go.AddComponent<LocalizedText>(), key);
             return t;

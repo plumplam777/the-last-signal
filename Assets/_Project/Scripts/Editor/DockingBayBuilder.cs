@@ -149,7 +149,10 @@ namespace LastSignal.EditorTools
             Box("Wall_Front_L", hall, new Vector3(-3.1f, HallHeight * 0.5f, fz), new Vector3(3.8f, HallHeight + 0.2f, 0.2f), StationMaterials.Wall);
             Box("Wall_Front_R", hall, new Vector3(3.1f, HallHeight * 0.5f, fz), new Vector3(3.8f, HallHeight + 0.2f, 0.2f), StationMaterials.Wall);
             Box("Wall_Front_Top", hall, new Vector3(0, 3.85f, fz), new Vector3(2.4f, 1.7f, 0.2f), StationMaterials.Wall);
-            Box("Wall_Front_Band", hall, new Vector3(0, 1.2f, fz - 0.12f), new Vector3(HallHalfWidth * 2, 0.22f, 0.04f), StationMaterials.Terracotta, false);
+            // the band stops at the door pillars (outer edge x = ±1.53) — it must never cross the opening
+            const float bandGap = 1.53f, bandW = HallHalfWidth - bandGap;
+            Box("Wall_Front_Band_L", hall, new Vector3(-(bandGap + bandW * 0.5f), 1.2f, fz - 0.12f), new Vector3(bandW, 0.22f, 0.04f), StationMaterials.Terracotta, false);
+            Box("Wall_Front_Band_R", hall, new Vector3(bandGap + bandW * 0.5f, 1.2f, fz - 0.12f), new Vector3(bandW, 0.22f, 0.04f), StationMaterials.Terracotta, false);
             // back wall
             Box("Wall_Back", hall, new Vector3(0, HallHeight * 0.5f, HallBack - 0.1f), new Vector3(HallHalfWidth * 2, HallHeight + 0.2f, 0.2f), StationMaterials.Wall);
 
@@ -236,7 +239,8 @@ namespace LastSignal.EditorTools
             back.transform.localRotation = Quaternion.Euler(0, 180, 0);
             back.AddComponent<SpawnPoint>().EditorSetId("from_engineering");
 
-            var sign = WorldText("Sign_Engineering", c, new Vector3(0, 2.85f, z1 - 0.05f), Quaternion.identity, "sector.engineering.name", 3.2f, SignalCyan);
+            var sign = WorldText("Sign_Engineering", c, new Vector3(0, 2.92f, z1 - 0.05f), Quaternion.identity, "sector.engineering.name", 3.2f, SignalCyan);
+            ((RectTransform)sign.transform).sizeDelta = new Vector2(2.7f, 0.42f); // corridor is 3.2 m wide, ceiling at 3.2 m
             on.Add(sign.gameObject);
             on.Add(PointLight("Corridor_Light_A", c, new Vector3(0, h - 0.4f, z0 + 2f), Amber, 3f, 6f).gameObject);
             on.Add(PointLight("Corridor_Light_B", c, new Vector3(0, h - 0.4f, z1 - 1.5f), Teal, 2.5f, 5f, LightShadows.Soft).gameObject);

@@ -93,6 +93,10 @@ if triangles ever matter. Light shafts skipped (need a custom shader; cost).
 - **macOS clean build:** succeeded, 144 MB, 0 errors; smoke test of all 8 scenes: exit 0, 0 errors/exceptions/warnings.
   Font asset unchanged by the build. `Builds/macOS/TheLastSignal.app` is now current (includes the art pass).
   Note: macOS has no `timeout` command — run the smoke loop without it (the player quits itself).
+- **Windows:** official `sqlite3.dll` 3.54.1 (hash-verified) added as a Win64-only plugin (`Assets/Plugins/Windows/x86_64`).
+  The Windows build itself is blocked: Unity 6000.3.10f1 has only Mac + WebGL modules → user must add **Windows Build
+  Support (Mono)** in Unity Hub, then `Last Signal/Build/Windows`. A failed build leaves `Assets/Resources/PerformanceTest*.json`
+  behind — delete them, don't commit.
 
 ### 4.4 Then
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.

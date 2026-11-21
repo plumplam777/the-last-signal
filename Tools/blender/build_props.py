@@ -181,6 +181,34 @@ def render_preview(obj, path):
     bpy.ops.render.render(write_still=True)
 
 
+def sphere(radius, pos, mat, segments=12, rings=8):
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=segments, ring_count=rings, radius=radius, location=U(*pos))
+    return _finish(bpy.context.object, mat, 0)
+
+
+def cable(points, radius, mat, resolution=2):
+    """A tube through Unity-space points (sagging cables, hoses)."""
+    curve = bpy.data.curves.new("cable", "CURVE")
+    curve.dimensions = "3D"
+    curve.bevel_depth = radius
+    curve.bevel_resolution = resolution
+    spline = curve.splines.new("POLY")
+    spline.points.add(len(points) - 1)
+    for i, p in enumerate(points):
+        spline.points[i].co = (*U(*p), 1.0)
+    obj = bpy.data.objects.new("cable", curve)
+    bpy.context.collection.objects.link(obj)
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.convert(target="MESH")
+    return _finish(bpy.context.object, mat, 0)
+
+
+def sag(x0, x1, y, z, depth, n=10):
+    return [(x0 + (x1 - x0) * i / n, y - depth * (1 - (2 * i / n - 1) ** 2), z) for i in range(n + 1)]
+
+
 # ------------------------------------------------------------------ props
 
 def cryo_pod_base():
@@ -519,6 +547,180 @@ def lift_cage():
         cyl(0.012, 1.6, (0, 4.4, z), "Steel", axis="y", verts=6, bevel=0.0)
 
 
+# ------------------------------------------------------------------ art pass 4.4: leftovers
+
+def lander_cradle():
+    """Empty survey-lander cradle, length along Z (3.0 m), floor pivot. Hazard-edged deck plate, brass rails,
+    four empty landing-gear rams and a rear umbilical gantry (+Z) with cut, hanging lines."""
+    box((2.2, 0.04, 3.2), (0, 0.02, 0), "Slate", 0.01)
+    for x in (-1.06, 1.06):                                                   # hazard edges (terracotta + slate chevrons)
+        box((0.1, 0.012, 3.2), (x, 0.045, 0), "Terracotta", 0.0)
+        for i in range(12):
+            box((0.035, 0.01, 0.16), (x, 0.052, -1.45 + i * 0.265), "Slate", 0.0, rot=(0, 45, 0))
+    for z in (-1.56, 1.56):
+        box((2.2, 0.012, 0.1), (0, 0.045, z), "Terracotta", 0.0)
+    for x in (-0.75, 0.75):                                                   # rails with bolts
+        box((0.14, 0.14, 3.0), (x, 0.11, 0), "Brass", 0.02)
+        for i in range(6):
+            cyl(0.022, 0.03, (x, 0.19, -1.25 + i * 0.5), "Steel", axis="y", verts=8, bevel=0.0)
+    for z in (-1.2, -0.4, 0.4, 1.2):                                          # cross ties
+        box((1.36, 0.07, 0.14), (0, 0.07, z), "Slate", 0.01)
+    for x in (-0.75, 0.75):                                                   # landing-gear rams (empty cups)
+        for z in (-0.95, 0.95):
+            box((0.32, 0.22, 0.32), (x, 0.3, z), "Steel", 0.02)
+            cyl(0.075, 0.5, (x, 0.65, z), "Brass", axis="y", verts=16)
+            torus(0.085, 0.02, (x, 0.45, z), "Brass", axis="y", major_seg=16, minor_seg=6)
+            cyl(0.04, 0.35, (x, 1.05, z), "Steel", axis="y", verts=12, bevel=0.0)
+            cyl(0.19, 0.06, (x, 1.24, z), "Terracotta", axis="y", verts=20)
+            cyl(0.13, 0.065, (x, 1.25, z), "Rubber", axis="y", verts=16, bevel=0.0)
+    for x in (-1.0, 1.0):                                                     # rear gantry
+        box((0.16, 2.7, 0.16), (x, 1.35, 1.65), "Brass", 0.02)
+        box((0.34, 0.12, 0.34), (x, 0.06, 1.65), "Slate", 0.015)
+    box((2.3, 0.18, 0.2), (0, 2.7, 1.65), "Brass", 0.02)
+    box((2.0, 0.08, 0.12), (0, 2.56, 1.65), "Terracotta", 0.01)
+    for (x, length) in ((-0.45, 0.9), (0.05, 1.25), (0.5, 0.7)):             # cut umbilicals with plug ends
+        cyl(0.045, length, (x, 2.6 - length / 2, 1.65), "Rubber", axis="y", verts=10, bevel=0.0)
+        cyl(0.06, 0.1, (x, 2.6 - length - 0.03, 1.65), "Terracotta", axis="y", verts=10, bevel=0.0)
+
+
+def pod_cradle():
+    """Escape-pod launch collar, ring axis = Z, front (hall) = -Z, floor pivot. Open clamp jaws (none at the top:
+    the ESCAPE POD 1 label sits above), launch-tube mouth behind, side pylons with rams, pedestal."""
+    torus(1.05, 0.12, (0, 1.35, 0), "Brass", axis="z", major_seg=40, minor_seg=10)
+    torus(0.9, 0.045, (0, 1.35, -0.06), "Steel", axis="z", major_seg=36, minor_seg=6)
+    cyl(1.08, 0.1, (0, 1.35, 0.22), "Slate", axis="z", verts=40)              # tube mouth
+    cyl(0.86, 0.04, (0, 1.35, 0.16), "Rubber", axis="z", verts=36, bevel=0.0)
+    for k in range(4):                                                         # guide rails inside the tube
+        a = math.radians(45 + k * 90)
+        box((0.06, 0.06, 0.12), (math.cos(a) * 0.8, 1.35 + math.sin(a) * 0.8, 0.12), "Brass", 0.0)
+    for deg in (0, 40, 140, 180, 220, 320):                                    # open clamp jaws
+        a = math.radians(deg)
+        box((0.26, 0.14, 0.2), (math.cos(a) * 1.22, 1.35 + math.sin(a) * 1.22, -0.02), "Terracotta", 0.015, rot=(0, 0, deg + 18))
+        cyl(0.03, 0.24, (math.cos(a) * 1.13, 1.35 + math.sin(a) * 1.13, -0.02), "Steel", axis="z", verts=8, bevel=0.0)
+    box((1.3, 0.3, 0.8), (0, 0.15, 0.05), "Slate", 0.02)                       # pedestal + saddle
+    box((1.36, 0.06, 0.86), (0, 0.31, 0.05), "Brass", 0.01)
+    box((0.7, 0.12, 0.5), (0, 0.38, -0.02), "Terracotta", 0.02)
+    for x in (-1.36, 1.36):                                                    # pylons with rams
+        box((0.18, 2.1, 0.34), (x, 1.05, 0.08), "Slate", 0.02)
+        box((0.24, 0.08, 0.4), (x, 2.12, 0.08), "Brass", 0.01)
+        box((0.26, 0.1, 0.42), (x, 0.05, 0.08), "Brass", 0.01)
+        cyl(0.055, 0.2, (x * 0.92, 1.35, 0.0), "Steel", axis="x", verts=12, bevel=0.0)
+        cyl(0.08, 0.06, (x * 0.97, 1.35, 0.0), "Brass", axis="x", verts=12)
+
+
+def hatch_rivets():
+    """Twelve low-poly rivet heads on a 0.92 m circle in the XY plane, front = -Z (replaces Unity spheres)."""
+    for i in range(12):
+        a = math.radians(i * 30)
+        x, y = math.cos(a) * 0.92, math.sin(a) * 0.92
+        cyl(0.035, 0.022, (x, y, -0.04), "Brass", axis="z", verts=8, bevel=0.0)            # stepped head, no bevel
+        cyl(0.022, 0.02, (x, y, -0.06), "Brass", axis="z", verts=8, bevel=0.0)
+
+
+def mug():
+    cyl(0.042, 0.1, (0, 0.05, 0), "Ceramic", axis="y", verts=16, bevel=0.004)
+    cyl(0.036, 0.004, (0, 0.098, 0), "Rubber", axis="y", verts=16, bevel=0.0)   # coffee
+    torus(0.028, 0.008, (0.05, 0.055, 0), "Ceramic", axis="z", major_seg=12, minor_seg=6)
+
+
+def chess_set():
+    """Travel chess board mid-game: 0.3 m board (8x8), a handful of pieces."""
+    box((0.32, 0.025, 0.32), (0, 0.0125, 0), "Brass", 0.004)
+    box((0.3, 0.004, 0.3), (0, 0.027, 0), "Slate", 0.0)
+    for i in range(8):
+        for j in range(8):
+            if (i + j) % 2 == 0:
+                box((0.0375, 0.002, 0.0375), (-0.13125 + i * 0.0375, 0.03, -0.13125 + j * 0.0375), "Ceramic", 0.0)
+    pieces = [(-1, 2, "Ceramic", 0.05), (1, 1, "Ceramic", 0.04), (3, -2, "Ceramic", 0.065), (-2, -1, "Rubber", 0.04),
+              (0, -3, "Rubber", 0.06), (2, 3, "Rubber", 0.045), (-3, 0, "Rubber", 0.07)]
+    for (i, j, m, h) in pieces:
+        x, z = -0.01875 + i * 0.0375, -0.01875 + j * 0.0375
+        cyl(0.012, 0.008, (x, 0.036, z), m, axis="y", verts=10, bevel=0.0)
+        cyl(0.007, h, (x, 0.032 + h / 2, z), m, axis="y", verts=8, bevel=0.0)
+        sphere(0.01, (x, 0.034 + h, z), m, segments=8, rings=5)
+
+
+def photo_frame():
+    """Standing photo frame, front = -Z, tilted back."""
+    box((0.15, 0.19, 0.012), (0, 0.1, 0), "Brass", 0.004, rot=(-12, 0, 0))
+    box((0.12, 0.155, 0.004), (0, 0.1, -0.008), "Ceramic", 0.0, rot=(-12, 0, 0))
+    box((0.07, 0.09, 0.003), (-0.015, 0.09, -0.011), "Terracotta", 0.0, rot=(-12, 0, 0))   # faded figures
+    box((0.012, 0.16, 0.012), (0, 0.075, 0.05), "Brass", 0.0, rot=(25, 0, 0))               # stand
+
+
+def file_stack():
+    """Three patient folders and loose sheets."""
+    for k, (m, yaw) in enumerate((("Terracotta", 4), ("Ceramic", -7), ("Slate", 11))):
+        box((0.23, 0.014, 0.31), (0.005 * k, 0.008 + k * 0.016, 0.004 * k), m, 0.002, rot=(0, yaw, 0))
+    box((0.21, 0.002, 0.297), (0.02, 0.056, -0.01), "Ceramic", 0.0, rot=(0, -15, 0))
+
+
+def paper_spread():
+    """Spectrogram printouts scattered over ~0.6 x 0.5 m (Rhee's desk)."""
+    sheets = [(-0.15, 0.0, -12), (0.06, -0.12, 9), (0.16, 0.1, 24), (-0.05, 0.15, -3), (0.2, -0.17, -30)]
+    for k, (x, z, yaw) in enumerate(sheets):
+        box((0.21, 0.002, 0.297), (x, 0.001 + k * 0.0022, z), "Ceramic", 0.0, rot=(0, yaw, 0))
+        for line in range(4):                                                  # trace lines
+            box((0.17, 0.0008, 0.006), (x, 0.0025 + k * 0.0022, z - 0.09 + line * 0.06), "Slate", 0.0, rot=(0, yaw, 0))
+
+
+def sample_rack():
+    """Brass rack with five glass vials of teal ice samples."""
+    box((0.3, 0.03, 0.08), (0, 0.015, 0), "Brass", 0.004)
+    box((0.3, 0.02, 0.08), (0, 0.09, 0), "Brass", 0.004)
+    for x in (-0.14, 0.14):
+        box((0.02, 0.1, 0.08), (x, 0.05, 0), "Brass", 0.0)
+    for i in range(5):
+        x = -0.1 + i * 0.05
+        cyl(0.017, 0.13, (x, 0.08, 0), "Glass", axis="y", verts=12, bevel=0.0)
+        if i != 3:                                                             # one vial is empty
+            cyl(0.011, 0.05, (x, 0.045, 0), "Cyan", axis="y", verts=8, bevel=0.0)
+        cyl(0.019, 0.015, (x, 0.15, 0), "Rubber", axis="y", verts=12, bevel=0.0)
+
+
+def nereth_globe():
+    """Desk globe of Nereth on a brass stand."""
+    cyl(0.06, 0.015, (0, 0.0075, 0), "Brass", axis="y", verts=20)
+    cyl(0.008, 0.09, (0, 0.05, 0), "Brass", axis="y", verts=8, bevel=0.0)
+    sphere(0.08, (0, 0.18, 0), "Ceramic", segments=20, rings=12)
+    torus(0.09, 0.006, (0, 0.18, 0), "Brass", axis="x", major_seg=28, minor_seg=6)
+    torus(0.082, 0.004, (0, 0.18, 0), "Cyan", axis="y", major_seg=24, minor_seg=4)        # the crack belt
+
+
+def keyboard():
+    box((0.42, 0.025, 0.15), (0, 0.0125, 0), "Slate", 0.006)
+    for r in range(4):
+        box((0.38, 0.008, 0.026), (0, 0.028, -0.05 + r * 0.033), "Steel", 0.002)
+
+
+def cable_run():
+    """Three sagging cables between brackets, 3 m along X, wall at +Z (front = -Z). Hang at y 0 = bracket height."""
+    for x in (-1.5, 0.0, 1.5):
+        box((0.06, 0.16, 0.14), (x, -0.04, -0.07), "Brass", 0.01)
+        cyl(0.018, 0.03, (x, 0.02, -0.14), "Steel", axis="z", verts=8, bevel=0.0)
+    for (z, depth, r, m) in ((-0.05, 0.16, 0.022, "Rubber"), (-0.1, 0.24, 0.018, "Rubber"), (-0.15, 0.12, 0.016, "Terracotta")):
+        for (a, b) in ((-1.5, 0.0), (0.0, 1.5)):
+            cable(sag(a, b, -0.06, z, depth), r, m, resolution=1)
+
+
+def wall_sconce():
+    """Brass wall lamp, back plate at z 0 (wall = +Z), front = -Z; glass shade centre at (0, 0.12, -0.2)."""
+    box((0.16, 0.3, 0.03), (0, 0, -0.015), "Brass", 0.008)
+    cyl(0.05, 0.03, (0, 0, -0.04), "Terracotta", axis="z", verts=16)
+    box((0.03, 0.03, 0.18), (0, 0.03, -0.12), "Brass", 0.004, rot=(-20, 0, 0))
+    torus(0.07, 0.012, (0, 0.06, -0.2), "Brass", axis="y", major_seg=16, minor_seg=6)
+    cyl(0.03, 0.04, (0, 0.04, -0.2), "Brass", axis="y", verts=12)
+
+
+def hazard_plate():
+    """Floor hazard plate 1.8 x 0.3 m (along X): terracotta with slate chevrons, brass edge."""
+    box((1.8, 0.01, 0.3), (0, 0.005, 0), "Terracotta", 0.0)
+    for i in range(9):
+        box((0.06, 0.004, 0.32), (-0.8 + i * 0.2, 0.011, 0), "Slate", 0.0, rot=(0, 35, 0))
+    for z in (-0.16, 0.16):
+        box((1.84, 0.014, 0.025), (0, 0.007, z), "Brass", 0.0)
+
+
 PROPS = [
     ("prop_cryo_pod_base", cryo_pod_base),
     ("prop_cryo_pod_canopy", cryo_pod_canopy),
@@ -540,6 +742,20 @@ PROPS = [
     ("prop_map_table", map_table),
     ("prop_listening_booth", listening_booth),
     ("prop_lift_cage", lift_cage),
+    ("prop_lander_cradle", lander_cradle),
+    ("prop_pod_cradle", pod_cradle),
+    ("prop_hatch_rivets", hatch_rivets),
+    ("prop_mug", mug),
+    ("prop_chess_set", chess_set),
+    ("prop_photo_frame", photo_frame),
+    ("prop_file_stack", file_stack),
+    ("prop_paper_spread", paper_spread),
+    ("prop_sample_rack", sample_rack),
+    ("prop_nereth_globe", nereth_globe),
+    ("prop_keyboard", keyboard),
+    ("prop_cable_run", cable_run),
+    ("prop_wall_sconce", wall_sconce),
+    ("prop_hazard_plate", hazard_plate),
 ]
 
 

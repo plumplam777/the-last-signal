@@ -356,11 +356,32 @@ namespace LastSignal.EditorTools
             {
                 Box($"Lamp_{i}", r, p, new Vector3(1.0f, 0.05f, 1.0f), M.LampOff, false);
                 on.Add(Box($"Lamp_{i}_On", r, p + Vector3.down * 0.005f, new Vector3(1.01f, 0.05f, 1.01f), _amberLamp, false, null, false));
-                on.Add(PointLight($"Lamp_{i}_Light", r, p + Vector3.down * 0.5f, Hex("#FFC891"), 3.0f, 8f, i == 2 ? LightShadows.Soft : LightShadows.None).gameObject);
+                on.Add(PointLight($"Lamp_{i}_Light", r, p + Vector3.down * 0.5f, Hex("#FFBE80"), 3.0f, 8f, i == 2 ? LightShadows.Soft : LightShadows.None).gameObject);
                 i++;
             }
             off.Add(PointLight("Emergency", r, new Vector3(0, 3.2f, -4f), EmergencyRed, 1.2f, 9f).gameObject);
             PointLight("PlanetFill", r, new Vector3(0, 1.8f, CmdHalfL - 0.8f), Hex("#5A8FD0"), 1.3f, 8f);
+
+            // warm brass wall sconces (no shadows) so the room is not all planet-blue: warm walls, cool window
+            if (PropModels.Exists("prop_wall_sconce"))
+            {
+                int s = 0;
+                foreach (int side in new[] { -1, 1 })
+                    foreach (float z in new[] { -0.6f, 3.5f })
+                    {
+                        var g = Group($"Sconce_{s}", r, new Vector3(side * (CmdHalfW - 0.02f), 2.35f, z));
+                        g.transform.localRotation = Quaternion.Euler(0, side * 90f, 0); // local +Z into the wall
+                        PropModels.Place("prop_wall_sconce", g.transform, Vector3.zero);
+                        Box("ShadeOff", g.transform, new Vector3(0, 0.11f, -0.2f), new Vector3(0.12f, 0.09f, 0.12f), M.LampOff, false);
+                        on.Add(Box("ShadeOn", g.transform, new Vector3(0, 0.11f, -0.2f), new Vector3(0.125f, 0.095f, 0.125f), _amberLamp, false, null, false));
+                        on.Add(PointLight("SconceLight", g.transform, new Vector3(0, 0.3f, -0.5f), Hex("#FFA860"), 3.2f, 6f).gameObject);
+                        s++;
+                    }
+            }
+            if (PropModels.Exists("prop_cable_run"))
+                foreach (float x in new[] { -1.5f, 1.5f, 4.5f }) // not over the lift (south-west corner)
+                    DockingBayBuilder.NoShadows(PropModels.Place("prop_cable_run", r, new Vector3(x, CmdH - 0.4f, -CmdHalfL + 0.02f),
+                        Quaternion.Euler(0, 180f, 0), name: $"Cables_S_{x:0.0}"));
         }
 
         /// <summary>Bridge workstation from the Blender model; false when the model is missing (greybox fallback).</summary>

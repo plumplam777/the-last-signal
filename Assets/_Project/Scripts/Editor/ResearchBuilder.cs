@@ -338,6 +338,14 @@ namespace LastSignal.EditorTools
             small.characterSpacing = 0;
 
             DockingBayBuilder.BuildRecorder(props, "Recorder_LogRes01", new Vector3(-5.75f, 0.84f, -2.6f), Quaternion.Euler(0, 80, 0), StationContent.LogRes01);
+
+            // Rhee's desk: spectrogram printouts, two abandoned coffees, ice samples and a globe of Nereth
+            MedicalBuilder.Clutter(d, "prop_keyboard", new Vector3(0.0f, 0.835f, 0.3f), 90f);
+            MedicalBuilder.Clutter(d, "prop_paper_spread", new Vector3(0.05f, 0.835f, -0.45f), 0f);
+            MedicalBuilder.Clutter(d, "prop_mug", new Vector3(0.3f, 0.835f, -0.05f), -40f);
+            MedicalBuilder.Clutter(d, "prop_mug", new Vector3(-0.32f, 0.835f, -1.05f), 120f);
+            MedicalBuilder.Clutter(d, "prop_sample_rack", new Vector3(-0.38f, 0.835f, -0.55f), 90f);
+            MedicalBuilder.Clutter(d, "prop_nereth_globe", new Vector3(-0.3f, 0.835f, 1.0f), 20f);
         }
 
         private static void BuildListeningBooth(Transform props)

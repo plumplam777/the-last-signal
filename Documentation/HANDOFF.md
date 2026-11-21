@@ -80,9 +80,11 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
 **Waiting on the user:** play a build on Medium → does the laptop stay cool (else Low or `PlayingFps` 45)? Do they like
 the new look? (Not yet seen in play.) Note `Builds/macOS/TheLastSignal.app` predates the art pass — rebuild first.
 
-**Optional leftovers (small, only if time):** lander + escape-pod cradles in Docking still greybox; Okafor/Rhee desk
-clutter; cable/signage decals; warmer key light in Command; hatch rivets are Unity spheres (~770 tris each) → low-poly
-if triangles ever matter. Light shafts skipped (need a custom shader; cost).
+**Art leftovers — DONE 2026-11-21** (screenshots `art44_before_*` / `art44_after_*`): Blender lander + escape-pod
+cradles (Docking), desk clutter for Okafor (chess set, mug, photo, files) and Rhee (printouts, mugs, ice-sample rack,
+Nereth globe, keyboard) via `MedicalBuilder.Clutter` (no collider, no shadows), cable runs (Docking hall, Command south
+wall), hazard plate at the pod, 4 warm unshadowed brass sconces + warmer ceiling lamps in Command, hatch rivets now one
+672-tri mesh (was 12 Unity spheres ≈ 9 200 tris). Light shafts still skipped (custom shader, cost).
 
 ### 4.4 Progress (2026-11-21, session 2)
 - **Audio:** all 222 clips re-measured, every one on its mix target (voices -17, ambience -20, per-effect). Still needs a

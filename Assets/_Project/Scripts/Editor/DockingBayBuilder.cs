@@ -63,6 +63,7 @@ namespace LastSignal.EditorTools
             BuildLanderConsole(props, poweredOn);
             BuildInnerDoor(props);
             BuildEscapePodCradle(props);
+            BuildCableRuns(props);
             BuildDialogueTriggers(root.transform);
             BuildEscapeExit(root.transform);
 
@@ -476,10 +477,20 @@ namespace LastSignal.EditorTools
         {
             // Bay control console beside the empty Survey Lander cradle (front-left), plus Rhee's log LOG_DOCK_02.
             var cradle = Group("SurveyLanderCradle_Empty", props, new Vector3(-2.6f, 0, 3.4f)).transform;
-            Box("RailL", cradle, new Vector3(-0.9f, 0.08f, 0), new Vector3(0.12f, 0.16f, 3.0f), StationMaterials.Brass);
-            Box("RailR", cradle, new Vector3(0.9f, 0.08f, 0), new Vector3(0.12f, 0.16f, 3.0f), StationMaterials.Brass);
-            Box("FrostMark", cradle, new Vector3(0, 0.005f, 0), new Vector3(1.6f, 0.01f, 2.6f), StationMaterials.GlassTeal, false);
-            Cylinder("CutUmbilical", cradle, new Vector3(0.4f, 1.4f, 1.1f), new Vector3(0.06f, 1.4f, 0.06f), StationMaterials.Rubber, false, Quaternion.Euler(0, 0, 8));
+            if (PropModels.Place("prop_lander_cradle", cradle, Vector3.zero) == null)
+            {
+                Box("RailL", cradle, new Vector3(-0.9f, 0.08f, 0), new Vector3(0.12f, 0.16f, 3.0f), StationMaterials.Brass);
+                Box("RailR", cradle, new Vector3(0.9f, 0.08f, 0), new Vector3(0.12f, 0.16f, 3.0f), StationMaterials.Brass);
+                Box("FrostMark", cradle, new Vector3(0, 0.005f, 0), new Vector3(1.6f, 0.01f, 2.6f), StationMaterials.GlassTeal, false);
+                Cylinder("CutUmbilical", cradle, new Vector3(0.4f, 1.4f, 1.1f), new Vector3(0.06f, 1.4f, 0.06f), StationMaterials.Rubber, false, Quaternion.Euler(0, 0, 8));
+            }
+            else
+            {
+                // the rails and gear rams are things to walk around, not through
+                PropModels.Solid(cradle, new Vector3(-0.75f, 0.6f, 0), new Vector3(0.36f, 1.2f, 2.3f));
+                PropModels.Solid(cradle, new Vector3(0.75f, 0.6f, 0), new Vector3(0.36f, 1.2f, 2.3f));
+                PropModels.Solid(cradle, new Vector3(0, 1.35f, 1.65f), new Vector3(2.3f, 2.7f, 0.3f));
+            }
 
             var console = Group("Console_BayControl", props, new Vector3(-4.45f, 0, 1.2f));
             console.transform.localRotation = Quaternion.Euler(0, -90, 0); // screen (local -Z) faces into the hall
@@ -511,9 +522,15 @@ namespace LastSignal.EditorTools
         {
             // Escape Pod 1 cradle (empty, umbilicals cut) — looking here makes CAIRN explain the evacuation (AI_DOCK_02)
             var c = Group("EscapePod1Cradle_Empty", props, new Vector3(2.3f, 0, 3.9f)).transform;
-            Ring("CradleRing", c, new Vector3(0, 1.3f, 0), 1.2f, 0.2f, 0.25f, 28, StationMaterials.Brass);
-            Box("Clamp_L", c, new Vector3(-1.25f, 0.6f, 0), new Vector3(0.2f, 1.2f, 0.4f), StationMaterials.SlateDark);
-            Box("Clamp_R", c, new Vector3(1.25f, 0.6f, 0), new Vector3(0.2f, 1.2f, 0.4f), StationMaterials.SlateDark);
+            if (PropModels.Place("prop_pod_cradle", c, Vector3.zero) == null)
+            {
+                Ring("CradleRing", c, new Vector3(0, 1.3f, 0), 1.2f, 0.2f, 0.25f, 28, StationMaterials.Brass);
+                Box("Clamp_L", c, new Vector3(-1.25f, 0.6f, 0), new Vector3(0.2f, 1.2f, 0.4f), StationMaterials.SlateDark);
+                Box("Clamp_R", c, new Vector3(1.25f, 0.6f, 0), new Vector3(0.2f, 1.2f, 0.4f), StationMaterials.SlateDark);
+            }
+            else
+                PropModels.Solid(c, new Vector3(0, 1.3f, 0.1f), new Vector3(3.0f, 2.6f, 0.6f));
+            PropModels.Place("prop_hazard_plate", props, new Vector3(2.3f, 0.002f, 2.9f), name: "HazardPlate_Pod1");
             Cylinder("CutUmbilical_A", c, new Vector3(-0.3f, 3.2f, 0.1f), new Vector3(0.07f, 1.1f, 0.07f), StationMaterials.Rubber, false, Quaternion.Euler(0, 0, -6));
             Cylinder("CutUmbilical_B", c, new Vector3(0.35f, 3.3f, -0.1f), new Vector3(0.07f, 0.9f, 0.07f), StationMaterials.Rubber, false, Quaternion.Euler(0, 0, 9));
             var label = WorldText("Label", c, new Vector3(0, 2.75f, -0.15f), Quaternion.identity, "dock.pod_label", 2.0f, EmergencyRed);
@@ -525,6 +542,25 @@ namespace LastSignal.EditorTools
             box.size = new Vector3(3.6f, 2.2f, 2.6f);
             volume.AddComponent<LastSignal.Dialogue.DialogueTrigger>().EditorSet(DialogueContent.AiDock02, LastSignal.Dialogue.DialogueTriggerMode.OnEnterVolume, null,
                 new ConditionSet { conditions = new List<Condition> { Condition.Flag(DialogueContent.AiDock01.PlayedKey) } }, 0.3f);
+        }
+
+        /// <summary>Sagging cable runs high on both side walls of the hall (decor, no colliders).</summary>
+        private static void BuildCableRuns(Transform props)
+        {
+            if (!PropModels.Exists("prop_cable_run")) return;
+            var g = Group("CableRuns", props).transform;
+            foreach (int side in new[] { -1, 1 })
+                foreach (float z in new[] { -8.4f, -5.4f, -2.4f, 0.6f, 3.6f })
+                    NoShadows(PropModels.Place("prop_cable_run", g, new Vector3(side * (HallHalfWidth - 0.02f), HallHeight - 0.55f, z),
+                        Quaternion.Euler(0, side * 90f, 0), name: $"Cables_{side}_{z:0.0}"));
+        }
+
+        internal static GameObject NoShadows(GameObject go)
+        {
+            if (go != null)
+                foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            return go;
         }
 
         private static void BuildDialogueTriggers(Transform root)

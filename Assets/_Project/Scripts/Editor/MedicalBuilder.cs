@@ -251,7 +251,17 @@ namespace LastSignal.EditorTools
             t.EditorSetTerminal(StationContent.OkaforNotes, null);
 
             DockingBayBuilder.BuildRecorder(props, "Recorder_LogMed01", new Vector3(4.7f, 0.84f, -3.4f), Quaternion.Euler(0, -80, 0), StationContent.LogMed01);
+
+            // Okafor's things: the chess game he never finished, a cold coffee, a photo turned to his chair, patient files
+            Clutter(d, "prop_chess_set", new Vector3(0.2f, 0.835f, 0.72f), 8f);
+            Clutter(d, "prop_mug", new Vector3(0.3f, 0.835f, 0.12f), 30f);
+            Clutter(d, "prop_photo_frame", new Vector3(0.42f, 0.835f, -0.18f), 70f);
+            Clutter(d, "prop_file_stack", new Vector3(-0.25f, 0.835f, -0.86f), 6f);
         }
+
+        /// <summary>Small desk props: decor only (no collider, no shadows), so they never block an interaction ray.</summary>
+        internal static GameObject Clutter(Transform parent, string id, Vector3 pos, float yaw)
+            => DockingBayBuilder.NoShadows(PropModels.Place(id, parent, pos, Quaternion.Euler(0, yaw, 0), name: id.Replace("prop_", "Clutter_")));
 
         // ------------------------------------------------------------------ patient terminal + cabinet
 
@@ -377,11 +387,13 @@ namespace LastSignal.EditorTools
                 var d = new Vector3(Mathf.Cos(a * Mathf.Deg2Rad), Mathf.Sin(a * Mathf.Deg2Rad), 0);
                 Box($"Tooth_{i}", o, d * 1.3f + new Vector3(0, 0, -0.02f), new Vector3(0.2f, 0.12f, 0.2f), M.Brass, false, Quaternion.Euler(0, 0, a));
             }
-            for (int i = 0; i < 12; i++)
-            {
-                float a = i * 30f * Mathf.Deg2Rad;
-                Sphere($"Rivet_{i}", o, new Vector3(Mathf.Cos(a) * 0.92f, Mathf.Sin(a) * 0.92f, -0.05f), Vector3.one * 0.07f, M.Brass);
-            }
+            // one low-poly mesh for all twelve rivets (672 tris) instead of twelve Unity spheres (~9 200 tris)
+            if (DockingBayBuilder.NoShadows(PropModels.Place("prop_hatch_rivets", o, Vector3.zero, name: "Rivets")) == null)
+                for (int i = 0; i < 12; i++)
+                {
+                    float a = i * 30f * Mathf.Deg2Rad;
+                    Sphere($"Rivet_{i}", o, new Vector3(Mathf.Cos(a) * 0.92f, Mathf.Sin(a) * 0.92f, -0.05f), Vector3.one * 0.07f, M.Brass);
+                }
             Ring("Wheel", o, new Vector3(0, 0, -0.12f), 0.42f, 0.05f, 0.05f, 20, M.Brass);
             Box("Spoke", o, new Vector3(0, 0, -0.12f), new Vector3(0.05f, 0.84f, 0.04f), M.Brass, false);
             Cylinder("Hub", o, new Vector3(0, 0, -0.13f), new Vector3(0.22f, 0.04f, 0.22f), M.Brass, false, Quaternion.Euler(90, 0, 0));

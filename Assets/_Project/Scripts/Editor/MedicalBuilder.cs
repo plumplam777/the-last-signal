@@ -93,7 +93,8 @@ namespace LastSignal.EditorTools
         {
             var r = Group("Room", env).transform;
             Box("Floor", r, new Vector3(0, -0.1f, 0), new Vector3(HalfW * 2, 0.2f, HalfL * 2), M.Floor);
-            Box("FloorInlay", r, new Vector3(0, 0.005f, 0), new Vector3(HalfW * 2 - 1.2f, 0.01f, HalfL * 2 - 1.2f), _clinicalTrim, false);
+            var clinicalFloor = StationMaterials.Painted(Lit("M_Clinical_Floor", Hex("#B9C6CA"), 0.5f, 0.05f), StationTextures.FloorPlate(), 0.7f);
+            Box("FloorInlay", r, new Vector3(0, 0.005f, 0), new Vector3(HalfW * 2 - 1.2f, 0.01f, HalfL * 2 - 1.2f), clinicalFloor, false);
             Box("Ceiling", r, new Vector3(0, H + 0.1f, 0), new Vector3(HalfW * 2, 0.2f, HalfL * 2), M.Ceiling);
             Box("Wall_W", r, new Vector3(-HalfW - 0.1f, H / 2, 0), new Vector3(0.2f, H + 0.2f, HalfL * 2), _clinical);
             Box("Wall_E", r, new Vector3(HalfW + 0.1f, H / 2, 0), new Vector3(0.2f, H + 0.2f, HalfL * 2), _clinical);
@@ -106,6 +107,9 @@ namespace LastSignal.EditorTools
                 Box($"Skirting_{side}", r, new Vector3(x, 0.08f, 0), new Vector3(0.06f, 0.16f, HalfL * 2), M.SlateDark, false);
                 for (float z = -HalfL + 1.5f; z < HalfL; z += 3f)
                     Box($"Rib_{side}_{z:0}", r, new Vector3(x - side * 0.06f, H / 2, z), new Vector3(0.12f, H, 0.16f), _clinicalTrim, false);
+                // teal enamel panels high between the ribs (above the pods' vital monitor, below the pipes)
+                Ornament.PanelRow(r, $"Panels_{side}", new Vector3(side * HalfW, 2.8f, -4f), new Vector3(side * HalfW, 2.8f, 5f),
+                    side < 0 ? Vector3.right : Vector3.left, 4, 1.6f, 0.8f);
             }
 
             int i = 0;
@@ -123,6 +127,7 @@ namespace LastSignal.EditorTools
                 off.Add(Box($"EmergencyGlow_{p.z:0}", r, p + new Vector3(-Mathf.Sign(p.x) * 0.06f, 0, 0), new Vector3(0.02f, 0.08f, 0.38f), M.RedLamp, false, null, false));
                 off.Add(PointLight($"EmergencyLight_{p.z:0}", r, p + new Vector3(-Mathf.Sign(p.x) * 0.6f, -0.3f, 0), EmergencyRed, 1.4f, 6f).gameObject);
             }
+            Atmosphere.Dust(r, new Vector3(0, 2f, 0), new Vector3(11f, 3.4f, 13f), new Color(0.8f, 0.95f, 0.97f, 0.2f), 45);
             PropModels.PipeRun(r, "Pipes_W", new Vector3(-HalfW, H - 0.55f, -HalfL), new Vector3(-HalfW, H - 0.55f, HalfL), -90f);
             PropModels.PipeRun(r, "Pipes_E", new Vector3(HalfW, H - 0.55f, -HalfL), new Vector3(HalfW, H - 0.55f, HalfL), 90f);
             // red cross over the south hatch, "Medical" sign
@@ -330,7 +335,7 @@ namespace LastSignal.EditorTools
                 SectorIds.Engineering, null, M.Terracotta);
             Hatch(props, "Hatch_ToResearch", new Vector3(-1.6f, 1.45f, HalfL - 0.06f), 0f, SceneIds.Research, "from_medical", "sector.research.name",
                 SectorIds.Research, new ConditionSet { conditions = { Condition.Item(StationContent.KeycardResearch, "med.door.research_keycard") } }, M.Ceramic);
-            WorldText("Sign_Research", props, new Vector3(-1.6f, 3.0f, HalfL - 0.03f), Quaternion.identity, "med.sign.research", 2.2f, SignalCyan);
+            WorldText("Sign_Research", props, new Vector3(-1.6f, 3.1f, HalfL - 0.03f), Quaternion.identity, "med.sign.research", 2.2f, SignalCyan);
             // keycard reader beside the research hatch
             var reader = Group("KeycardReader", props, new Vector3(-0.1f, 1.4f, HalfL - 0.05f)).transform;
             Box("Body", reader, Vector3.zero, new Vector3(0.22f, 0.32f, 0.06f), M.SlateDark, false);
@@ -350,10 +355,37 @@ namespace LastSignal.EditorTools
             Ring("Ring", hatchGo.transform, Vector3.zero, 1.15f, 0.22f, 0.2f, 32, M.Brass);
             Cylinder("Plate", hatchGo.transform, new Vector3(0, 0, -0.02f), new Vector3(2.1f, 0.04f, 2.1f), plate, false, Quaternion.Euler(90, 0, 0));
             Box("Bar", hatchGo.transform, new Vector3(0, 0, -0.06f), new Vector3(2.0f, 0.18f, 0.06f), M.Brass, false);
+            HatchOrnament(hatchGo.transform);
             hatchGo.AddComponent<BoxCollider>().size = new Vector3(2.3f, 2.3f, 0.3f);
             var hatch = hatchGo.AddComponent<SectorHatch>();
             hatch.EditorConfigure(name.ToLowerInvariant(), "prompt.hatch.go", null, false, reqs);
             hatch.EditorSetTarget(scene, spawnId, nameKey, sectorId);
+        }
+
+        /// <summary>
+        /// Ornate surround for the round sector hatches (reference A rings): terracotta surround ring with eight brass
+        /// clamp teeth, a rivet circle on the plate and a hand wheel with a teal status hub. Kept within r = 1.41 m so
+        /// it never reaches the sector signs above the hatches. Decorative only (the hatch keeps its own collider).
+        /// </summary>
+        internal static void HatchOrnament(Transform h)
+        {
+            var o = Group("Ornament", h).transform;
+            Ring("Surround", o, new Vector3(0, 0, 0.04f), 1.33f, 0.16f, 0.12f, 32, M.Terracotta);
+            for (int i = 0; i < 8; i++)
+            {
+                float a = i * 45f + 22.5f;
+                var d = new Vector3(Mathf.Cos(a * Mathf.Deg2Rad), Mathf.Sin(a * Mathf.Deg2Rad), 0);
+                Box($"Tooth_{i}", o, d * 1.3f + new Vector3(0, 0, -0.02f), new Vector3(0.2f, 0.12f, 0.2f), M.Brass, false, Quaternion.Euler(0, 0, a));
+            }
+            for (int i = 0; i < 12; i++)
+            {
+                float a = i * 30f * Mathf.Deg2Rad;
+                Sphere($"Rivet_{i}", o, new Vector3(Mathf.Cos(a) * 0.92f, Mathf.Sin(a) * 0.92f, -0.05f), Vector3.one * 0.07f, M.Brass);
+            }
+            Ring("Wheel", o, new Vector3(0, 0, -0.12f), 0.42f, 0.05f, 0.05f, 20, M.Brass);
+            Box("Spoke", o, new Vector3(0, 0, -0.12f), new Vector3(0.05f, 0.84f, 0.04f), M.Brass, false);
+            Cylinder("Hub", o, new Vector3(0, 0, -0.13f), new Vector3(0.22f, 0.04f, 0.22f), M.Brass, false, Quaternion.Euler(90, 0, 0));
+            Cylinder("HubGlow", o, new Vector3(0, 0, -0.16f), new Vector3(0.1f, 0.01f, 0.1f), M.CyanStrip, false, Quaternion.Euler(90, 0, 0));
         }
 
         internal static void Spawn(Transform root, string id, Vector3 pos, float yaw)

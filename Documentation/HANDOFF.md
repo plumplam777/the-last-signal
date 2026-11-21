@@ -72,9 +72,12 @@ Done (screenshots `Documentation/Screenshots/art43_*`, before = `art43_before_do
 - Ornament: rondel bands in all sectors, framed teal panels (`Ornament.PanelRow`) in Docking hall, Research, Command.
 - Hero machines: Research **containment rig** (armillary around a teal shard), Reactor **gyro rings** + cold-blue
   core seams. Anything that moves must call `MakeDynamic` (static batching freezes it in builds) — `MovingPartsTests`.
-Still open, by impact: Medical (only textures so far — teal/white enamel panels, glass domes on the pods);
-lighting/post polish (light shafts / fog cards in Docking + Reactor, warmer key in Command); remaining greybox props
-(listening booth, map table, lift cabins, hatch frames, lander cradle); set dressing (cables, signage decals).
+Pass 4c (2026-11-21): Medical teal panels + clinical tile floor, softer enamel chips; ornate surrounds on the round
+sector hatches (`MedicalBuilder.HatchOrnament`); per-room dust motes (`Atmosphere.Dust`); Blender props map table,
+listening booth, lift cage. Triangles now 30–110k per sector (still light); no new shadowed lights.
+Still open, by impact: lighting/post polish (warmer key in Command, light-shaft look would need a custom shader —
+skipped for cost); remaining greybox: lander + escape-pod cradles, Okafor/Rhee clutter; set dressing (cables, signage
+decals); hatch rivets use Unity spheres (~770 tris each) — swap for low-poly if triangles ever matter.
 
 ### 4.4 Then
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.

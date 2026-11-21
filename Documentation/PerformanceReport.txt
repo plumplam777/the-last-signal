@@ -1,8 +1,8 @@
-Render cost report  2026-11-21 17:51
+Render cost report  2026-11-21 18:15
 scene | lights (all/active) | shadowed lights (all/active) | shadow maps (active) | renderers | static | triangles
 Sector_DockingBay | 17/9 | 1/0 | 0 | 642 | 601 | 83228
-Sector_Engineering | 13/7 | 1/0 | 0 | 226 | 135 | 21580
-Sector_Medical | 10/6 | 2/1 | 6 | 174 | 137 | 58360
-Sector_Research | 13/13 | 0/0 | 0 | 417 | 315 | 52956
-Sector_ReactorCommand | 17/10 | 2/1 | 6 | 555 | 500 | 73664
+Sector_Engineering | 13/7 | 1/0 | 0 | 301 | 210 | 31688
+Sector_Medical | 10/6 | 2/1 | 6 | 380 | 343 | 80336
+Sector_Research | 13/13 | 0/0 | 0 | 564 | 354 | 88224
+Sector_ReactorCommand | 17/10 | 2/1 | 6 | 694 | 423 | 108880
 Cutscene_Opening | 12/4 | 1/1 | 1 | 123 | 82 | 18572

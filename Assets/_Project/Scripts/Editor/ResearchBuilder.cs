@@ -121,6 +121,8 @@ namespace LastSignal.EditorTools
             Ornament.PanelRow(r, "Panels_S_E", new Vector3(2.8f, 2.45f, -HalfL), new Vector3(5.2f, 2.45f, -HalfL), Vector3.forward, 2);
             Ornament.PanelRow(r, "Panels_W", new Vector3(-HalfW, 2.45f, -1.0f), new Vector3(-HalfW, 2.45f, 1.9f), Vector3.right, 2);
 
+            Atmosphere.Dust(r, new Vector3(0, 2.2f, 0), new Vector3(13f, 3.8f, 15f), new Color(0.55f, 0.95f, 0.92f, 0.28f));
+
             // dim ceiling strips (the lab was kept dark for the screens)
             foreach (float x in new[] { -3.5f, 3.5f })
             {
@@ -341,11 +343,12 @@ namespace LastSignal.EditorTools
         private static void BuildListeningBooth(Transform props)
         {
             var b = Group("ListeningBooth", props, new Vector3(-5.2f, 0, 4.4f)).transform;
-            // three-sided booth open to the east
-            Box("Back", b, new Vector3(-1.6f, 1.3f, 0), new Vector3(0.1f, 2.6f, 2.6f), M.Terracotta);
-            Box("Side_S", b, new Vector3(-0.4f, 1.3f, -1.3f), new Vector3(2.4f, 2.6f, 0.1f), M.Terracotta);
-            Box("Side_N", b, new Vector3(-0.4f, 1.3f, 1.3f), new Vector3(2.4f, 2.6f, 0.1f), M.Terracotta);
-            Box("Roof", b, new Vector3(-0.4f, 2.62f, 0), new Vector3(2.4f, 0.06f, 2.7f), M.Brass, false);
+            // three-sided booth open to the east (Blender model; the boxes stay as colliders / greybox fallback)
+            bool boothModel = PropModels.Place("prop_listening_booth", b, Vector3.zero) != null;
+            HideRenderers(Box("Back", b, new Vector3(-1.6f, 1.3f, 0), new Vector3(0.1f, 2.6f, 2.6f), M.Terracotta), boothModel);
+            HideRenderers(Box("Side_S", b, new Vector3(-0.4f, 1.3f, -1.3f), new Vector3(2.4f, 2.6f, 0.1f), M.Terracotta), boothModel);
+            HideRenderers(Box("Side_N", b, new Vector3(-0.4f, 1.3f, 1.3f), new Vector3(2.4f, 2.6f, 0.1f), M.Terracotta), boothModel);
+            if (!boothModel) Box("Roof", b, new Vector3(-0.4f, 2.62f, 0), new Vector3(2.4f, 0.06f, 2.7f), M.Brass, false);
             Box("Seat", b, new Vector3(-0.8f, 0.45f, 0), new Vector3(0.55f, 0.08f, 0.55f), M.Rubber);
             Box("SeatBack", b, new Vector3(-1.05f, 0.8f, 0), new Vector3(0.06f, 0.7f, 0.5f), M.Rubber, false);
             Box("Shelf", b, new Vector3(-1.4f, 1.0f, 0), new Vector3(0.35f, 0.05f, 1.2f), M.SlateDark, false);
@@ -412,11 +415,11 @@ namespace LastSignal.EditorTools
         {
             MedicalBuilder.Hatch(props, "Hatch_ToMedical", new Vector3(0, 1.45f, -HalfL + 0.06f), 180f, SceneIds.Medical, "from_research",
                 "sector.medical.name", SectorIds.Medical, null, M.Ceramic);
-            WorldText("Sign_Medical", props, new Vector3(0, 3.0f, -HalfL + 0.04f), Quaternion.Euler(0, 180, 0), "sector.medical.name", 2.2f, TealLight);
+            WorldText("Sign_Medical", props, new Vector3(0, 3.1f, -HalfL + 0.04f), Quaternion.Euler(0, 180, 0), "sector.medical.name", 2.2f, TealLight);
             MedicalBuilder.Hatch(props, "Hatch_ToReactor", new Vector3(HalfW - 0.06f, 1.45f, -4.6f), 90f, SceneIds.ReactorCommand, "from_research",
                 "sector.reactor.name", SectorIds.Reactor,
                 new ConditionSet { conditions = { Condition.Item(StationContent.KeycardCore, "res.door.core_keycard") } }, M.Terracotta);
-            WorldText("Sign_Reactor", props, new Vector3(HalfW - 0.04f, 3.0f, -4.6f), Quaternion.Euler(0, 90, 0), "sector.reactor.name", 2.2f, Amber);
+            WorldText("Sign_Reactor", props, new Vector3(HalfW - 0.04f, 3.1f, -4.6f), Quaternion.Euler(0, 90, 0), "sector.reactor.name", 2.2f, Amber);
 
             MedicalBuilder.Spawn(root, "from_medical", new Vector3(0, 0.05f, -6.6f), 0f);
             MedicalBuilder.Spawn(root, "default", new Vector3(0, 0.05f, -6.6f), 0f);

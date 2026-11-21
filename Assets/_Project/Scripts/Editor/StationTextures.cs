@@ -171,8 +171,8 @@ namespace LastSignal.EditorTools
             float c = 0.92f + (Fbm(u, v, 4, 4, 21.3f) - 0.5f) * 0.14f;
             c += (Fbm(u, v, 48, 2, 3.9f) - 0.5f) * 0.04f;
             float chip = Smooth(0.73f, 0.77f, Fbm(u, v, 12, 4, 17.7f));
-            c = Mathf.Lerp(c, 0.55f, chip);
-            float h = 0.6f - chip * 0.15f + (Fbm(u, v, 24, 2, 8.1f) - 0.5f) * 0.04f;
+            c = Mathf.Lerp(c, 0.72f, chip * 0.8f);                                  // soft chips (read as dirt on pale enamel if too dark)
+            float h = 0.6f - chip * 0.12f + (Fbm(u, v, 24, 2, 8.1f) - 0.5f) * 0.04f;
             return new Px(Tint(c, 1f, 1f, 1f), h);
         }
 

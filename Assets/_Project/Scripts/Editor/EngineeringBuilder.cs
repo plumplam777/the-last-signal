@@ -116,6 +116,8 @@ namespace LastSignal.EditorTools
                 Cylinder($"PipeThin_{side}", r, new Vector3(side * 3.6f, H - 0.3f, 0), new Vector3(0.14f, HalfL, 0.14f), _rust, false, Quaternion.Euler(90, 0, 0));
             }
 
+            Atmosphere.Dust(r, new Vector3(0, 2.5f, 0), new Vector3(11f, 4f, 13f), new Color(1f, 0.7f, 0.42f, 0.3f));
+
             int i = 0;
             foreach (var p in new[] { new Vector3(-3f, H - 0.5f, -4f), new Vector3(3f, H - 0.5f, -4f), new Vector3(-3f, H - 0.5f, 3.5f), new Vector3(4f, H - 0.5f, 4f) })
             {
@@ -432,11 +434,12 @@ namespace LastSignal.EditorTools
             var hatchGo = Group("Hatch_ToDocking", props, new Vector3(0, 1.45f, -HalfL + 0.06f));
             Ring("Ring", hatchGo.transform, Vector3.zero, 1.15f, 0.22f, 0.2f, 32, M.Brass);
             Cylinder("Plate", hatchGo.transform, new Vector3(0, 0, -0.02f), new Vector3(2.1f, 0.04f, 2.1f), M.Terracotta, false, Quaternion.Euler(90, 0, 0));
+            MedicalBuilder.HatchOrnament(hatchGo.transform);
             hatchGo.AddComponent<BoxCollider>().size = new Vector3(2.3f, 2.3f, 0.3f);
             var hatch = hatchGo.AddComponent<SectorHatch>();
             hatch.EditorConfigure("eng_hatch_docking", "prompt.hatch.go", null, false);
             hatch.EditorSetTarget(SceneIds.DockingBay, "from_engineering", "sector.docking.name", SectorIds.Docking);
-            WorldText("Sign_Docking", props, new Vector3(0, 2.9f, -HalfL + 0.05f), Quaternion.Euler(0, 180, 0), "sector.docking.name", 2.6f, SignalCyan);
+            WorldText("Sign_Docking", props, new Vector3(0, 3.15f, -HalfL + 0.05f), Quaternion.Euler(0, 180, 0), "sector.docking.name", 2.6f, SignalCyan);
 
             var spawn = Group("Spawn_FromDocking", root, new Vector3(0, 0.05f, -5.6f));
             spawn.AddComponent<SpawnPoint>().EditorSetId("from_docking");

@@ -129,6 +129,8 @@ namespace LastSignal.EditorTools
             var glow = Cylinder("CoreGlow", s, new Vector3(0, ShaftH / 2, 0), new Vector3(3.7f, ShaftH / 2 - 0.6f, 3.7f), _coreGlow, false, null, false);
             for (float y = 1.2f; y < ShaftH; y += 1.6f)
                 Cylinder($"CoreBand_{y:0.0}", s, new Vector3(0, y, 0), new Vector3(3.85f, 0.08f, 3.85f), M.Brass, false);
+            Atmosphere.Dust(s, new Vector3(0, 4.5f, 0), new Vector3(12f, 8f, 12f), new Color(0.6f, 0.85f, 1f, 0.3f), 90);
+
             // cold-blue glowing seams down the housing (8 slots between the brass bands)
             var seam = Emissive("M_Emissive_CoreBlue", Hex("#6FB8FF"), 1.1f, Color.Lerp(Hex("#6FB8FF"), Navy, 0.5f));
             for (int k = 0; k < 8; k++)
@@ -264,10 +266,13 @@ namespace LastSignal.EditorTools
             var l = Group(name, t, pos);
             l.transform.localRotation = Quaternion.Euler(0, yaw, 0);
             var lt = l.transform;
-            Box("Platform", lt, new Vector3(0, 0.05f, 0), new Vector3(1.8f, 0.1f, 1.8f), M.Brass, false);
-            foreach (var (x, z) in new[] { (-0.85f, -0.85f), (0.85f, -0.85f), (-0.85f, 0.85f), (0.85f, 0.85f) })
-                Box($"Post_{x}_{z}", lt, new Vector3(x, 1.5f, z), new Vector3(0.1f, 3f, 0.1f), M.Brass, false);
-            Box("Roof", lt, new Vector3(0, 3.02f, 0), new Vector3(1.9f, 0.08f, 1.9f), M.SlateDark, false);
+            if (PropModels.Place("prop_lift_cage", lt, Vector3.zero) == null)
+            {
+                Box("Platform", lt, new Vector3(0, 0.05f, 0), new Vector3(1.8f, 0.1f, 1.8f), M.Brass, false);
+                foreach (var (x, z) in new[] { (-0.85f, -0.85f), (0.85f, -0.85f), (-0.85f, 0.85f), (0.85f, 0.85f) })
+                    Box($"Post_{x}_{z}", lt, new Vector3(x, 1.5f, z), new Vector3(0.1f, 3f, 0.1f), M.Brass, false);
+                Box("Roof", lt, new Vector3(0, 3.02f, 0), new Vector3(1.9f, 0.08f, 1.9f), M.SlateDark, false);
+            }
             var panel = Group("CallPanel", lt, new Vector3(0.85f, 1.3f, -0.95f));
             Box("Body", panel.transform, Vector3.zero, new Vector3(0.3f, 0.45f, 0.08f), M.SlateDark, false, null, false);
             var lamp = Sphere("Lamp", panel.transform, new Vector3(0, 0.1f, -0.05f), Vector3.one * 0.07f, M.CyanStrip, false, false);
@@ -343,6 +348,8 @@ namespace LastSignal.EditorTools
             }
             PropModels.PipeRun(r, "Pipes_W", new Vector3(-CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(-CmdHalfW, CmdH - 0.55f, CmdHalfL), -90f);
             PropModels.PipeRun(r, "Pipes_E", new Vector3(CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(CmdHalfW, CmdH - 0.55f, CmdHalfL), 90f);
+
+            Atmosphere.Dust(r, new Vector3(0, 2f, 0), new Vector3(13f, 3.4f, 11f), new Color(1f, 0.78f, 0.52f, 0.32f));
 
             int i = 0;
             foreach (var p in new[] { new Vector3(-3.5f, CmdH - 0.05f, -2f), new Vector3(3.5f, CmdH - 0.05f, -2f), new Vector3(0, CmdH - 0.05f, 2f) })
@@ -482,8 +489,9 @@ namespace LastSignal.EditorTools
 
             // paper map and mugs
             var table = Group("MapTable", p, new Vector3(3.6f, 0, -3.6f)).transform;
-            Box("Top", table, new Vector3(0, 0.85f, 0), new Vector3(1.6f, 0.06f, 1.0f), M.SlateDark);
-            Box("Leg", table, new Vector3(0, 0.42f, 0), new Vector3(0.2f, 0.84f, 0.2f), M.Brass, false);
+            bool tableModel = PropModels.Place("prop_map_table", table, Vector3.zero) != null;
+            HideRenderers(Box("Top", table, new Vector3(0, 0.85f, 0), new Vector3(1.6f, 0.06f, 1.0f), M.SlateDark), tableModel);
+            if (!tableModel) Box("Leg", table, new Vector3(0, 0.42f, 0), new Vector3(0.2f, 0.84f, 0.2f), M.Brass, false);
             Box("Map", table, new Vector3(0, 0.885f, 0), new Vector3(1.4f, 0.005f, 0.85f), M.Ceramic, false, Quaternion.Euler(0, 4, 0));
             var mapText = WorldText("MapLabel", table, new Vector3(0, 0.9f, 0.25f), Quaternion.Euler(90, 4, 0), "command.map", 0.7f, Navy);
             ((RectTransform)mapText.transform).sizeDelta = new Vector2(1.3f, 0.2f);

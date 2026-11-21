@@ -440,6 +440,85 @@ def fuse_box():
             cyl(0.02, 0.03, (x, y, 0.12), "Steel", axis="z", verts=8, bevel=0.0)
 
 
+def map_table():
+    """Command map table: slate top (1.6 x 1.0, surface y 0.88) in a brass rim, terracotta apron, turned brass pedestal."""
+    box((1.6, 0.06, 1.0), (0, 0.85, 0), "Slate", 0.02)
+    for (sx, sz, x, z) in ((1.66, 0.04, 0, 0.52), (1.66, 0.04, 0, -0.52), (0.04, 1.06, 0.82, 0), (0.04, 1.06, -0.82, 0)):
+        box((sx, 0.06, sz), (x, 0.87, z), "Brass", 0.012)
+    box((1.48, 0.1, 0.88), (0, 0.77, 0), "Terracotta", 0.02)
+    cyl(0.1, 0.68, (0, 0.38, 0), "Brass", axis="y", verts=24)
+    for y in (0.12, 0.7):
+        torus(0.13, 0.03, (0, y, 0), "Brass", axis="y", major_seg=24, minor_seg=8)
+    cyl(0.16, 0.06, (0, 0.06, 0), "Brass", axis="y", verts=24)
+    box((1.1, 0.06, 0.14), (0, 0.04, 0), "Slate", 0.015)
+    box((0.14, 0.06, 0.8), (0, 0.04, 0), "Slate", 0.015)
+    for (x, z) in ((0.55, 0), (-0.55, 0), (0, 0.4), (0, -0.4)):
+        cyl(0.07, 0.05, (x, 0.05, z), "Brass", axis="y", verts=16)
+
+
+def listening_booth():
+    """Research listening booth, open to +X: terracotta shell with brass edges, an arch crown over the opening,
+    quilted acoustic panels high on the inside walls (kept clear of the tally marks, terminal and headphones)."""
+    box((0.1, 2.6, 2.6), (-1.6, 1.3, 0), "Terracotta", 0.02)
+    for z in (-1.3, 1.3):
+        box((2.4, 2.6, 0.1), (-0.4, 1.3, z), "Terracotta", 0.02)
+        box((0.14, 2.7, 0.16), (0.82, 1.33, z), "Brass", 0.02)                   # front edge posts
+        box((2.5, 0.12, 0.14), (-0.4, 0.06, z), "Slate", 0.015)                   # plinth
+        box((2.5, 0.06, 0.14), (-0.4, 1.0, z), "Brass", 0.01)                     # rail
+    box((0.14, 0.12, 2.7), (-1.6, 0.06, 0), "Slate", 0.015)
+    box((2.6, 0.08, 2.8), (-0.4, 2.64, 0), "Slate", 0.02)                         # roof
+    box((2.66, 0.08, 2.86), (-0.4, 2.72, 0), "Brass", 0.015)                      # cornice
+    torus(1.22, 0.06, (0.84, 1.55, 0), "Brass", axis="x", major_seg=36, minor_seg=10, half=True)
+    box((0.06, 0.06, 2.6), (0.84, 1.55, 0), "Brass", 0.01)                        # arch spring line
+    cyl(0.14, 0.06, (0.84, 2.78, 0), "Cyan", axis="x", verts=20, bevel=0.0)       # keystone light
+    # quilted acoustic panels (upper band only)
+    for iy in range(3):
+        y = 1.9 + iy * 0.22
+        for iz in range(11):
+            box((0.04, 0.19, 0.19), (-1.53, y, -1.0 + iz * 0.2), "Slate", 0.02, segments=3)
+        for ix in range(10):
+            box((0.19, 0.19, 0.04), (-1.35 + ix * 0.2, y + 0.05, 1.23), "Slate", 0.02, segments=3)
+            if y + 0.05 > 2.0:
+                box((0.19, 0.19, 0.04), (-1.35 + ix * 0.2, y + 0.05, -1.23), "Slate", 0.02, segments=3)
+    cyl(0.18, 0.08, (-0.6, 2.56, 0), "Brass", axis="y", verts=20)                 # lamp housing
+    cyl(0.14, 0.02, (-0.6, 2.51, 0), "Ceramic", axis="y", verts=20, bevel=0.0)
+
+
+def lift_cage():
+    """Brass cage lift on a 1.8 m platform, front (call panel side) = -Z open: fluted corner posts, scissor lattice
+    on the other three sides, cornice and a pulley crown with cables."""
+    box((1.8, 0.1, 1.8), (0, 0.05, 0), "Brass", 0.02)
+    for i in range(7):
+        box((1.7, 0.012, 0.05), (0, 0.105, -0.75 + i * 0.25), "Slate", 0.0)          # floor grate lines
+    for (x, z) in ((-0.85, -0.85), (0.85, -0.85), (-0.85, 0.85), (0.85, 0.85)):
+        cyl(0.06, 3.0, (x, 1.5, z), "Brass", axis="y", verts=16)
+        for y in (0.2, 1.0, 2.0, 2.9):
+            torus(0.075, 0.018, (x, y, z), "Brass", axis="y", major_seg=16, minor_seg=6)
+    # rails + scissor lattice on +X, -X and +Z
+    sides = [((0.85, 0), "z"), ((-0.85, 0), "z"), ((0, 0.85), "x")]
+    for (cx, cz), along in sides:
+        for y in (1.0, 2.0):
+            if along == "z":
+                cyl(0.025, 1.7, (cx, y, cz), "Brass", axis="z", verts=10)
+            else:
+                cyl(0.025, 1.7, (cx, y, cz), "Brass", axis="x", verts=10)
+        for k in range(4):
+            off = -0.64 + k * 0.425
+            for sgn in (-1, 1):
+                if along == "z":
+                    box((0.02, 0.62, 0.03), (cx, 1.5, cz + off), "Brass", 0.0, rot=(sgn * 35, 0, 0))
+                else:
+                    box((0.03, 0.62, 0.02), (cx + off, 1.5, cz), "Brass", 0.0, rot=(0, 0, sgn * 35))
+    box((1.9, 0.08, 1.9), (0, 3.02, 0), "Slate", 0.02)
+    box((2.0, 0.1, 2.0), (0, 3.1, 0), "Brass", 0.02)
+    box((1.5, 0.12, 1.5), (0, 3.2, 0), "Terracotta", 0.02)
+    torus(0.26, 0.04, (0, 3.6, 0), "Brass", axis="x", major_seg=28, minor_seg=8)
+    cyl(0.08, 0.14, (0, 3.6, 0), "Steel", axis="x", verts=16)
+    box((0.08, 0.4, 0.08), (0, 3.4, 0), "Brass", 0.01)
+    for z in (-0.24, 0.24):
+        cyl(0.012, 1.6, (0, 4.4, z), "Steel", axis="y", verts=6, bevel=0.0)
+
+
 PROPS = [
     ("prop_cryo_pod_base", cryo_pod_base),
     ("prop_cryo_pod_canopy", cryo_pod_canopy),
@@ -458,6 +537,9 @@ PROPS = [
     ("prop_crate", crate),
     ("prop_workbench", workbench),
     ("prop_fuse_box", fuse_box),
+    ("prop_map_table", map_table),
+    ("prop_listening_booth", listening_booth),
+    ("prop_lift_cage", lift_cage),
 ]
 
 

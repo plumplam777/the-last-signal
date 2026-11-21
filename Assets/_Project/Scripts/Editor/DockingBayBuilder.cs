@@ -157,6 +157,8 @@ namespace LastSignal.EditorTools
                 on.Add(strip);
             }
 
+            Atmosphere.Dust(hall, new Vector3(0, 2.2f, -2f), new Vector3(9f, 3.6f, 15f), new Color(1f, 0.78f, 0.52f, 0.32f));
+
             // ceiling beams
             for (float z = HallBack + 2f; z < HallFront; z += 4f)
                 Box($"Ceiling_Beam_{z:0}", hall, new Vector3(0, HallHeight - 0.12f, z), new Vector3(HallHalfWidth * 2, 0.22f, 0.28f), StationMaterials.Brass, false);

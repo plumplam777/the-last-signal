@@ -1,8 +1,9 @@
 # The Last Signal — Handoff for a new chat
 
-**Updated:** 2026-11-20 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
-Phase 7 (polish) is in progress. Everything is committed on `main`; **no GitHub remote yet** (user will give the URL →
-`git remote add origin <url>` → push).
+**Updated:** 2026-11-21 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
+Phase 7 (polish): playtest bugs, performance and the big art pass are **done**; next is **§4.4** (audio listen, BG pass,
+builds, GitHub, diploma docs). Everything is committed on `main` (last art commit `908bd0c`); **no GitHub remote yet** (user will
+give the URL → `git remote add origin <url>` → push).
 
 > New chat: read this file, then `Documentation/ArtDirection.md` (+ the two images in `Documentation/ArtReference/`).
 > Do not re-ask the user anything under "User decisions". Work through **§4 To do** top to bottom.
@@ -43,46 +44,50 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
 - **Bulgarian font:** Cyrillic comes from the dynamic `LiberationSans SDF - Fallback` asset. Its "Clear Dynamic Data On
   Build" must stay **off** — a build wiped it once and the whole BG UI went blank (TMP exceptions every frame).
   `GlyphRenderTests` catches it. Never commit that asset with an empty `m_GlyphTable`.
+- **After every macOS build** run `git diff --stat` on that font asset before committing (see `tmp-fallback-font` memory).
+- **Surfaces:** `StationTextures.cs` generates the painted textures (`Art/Textures/Surfaces`, delete a PNG to regenerate);
+  `BuilderKit.Box` uses `MetricBox` meshes (UVs in metres). Unity's `Mathf.SmoothStep` is an interpolation, not an
+  edge function — use `StationTextures.Smooth()`-style helpers.
+- **Anything that moves at runtime** (FlagSpinner, door panels) must not be static: call `BuilderKit.MakeDynamic(go)`
+  (`MovingPartsTests`). `FlagSpinner` with an empty flag spins always.
+- Reusable art helpers: `Ornament.PanelRow` (framed teal panels), `MedicalBuilder.HatchOrnament` (round hatch surround),
+  `Atmosphere.Dust` (room dust motes), `StationMaterials.Painted(mat, maps)`.
+- **Screenshots in powered state:** load scene → `manage_editor play` → menu `Last Signal/Debug/Restore Sector Power` →
+  `manage_camera screenshot` with `view_position`/`view_target`, `output_folder: Documentation/Screenshots` → `stop`.
+  (Command Center sits at y + 20 in `Sector_ReactorCommand`.)
+- MCP quirks: `Build All Sectors` may report "Timeout receiving Unity response" but still finishes — check the console
+  for `[…Builder] Built …` lines. Don't edit C# while a PlayMode run is going (full PlayMode run ≈ 6 min).
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 28 EditMode + 93 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
-  sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables). Spec §16 evidence:
+- Tests: 28 EditMode + 93 PlayMode, all green (2026-11-21). Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
+  sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables), `DoorOpeningClearTests`, `WorldTextFitTests`
+  (EN+BG), `GlyphRenderTests` (Cyrillic font), `MaterialSanityTests` (no pink), `PerformanceBudgetTests`, `MovingPartsTests`. Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
 
 ## 4. To do (in this order)
 
-### 4.1 / 4.2 — DONE (2026-11-20, see `Documentation/Performance.md`)
-- Wall band across the Docking → Engineering door removed (band stops at the pillars). `DoorOpeningClearTests`.
-- World text auto-sizes (design size = max) and wraps; corridor signs, Rhee's notes and reactor warnings re-fitted.
-  `WorldTextFitTests` checks EN + BG: fits its rect, readable size, not inside/covered by geometry.
-- Pink "A" on Rhee's wall: not in a camera render (= an editor gizmo, never in builds). `MaterialSanityTests` guards
-  against real pink (missing shaders). Turn Gizmos off in the Game view to stop seeing it.
-- Performance: fps cap (`FrameRateGovernor`: 60, pause 30, unfocused 10), Low/Medium/High quality (default Medium, Settings → Graphics),
-  fewer shadowed lights, audio import rules. Build 136 MB (engine dominates). **Still to do:** the user should play a
-  build on Medium and say if the laptop stays cool; if not, try Low or lower `PlayingFps` to 45.
+### 4.1 – 4.3 — DONE (2026-11-20/21)
+- **4.1 Playtest bugs:** wall band across the Docking→Engineering door; world text overflowing/clipped (auto-size +
+  re-fitted rects, EN+BG); pink "A" = editor gizmo only. Plus: blank BG UI after a build (font asset wiped) — fixed.
+- **4.2 Performance** (`Documentation/Performance.md`): `FrameRateGovernor` (60 fps, pause 30, unfocused 10), Low/Medium/
+  High quality (default Medium, Settings → "Graphics"), 1 shadowed lamp per room, audio import rules.
+  `Last Signal/Diagnostics/Report Render Cost` → `Documentation/PerformanceReport.txt`.
+- **4.3 Art pass** (screenshots `Documentation/Screenshots/art43_*`, `art43b_*`; before = `art43_before_dock_hall.png`):
+  painted procedural textures + normal maps on all station materials, rondel trim bands, framed teal panels (Docking,
+  Research, Command, Medical), ornate round-hatch surrounds, dust motes, hero machines (Research containment rig,
+  Reactor gyro rings + glowing core seams), Blender props map table / listening booth / lift cage.
 
-### 4.3 Make it look like the references — pass 4 DONE (2026-11-21), more possible
-Done (screenshots `Documentation/Screenshots/art43_*`, before = `art43_before_dock_hall.png`):
-- `StationTextures`: procedural seamless painted detail + normal maps (painted metal panels with rivets, worn floor
-  plates, ceiling panels, brushed brass, chipped enamel) and a **rondel trim band** (reference A). Hue stays in
-  `_BaseColor`. Delete a PNG in `Art/Textures/Surfaces` to regenerate. Note: Unity's `Mathf.SmoothStep` is NOT an
-  edge function — the generators use their own `Smooth()`.
-- `BuilderKit.Box` → `MetricBox` meshes with UVs in metres (cached in `Art/Meshes/MetricBoxes`; prune with
-  `Last Signal/Setup/Prune Unused Box Meshes`).
-- Ornament: rondel bands in all sectors, framed teal panels (`Ornament.PanelRow`) in Docking hall, Research, Command.
-- Hero machines: Research **containment rig** (armillary around a teal shard), Reactor **gyro rings** + cold-blue
-  core seams. Anything that moves must call `MakeDynamic` (static batching freezes it in builds) — `MovingPartsTests`.
-Pass 4c (2026-11-21): Medical teal panels + clinical tile floor, softer enamel chips; ornate surrounds on the round
-sector hatches (`MedicalBuilder.HatchOrnament`); per-room dust motes (`Atmosphere.Dust`); Blender props map table,
-listening booth, lift cage. Triangles now 30–110k per sector (still light); no new shadowed lights.
-Still open, by impact: lighting/post polish (warmer key in Command, light-shaft look would need a custom shader —
-skipped for cost); remaining greybox: lander + escape-pod cradles, Okafor/Rhee clutter; set dressing (cables, signage
-decals); hatch rivets use Unity spheres (~770 tris each) — swap for low-poly if triangles ever matter.
+**Waiting on the user:** play a build on Medium → does the laptop stay cool (else Low or `PlayingFps` 45)? Do they like
+the new look? (Not yet seen in play.) Note `Builds/macOS/TheLastSignal.app` predates the art pass — rebuild first.
+
+**Optional leftovers (small, only if time):** lander + escape-pod cradles in Docking still greybox; Okafor/Rhee desk
+clutter; cable/signage decals; warmer key light in Command; hatch rivets are Unity spheres (~770 tris each) → low-poly
+if triangles ever matter. Light shafts skipped (need a custom shader; cost).
 
 ### 4.4 Then
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.
 - BG translation pass with the user (tone, gender forms; Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).
-- Builds: clean macOS build + smoke test of all 8 scenes; Windows build (ask before downloading `sqlite3.dll`).
+- Builds: clean macOS build (`Last Signal/Build/macOS (clean)`) + smoke test of all 8 scenes; Windows build (ask before downloading `sqlite3.dll`).
 - GitHub push when the user gives the URL.
 - Diploma docs (Dec 17–19): demo script, architecture/DB diagrams (`TechnicalArchitecture.md`, `DatabaseSchema.md`),
   screenshots. Cut list if late: hidden Ending C → item combination → Windows build.
@@ -92,10 +97,10 @@ decals); hatch rivets use Unity spheres (~770 tris each) — swap for low-poly i
 | Path | What |
 |---|---|
 | `The_Last_Signal_Master_Plan.md` | Original spec (§16 = acceptance criteria) |
-| `Documentation/` | `ArtDirection.md` + `ArtReference/`, `AcceptanceChecklist.md`, `TechnicalArchitecture.md`, `DatabaseSchema.md`, `DecisionsLog.md`, `AssetRegister.md` (licence of every asset), `Narrative/StoryBible.md`, `Screenshots/` |
-| `Assets/_Project/Scripts/` | `Core` (GameServices, WorldState, scenes, localization, settings), `Player`, `Interaction`, `Puzzles`, `Dialogue`, `Endings`, `Audio`, `Database` (SQLite), `SaveSystem`, `Admin`, `UI`, `Editor` (all builders, `PropModels`, `SkyArt`, debug menus) |
+| `Documentation/` | `HANDOFF.md` (this), `Performance.md`, `ArtDirection.md` + `ArtReference/`, `AcceptanceChecklist.md`, `TechnicalArchitecture.md`, `DatabaseSchema.md`, `DecisionsLog.md`, `AssetRegister.md` (licence of every asset), `Narrative/StoryBible.md`, `Screenshots/` |
+| `Assets/_Project/Scripts/` | `Core` (GameServices, WorldState, scenes, localization, settings), `Player`, `Interaction`, `Puzzles`, `Dialogue`, `Endings`, `Audio`, `Database` (SQLite), `SaveSystem`, `Admin`, `UI`, `Editor` (all builders, `PropModels`, `SkyArt`, `StationTextures`, `Ornament`, `Atmosphere`, `QualityPresets`, `AudioImportRules`, `PerformanceReport`, debug menus) |
 | `Tools/` | `blender/build_props.py`, `generate_voices.py`, `generate_sfx.py`, `normalize_audio.py` |
-| Menus | `Last Signal/Build Content/*`, `Last Signal/Build/macOS`, `Last Signal/Debug/*` (give items, restore power, open decision), `Last Signal/Diagnostics/*` (UI previews, Report Prop Models) |
+| Menus | `Last Signal/Build Content/*`, `Last Signal/Build/macOS (clean)`, `Last Signal/Debug/*` (give items, restore power, open decision), `Last Signal/Diagnostics/*` (UI previews, Report Prop Models, Report Render Cost), `Last Signal/Setup/*` (Build Quality Presets, Reimport Audio, Prune Unused Box Meshes) |
 
 Spoiler walkthrough (for testing): Docking — flashlight, 30A fuse under the tarp → fuse box → breaker → door.
 Engineering — coupling → generator coolant→fuel→ignition→load → route Medical, Life support, Lighting. Medical — wipe

@@ -2,8 +2,8 @@
 
 **Updated:** 2026-11-21 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
 Phase 7 (polish): playtest bugs, performance and the big art pass are **done**; next is **§4.4** (audio listen, BG pass,
-builds, GitHub, diploma docs). Everything is committed on `main` (last art commit `908bd0c`); **no GitHub remote yet** (user will
-give the URL → `git remote add origin <url>` → push).
+builds, GitHub, diploma docs). Everything is committed on `main` (last art commit `908bd0c`); pushed to **github.com/plumplam777/the-last-signal**
+(public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push` after each commit.
 
 > New chat: read this file, then `Documentation/ArtDirection.md` (+ the two images in `Documentation/ArtReference/`).
 > Do not re-ask the user anything under "User decisions". Work through **§4 To do** top to bottom.
@@ -102,7 +102,7 @@ if triangles ever matter. Light shafts skipped (need a custom shader; cost).
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.
 - BG translation pass with the user (tone, gender forms; Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).
 - Builds: clean macOS build (`Last Signal/Build/macOS (clean)`) + smoke test of all 8 scenes; Windows build (ask before downloading `sqlite3.dll`).
-- GitHub push when the user gives the URL.
+- ~~GitHub push~~ done 2026-11-21: public repo `plumplam777/the-last-signal`, push after every commit.
 - Diploma docs (Dec 17–19): demo script, architecture/DB diagrams (`TechnicalArchitecture.md`, `DatabaseSchema.md`),
   screenshots. Cut list if late: hidden Ending C → item combination → Windows build.
 

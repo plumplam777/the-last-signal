@@ -185,6 +185,7 @@ namespace LastSignal.EditorTools
             foreach (float y in new[] { -0.95f, 0.95f })
                 Sphere($"Pin_{y:0}", outer.transform, new Vector3(0, y, 0), Vector3.one * 0.11f, M.Brass, false, false);
             outer.AddComponent<FlagSpinner>().EditorSet(null, Vector3.up, 9f);
+            MakeDynamic(outer);
 
             var middle = Group("Ring_Middle", outer.transform);
             middle.transform.localRotation = Quaternion.Euler(0, 90f, 0);
@@ -204,6 +205,8 @@ namespace LastSignal.EditorTools
             Box("Prism_A", shard.transform, Vector3.zero, new Vector3(0.2f, 0.62f, 0.2f), crystal, false, Quaternion.Euler(8f, 45f, 6f), false);
             Box("Prism_B", shard.transform, new Vector3(0.05f, -0.08f, 0), new Vector3(0.13f, 0.4f, 0.13f), crystal, false, Quaternion.Euler(-14f, 20f, 22f), false);
             shard.AddComponent<FlagSpinner>().EditorSet(null, Vector3.up, -16f);
+            MakeDynamic(outer);
+            MakeDynamic(shard);
             PointLight("ShardGlow", rig, new Vector3(0, cy, 0), TealLight, 2.6f, 5f);
         }
 

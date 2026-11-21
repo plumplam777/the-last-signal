@@ -129,6 +129,31 @@ namespace LastSignal.EditorTools
             var glow = Cylinder("CoreGlow", s, new Vector3(0, ShaftH / 2, 0), new Vector3(3.7f, ShaftH / 2 - 0.6f, 3.7f), _coreGlow, false, null, false);
             for (float y = 1.2f; y < ShaftH; y += 1.6f)
                 Cylinder($"CoreBand_{y:0.0}", s, new Vector3(0, y, 0), new Vector3(3.85f, 0.08f, 3.85f), M.Brass, false);
+            // cold-blue glowing seams down the housing (8 slots between the brass bands)
+            var seam = Emissive("M_Emissive_CoreBlue", Hex("#6FB8FF"), 1.1f, Color.Lerp(Hex("#6FB8FF"), Navy, 0.5f));
+            for (int k = 0; k < 8; k++)
+            {
+                float a = k * 45f + 22.5f;
+                var d = Quaternion.Euler(0, a, 0) * Vector3.forward;
+                Box($"CoreSeam_{k}", s, d * 1.86f + Vector3.up * (ShaftH / 2), new Vector3(0.1f, ShaftH - 1.4f, 0.06f), seam, false, Quaternion.Euler(0, a, 0));
+            }
+
+            // gyroscopic rings (hero machine): tilted brass rings precessing around the core. Tilt <= 30 deg keeps every
+            // ring point >= 1.99 m from the axis (core radius 1.92 m) and inside the safety rail (2.6 m).
+            var gyro = new[] { (y: 3.1f, tilt: 24f, speed: 11f), (y: 4.7f, tilt: -18f, speed: -15f), (y: 6.3f, tilt: 28f, speed: 8f) };
+            for (int g = 0; g < gyro.Length; g++)
+            {
+                var spin = Group($"GyroRing_{g}", s, new Vector3(0, gyro[g].y, 0));
+                spin.transform.localRotation = Quaternion.Euler(0, g * 50f, 0);
+                var tilt = Group("Tilt", spin.transform);
+                tilt.transform.localRotation = Quaternion.Euler(90f + gyro[g].tilt, 0, 0);
+                Ring("Band", tilt.transform, Vector3.zero, 2.3f, 0.12f, 0.16f, 36, M.Brass);
+                Ring("Inlay", tilt.transform, new Vector3(0, 0, -0.085f), 2.3f, 0.05f, 0.02f, 36, M.TrimRondel);
+                foreach (int k in new[] { -1, 1 })
+                    Sphere($"Bearing_{k}", tilt.transform, new Vector3(k * 2.3f, 0, 0), Vector3.one * 0.22f, M.Brass, false, false);
+                spin.AddComponent<FlagSpinner>().EditorSet(null, Vector3.up, gyro[g].speed);
+                MakeDynamic(spin);
+            }
             var coreLight = PointLight("CoreLight", s, new Vector3(0, 2.2f, 0), Hex("#6FB8FF"), 1.5f, 14f, LightShadows.Soft);
             glow.AddComponent<EmissionPulse>().EditorSet(Hex("#3C7FC4"), 0.15f, 0.65f, 6f, 0f); // safe shutdown: dim, slow
             // safety railing around the core (frosted)
@@ -308,6 +333,14 @@ namespace LastSignal.EditorTools
             planet.transform.localRotation = Quaternion.Euler(10f, 160f, 0f);
             planet.AddComponent<EmissionPulse>().EditorSet(Hex("#2F8FD8"), 0.15f, 1.2f, 40f / 6f, 0.3f);
             Box("Band", r, new Vector3(0, 1.0f, -CmdHalfL + 0.03f), new Vector3(CmdHalfW * 2, StationTextures.TrimHeight, 0.05f), M.TrimRondel, false);
+            // ornament: rondel trim on the side walls and framed teal panels south of the comms console / archive
+            foreach (int side in new[] { -1, 1 })
+            {
+                float wx = side * (CmdHalfW - 0.03f);
+                Box($"Band_{side}", r, new Vector3(wx, 1.0f, 0), new Vector3(0.05f, StationTextures.TrimHeight, CmdHalfL * 2), M.TrimRondel, false);
+                Ornament.PanelRow(r, $"Panels_{side}", new Vector3(side * CmdHalfW, 2.2f, -4.6f), new Vector3(side * CmdHalfW, 2.2f, -1.8f),
+                    side < 0 ? Vector3.right : Vector3.left, 2);
+            }
             PropModels.PipeRun(r, "Pipes_W", new Vector3(-CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(-CmdHalfW, CmdH - 0.55f, CmdHalfL), -90f);
             PropModels.PipeRun(r, "Pipes_E", new Vector3(CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(CmdHalfW, CmdH - 0.55f, CmdHalfL), 90f);
 

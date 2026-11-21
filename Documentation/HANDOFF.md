@@ -45,7 +45,7 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   `GlyphRenderTests` catches it. Never commit that asset with an empty `m_GlyphTable`.
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 28 EditMode + 88 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 28 EditMode + 93 PlayMode, all green. Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables). Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
 
@@ -61,18 +61,20 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   fewer shadowed lights, audio import rules. Build 136 MB (engine dominates). **Still to do:** the user should play a
   build on Medium and say if the laptop stays cool; if not, try Low or lower `PlayingFps` to 45.
 
-### 4.3 Make it look like the references (biggest visual gap — "still looks quite simple")
-Goal (`ArtDirection.md`): crafted retro-futurist station — dark painted metal, polished brass, teal crystal, terracotta,
-lit like a painting. Ideas, highest impact first:
-- **Materials/textures:** hand-painted style albedo with soft gradients, edge-wear on brass, grime in corners, trim sheets
-  and panel lines (generate procedurally like `SkyArt`, or bake in Blender). Right now most surfaces are flat colours.
-- **Architecture modules in Blender:** wall panels with brass ribs and rivet rows, ornate arch/ring door frames, domed
-  ceilings, floor grates, meander trim bands — replace the flat box rooms.
-- **Lighting & post:** stronger warm amber vs cold teal contrast, colour grading + vignette, bloom on emissives, light
-  shafts/fog in big rooms, emissive signal lines. Keep it cheap (see 4.2).
-- **Set dressing:** cables, pipes, signage, decals, a hero machine per sector (generator, cryo pods, reactor core, …).
-- Remaining greybox props: listening booth, map table, lift cabins, hatch frames, lander cradle, Okafor/Rhee clutter.
-- Compare every pass with the reference images; take before/after screenshots into `Documentation/Screenshots/`.
+### 4.3 Make it look like the references — pass 4 DONE (2026-11-21), more possible
+Done (screenshots `Documentation/Screenshots/art43_*`, before = `art43_before_dock_hall.png`):
+- `StationTextures`: procedural seamless painted detail + normal maps (painted metal panels with rivets, worn floor
+  plates, ceiling panels, brushed brass, chipped enamel) and a **rondel trim band** (reference A). Hue stays in
+  `_BaseColor`. Delete a PNG in `Art/Textures/Surfaces` to regenerate. Note: Unity's `Mathf.SmoothStep` is NOT an
+  edge function — the generators use their own `Smooth()`.
+- `BuilderKit.Box` → `MetricBox` meshes with UVs in metres (cached in `Art/Meshes/MetricBoxes`; prune with
+  `Last Signal/Setup/Prune Unused Box Meshes`).
+- Ornament: rondel bands in all sectors, framed teal panels (`Ornament.PanelRow`) in Docking hall, Research, Command.
+- Hero machines: Research **containment rig** (armillary around a teal shard), Reactor **gyro rings** + cold-blue
+  core seams. Anything that moves must call `MakeDynamic` (static batching freezes it in builds) — `MovingPartsTests`.
+Still open, by impact: Medical (only textures so far — teal/white enamel panels, glass domes on the pods);
+lighting/post polish (light shafts / fog cards in Docking + Reactor, warmer key in Command); remaining greybox props
+(listening booth, map table, lift cabins, hatch frames, lander cradle); set dressing (cables, signage decals).
 
 ### 4.4 Then
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.

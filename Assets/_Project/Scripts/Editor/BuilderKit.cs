@@ -186,6 +186,34 @@ namespace LastSignal.EditorTools
             return mesh;
         }
 
+        /// <summary>Clears static flags on a hierarchy that moves at runtime (spinners): static batching would freeze it in a build.</summary>
+        public static GameObject MakeDynamic(GameObject root)
+        {
+            foreach (var t in root.GetComponentsInChildren<Transform>(true))
+                GameObjectUtility.SetStaticEditorFlags(t.gameObject, 0);
+            return root;
+        }
+
+        /// <summary>Deletes cached box meshes that no scene or prefab uses any more (sizes from earlier iterations).</summary>
+        [MenuItem("Last Signal/Setup/Prune Unused Box Meshes")]
+        public static void PruneMetricBoxes()
+        {
+            var roots = new System.Collections.Generic.List<string>();
+            foreach (var guid in AssetDatabase.FindAssets("t:Scene t:Prefab", new[] { "Assets/_Project" }))
+                roots.Add(AssetDatabase.GUIDToAssetPath(guid));
+            var used = new System.Collections.Generic.HashSet<string>(AssetDatabase.GetDependencies(roots.ToArray(), true));
+            int removed = 0;
+            foreach (var guid in AssetDatabase.FindAssets("t:Mesh", new[] { BoxMeshFolder }))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (used.Contains(path)) continue;
+                AssetDatabase.DeleteAsset(path);
+                removed++;
+            }
+            BoxMeshes.Clear();
+            Debug.Log($"[BuilderKit] Pruned {removed} unused box meshes.");
+        }
+
         private static Mesh BuildMetricBox(Vector3 s)
         {
             var verts = new System.Collections.Generic.List<Vector3>();

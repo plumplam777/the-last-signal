@@ -152,9 +152,77 @@ namespace LastSignal.EditorTools
             go.transform.localRotation = rot ?? Quaternion.identity;
             go.transform.localScale = size;
             go.GetComponent<Renderer>().sharedMaterial = mat;
+            if (type == PrimitiveType.Cube) go.GetComponent<MeshFilter>().sharedMesh = MetricBox(size);
             if (!collider) Object.DestroyImmediate(go.GetComponent<Collider>());
             if (isStatic) GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
             return go;
+        }
+
+        private const string BoxMeshFolder = "Assets/_Project/Art/Meshes/MetricBoxes";
+        private static readonly System.Collections.Generic.Dictionary<string, Mesh> BoxMeshes = new();
+
+        /// <summary>
+        /// Unit cube (same as Unity's, so localScale = size still works) whose UVs are in metres of the scaled box:
+        /// a 16 m wall repeats its texture 16 x per metre-tiling instead of stretching one copy. Cached per size (mm).
+        /// Side faces: u = horizontal, v = up; top/bottom: u = x, v = z. UVs start at 0 on the box's min edge.
+        /// </summary>
+        public static Mesh MetricBox(Vector3 size)
+        {
+            int sx = Mathf.Max(1, Mathf.RoundToInt(Mathf.Abs(size.x) * 1000f));
+            int sy = Mathf.Max(1, Mathf.RoundToInt(Mathf.Abs(size.y) * 1000f));
+            int sz = Mathf.Max(1, Mathf.RoundToInt(Mathf.Abs(size.z) * 1000f));
+            string key = $"Box_{sx}x{sy}x{sz}";
+            if (BoxMeshes.TryGetValue(key, out var cached) && cached != null) return cached;
+            string path = $"{BoxMeshFolder}/{key}.asset";
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            if (mesh == null)
+            {
+                Directory.CreateDirectory(BoxMeshFolder);
+                mesh = BuildMetricBox(new Vector3(sx, sy, sz) / 1000f);
+                mesh.name = key;
+                AssetDatabase.CreateAsset(mesh, path);
+            }
+            BoxMeshes[key] = mesh;
+            return mesh;
+        }
+
+        private static Mesh BuildMetricBox(Vector3 s)
+        {
+            var verts = new System.Collections.Generic.List<Vector3>();
+            var norms = new System.Collections.Generic.List<Vector3>();
+            var tans = new System.Collections.Generic.List<Vector4>();
+            var uvs = new System.Collections.Generic.List<Vector2>();
+            var tris = new System.Collections.Generic.List<int>();
+            // (normal, u axis, v axis)
+            var faces = new (Vector3 n, Vector3 u, Vector3 v)[]
+            {
+                (Vector3.forward, Vector3.left, Vector3.up), (Vector3.back, Vector3.right, Vector3.up),
+                (Vector3.right, Vector3.forward, Vector3.up), (Vector3.left, Vector3.back, Vector3.up),
+                (Vector3.up, Vector3.right, Vector3.forward), (Vector3.down, Vector3.right, Vector3.back),
+            };
+            foreach (var (n, ua, va) in faces)
+            {
+                int start = verts.Count;
+                float su = Mathf.Abs(Vector3.Dot(ua, s)), sv = Mathf.Abs(Vector3.Dot(va, s));
+                for (int i = 0; i < 4; i++)
+                {
+                    float a = (i == 1 || i == 2) ? 0.5f : -0.5f, b = i >= 2 ? 0.5f : -0.5f;
+                    verts.Add(n * 0.5f + ua * a + va * b);
+                    norms.Add(n);
+                    tans.Add(new Vector4(ua.x, ua.y, ua.z, -1f)); // cross(n, u) = -v for these faces
+                    uvs.Add(new Vector2((a + 0.5f) * su, (b + 0.5f) * sv));
+                }
+                tris.AddRange(new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
+            }
+            var mesh = new Mesh();
+            mesh.SetVertices(verts);
+            mesh.SetNormals(norms);
+            mesh.SetTangents(tans);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(tris, 0);
+            // a second UV set for lightmaps/probes is not needed (realtime lighting only)
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         /// <summary>Ring (or arc) of box segments in the local XY plane, facing Z. Angles in degrees, 0 = +X, CCW.</summary>

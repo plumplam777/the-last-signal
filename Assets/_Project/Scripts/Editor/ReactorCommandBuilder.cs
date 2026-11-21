@@ -39,7 +39,7 @@ namespace LastSignal.EditorTools
             _coreGlow = Emissive("M_Emissive_CoreBlue", Hex("#3C7FC4"), 0.5f, Hex("#14263D"));
             _frostRail = Lit("M_Rail_Frost", Color.Lerp(MetalGrey, Color.white, 0.35f), 0.7f, 0.6f);
             _amberLamp = Emissive("M_Emissive_CommandAmber", Amber, 1.6f, Amber);
-            _console = Lit("M_Console_Dark", Color.Lerp(Navy, Slate, 0.6f), 0.4f, 0.2f);
+            _console = StationMaterials.Painted(Lit("M_Console_Dark", Color.Lerp(Navy, Slate, 0.6f), 0.4f, 0.2f), StationTextures.Enamel(), 0.5f);
             _consoleGlow = Emissive("M_Console_Glow", Color.Lerp(Teal, Navy, 0.35f), 0.45f, Color.Lerp(Teal, Navy, 0.6f));
             DockingBayContent.CreateAll();
             var playerPrefab = PlayerPrefabBuilder.Build();
@@ -307,7 +307,7 @@ namespace LastSignal.EditorTools
             var planet = Sphere("Nereth", r, new Vector3(0, -14f, CmdHalfL + 26f), new Vector3(48f, 48f, 48f), SkyArt.Nereth());
             planet.transform.localRotation = Quaternion.Euler(10f, 160f, 0f);
             planet.AddComponent<EmissionPulse>().EditorSet(Hex("#2F8FD8"), 0.15f, 1.2f, 40f / 6f, 0.3f);
-            Box("Band", r, new Vector3(0, 1.0f, -CmdHalfL + 0.03f), new Vector3(CmdHalfW * 2, 0.18f, 0.05f), M.Terracotta, false);
+            Box("Band", r, new Vector3(0, 1.0f, -CmdHalfL + 0.03f), new Vector3(CmdHalfW * 2, StationTextures.TrimHeight, 0.05f), M.TrimRondel, false);
             PropModels.PipeRun(r, "Pipes_W", new Vector3(-CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(-CmdHalfW, CmdH - 0.55f, CmdHalfL), -90f);
             PropModels.PipeRun(r, "Pipes_E", new Vector3(CmdHalfW, CmdH - 0.55f, -CmdHalfL), new Vector3(CmdHalfW, CmdH - 0.55f, CmdHalfL), 90f);
 

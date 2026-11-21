@@ -121,7 +121,7 @@ namespace LastSignal.EditorTools
                 Box($"Wall_{s}", hall, new Vector3(x, HallHeight * 0.5f, midZ), new Vector3(0.2f, HallHeight + 0.2f, len), StationMaterials.Wall);
                 float inner = side * (HallHalfWidth - 0.02f);
                 Box($"Wall_{s}_Dado", hall, new Vector3(inner, 0.55f, midZ), new Vector3(0.06f, 1.1f, len), StationMaterials.SlateDark, false);
-                Box($"Wall_{s}_Band", hall, new Vector3(inner - side * 0.02f, 1.2f, midZ), new Vector3(0.06f, 0.22f, len), StationMaterials.Terracotta, false);
+                Box($"Wall_{s}_Band", hall, new Vector3(inner - side * 0.02f, 1.2f, midZ), new Vector3(0.06f, StationTextures.TrimHeight, len), StationMaterials.TrimRondel, false);
                 Box($"Wall_{s}_BandTrim", hall, new Vector3(inner - side * 0.03f, 1.33f, midZ), new Vector3(0.05f, 0.04f, len), StationMaterials.Brass, false);
                 Box($"Wall_{s}_Window", hall, new Vector3(inner, 3.35f, midZ), new Vector3(0.04f, 0.7f, len - 1f), StationMaterials.WindowGlow, false);
                 Box($"Wall_{s}_WindowSillTrim", hall, new Vector3(inner - side * 0.03f, 2.97f, midZ), new Vector3(0.07f, 0.06f, len), StationMaterials.Brass, false);
@@ -133,6 +133,23 @@ namespace LastSignal.EditorTools
                     for (float y = 0.6f; y < HallHeight; y += 0.9f)
                         Sphere($"Rivet_{y:0.0}", hall, new Vector3(inner - side * 0.16f, y, z), Vector3.one * 0.06f, StationMaterials.Brass);
                     _ = rib;
+                }
+
+                // teal enamel inset panels in brass frames between the ribs (reference A), with a brass rondel boss
+                for (float z = HallBack + 2f; z <= HallFront - 2f; z += 2f)
+                {
+                    const float pw = 1.5f, ph = 1.28f, py = 2.12f;
+                    float px = inner - side * 0.012f;
+                    Box($"Wall_{s}_Panel_{z:0}", hall, new Vector3(px, py, z), new Vector3(0.02f, ph, pw), StationMaterials.TealPanel, false);
+                    float fx = inner - side * 0.03f;
+                    Box($"Wall_{s}_PanelFrameT_{z:0}", hall, new Vector3(fx, py + ph * 0.5f, z), new Vector3(0.04f, 0.05f, pw + 0.05f), StationMaterials.Brass, false);
+                    Box($"Wall_{s}_PanelFrameB_{z:0}", hall, new Vector3(fx, py - ph * 0.5f, z), new Vector3(0.04f, 0.05f, pw + 0.05f), StationMaterials.Brass, false);
+                    Box($"Wall_{s}_PanelFrameF_{z:0}", hall, new Vector3(fx, py, z - pw * 0.5f), new Vector3(0.04f, ph, 0.05f), StationMaterials.Brass, false);
+                    Box($"Wall_{s}_PanelFrameK_{z:0}", hall, new Vector3(fx, py, z + pw * 0.5f), new Vector3(0.04f, ph, 0.05f), StationMaterials.Brass, false);
+                    Cylinder($"Wall_{s}_PanelBoss_{z:0}", hall, new Vector3(inner - side * 0.03f, py, z), new Vector3(0.34f, 0.02f, 0.34f),
+                        StationMaterials.Brass, false, Quaternion.Euler(0, 0, 90));
+                    Cylinder($"Wall_{s}_PanelBossInner_{z:0}", hall, new Vector3(inner - side * 0.045f, py, z), new Vector3(0.2f, 0.02f, 0.2f),
+                        StationMaterials.Terracotta, false, Quaternion.Euler(0, 0, 90));
                 }
 
                 // floor-edge cyan guide strips (powered)
@@ -151,8 +168,8 @@ namespace LastSignal.EditorTools
             Box("Wall_Front_Top", hall, new Vector3(0, 3.85f, fz), new Vector3(2.4f, 1.7f, 0.2f), StationMaterials.Wall);
             // the band stops at the door pillars (outer edge x = ±1.53) — it must never cross the opening
             const float bandGap = 1.53f, bandW = HallHalfWidth - bandGap;
-            Box("Wall_Front_Band_L", hall, new Vector3(-(bandGap + bandW * 0.5f), 1.2f, fz - 0.12f), new Vector3(bandW, 0.22f, 0.04f), StationMaterials.Terracotta, false);
-            Box("Wall_Front_Band_R", hall, new Vector3(bandGap + bandW * 0.5f, 1.2f, fz - 0.12f), new Vector3(bandW, 0.22f, 0.04f), StationMaterials.Terracotta, false);
+            Box("Wall_Front_Band_L", hall, new Vector3(-(bandGap + bandW * 0.5f), 1.2f, fz - 0.12f), new Vector3(bandW, StationTextures.TrimHeight, 0.04f), StationMaterials.TrimRondel, false);
+            Box("Wall_Front_Band_R", hall, new Vector3(bandGap + bandW * 0.5f, 1.2f, fz - 0.12f), new Vector3(bandW, StationTextures.TrimHeight, 0.04f), StationMaterials.TrimRondel, false);
             // back wall
             Box("Wall_Back", hall, new Vector3(0, HallHeight * 0.5f, HallBack - 0.1f), new Vector3(HallHalfWidth * 2, HallHeight + 0.2f, 0.2f), StationMaterials.Wall);
 
@@ -216,8 +233,8 @@ namespace LastSignal.EditorTools
             Box("Wall_L", c, new Vector3(-1.7f, h * 0.5f, midZ), new Vector3(0.2f, h, len), StationMaterials.Wall);
             Box("Wall_R", c, new Vector3(1.7f, h * 0.5f, midZ), new Vector3(0.2f, h, len), StationMaterials.Wall);
             Box("Wall_End", c, new Vector3(0, h * 0.5f, z1 + 0.1f), new Vector3(3.4f, h, 0.2f), StationMaterials.Wall);
-            Box("Band_L", c, new Vector3(-1.58f, 1.2f, midZ), new Vector3(0.04f, 0.22f, len), StationMaterials.Terracotta, false);
-            Box("Band_R", c, new Vector3(1.58f, 1.2f, midZ), new Vector3(0.04f, 0.22f, len), StationMaterials.Terracotta, false);
+            Box("Band_L", c, new Vector3(-1.58f, 1.2f, midZ), new Vector3(0.04f, StationTextures.TrimHeight, len), StationMaterials.TrimRondel, false);
+            Box("Band_R", c, new Vector3(1.58f, 1.2f, midZ), new Vector3(0.04f, StationTextures.TrimHeight, len), StationMaterials.TrimRondel, false);
             for (float z = z0 + 1f; z < z1; z += 2.4f)
             {
                 Ring($"Arch_{z:0}", c, new Vector3(0, 1.6f, z), 1.55f, 0.16f, 0.22f, 20, StationMaterials.Brass, 0f, 180f);

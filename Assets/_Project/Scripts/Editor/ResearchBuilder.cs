@@ -45,7 +45,7 @@ namespace LastSignal.EditorTools
             _screenWave = Emissive("M_Screen_Wave", SignalCyan, 1.6f, SignalCyan);
             _note = Emissive("M_StickyNote", Hex("#E8C76A"), 0.25f, Hex("#E8C76A"));
             _planetGlow = Emissive("M_Nereth_Night", Hex("#1E4E7A"), 0.5f, Hex("#0B1A2A"));
-            _wallDark = Lit("M_Wall_LabDark", Color.Lerp(Navy, Slate, 0.4f), 0.35f, 0.1f);
+            _wallDark = StationMaterials.Painted(Lit("M_Wall_LabDark", Color.Lerp(Navy, Slate, 0.55f), 0.35f, 0.1f), StationTextures.PaintedMetal());
             DockingBayContent.CreateAll();
             var playerPrefab = PlayerPrefabBuilder.Build();
 
@@ -57,6 +57,7 @@ namespace LastSignal.EditorTools
             BuildRoom(env);
             BuildWindow(env);
             var props = Group("Props", root.transform).transform;
+            BuildContainmentRig(props);
             BuildTrialWall(props);
             BuildDecodeConsole(props);
             BuildRheeDesk(props);
@@ -114,7 +115,12 @@ namespace LastSignal.EditorTools
             for (float x = -4.5f; x <= 4.6f; x += 1.8f)
                 Box($"Mullion_{x:0.0}", r, new Vector3(x, 2.2f, HalfL + 0.02f), new Vector3(0.1f, 2.4f, 0.12f), M.Brass, false);
             foreach (int side in new[] { -1, 1 })
-                Box($"Band_{side}", r, new Vector3(side * (HalfW - 0.03f), 1.2f, 0), new Vector3(0.05f, 0.2f, HalfL * 2), M.Terracotta, false);
+                Box($"Band_{side}", r, new Vector3(side * (HalfW - 0.03f), 1.2f, 0), new Vector3(0.05f, StationTextures.TrimHeight, HalfL * 2), M.TrimRondel, false);
+            // ornament: framed teal panels on the free wall stretches (south wall beside the hatch, west wall middle)
+            Ornament.PanelRow(r, "Panels_S_W", new Vector3(-5.2f, 2.45f, -HalfL), new Vector3(-2.8f, 2.45f, -HalfL), Vector3.forward, 2);
+            Ornament.PanelRow(r, "Panels_S_E", new Vector3(2.8f, 2.45f, -HalfL), new Vector3(5.2f, 2.45f, -HalfL), Vector3.forward, 2);
+            Ornament.PanelRow(r, "Panels_W", new Vector3(-HalfW, 2.45f, -1.0f), new Vector3(-HalfW, 2.45f, 1.9f), Vector3.right, 2);
+
             // dim ceiling strips (the lab was kept dark for the screens)
             foreach (float x in new[] { -3.5f, 3.5f })
             {
@@ -142,6 +148,64 @@ namespace LastSignal.EditorTools
         }
 
         // ------------------------------------------------------------------ trials + decode
+
+        /// <summary>
+        /// Hero machine (ArtDirection.md): an armillary-like containment rig around a teal crystal shard of the
+        /// Murmur — three nested brass rings turning slowly on different axes, hung from the ceiling on a brass rod,
+        /// standing on a stepped terracotta pedestal. Centre of the lab, framed by the Nereth window from the entrance.
+        /// </summary>
+        private static void BuildContainmentRig(Transform props)
+        {
+            var rig = Group("ContainmentRig", props, new Vector3(0f, 0f, 1.2f)).transform;
+            var crystal = Emissive("M_Crystal_Teal", Teal, 0.75f, Color.Lerp(Teal, Navy, 0.35f)); // stays teal under bloom
+            crystal.SetFloat("_Smoothness", 0.9f);
+
+            // pedestal (the only collider)
+            Cylinder("Base", rig, new Vector3(0, 0.1f, 0), new Vector3(1.9f, 0.1f, 1.9f), M.SlateDark);
+            Cylinder("BaseTrim", rig, new Vector3(0, 0.21f, 0), new Vector3(1.96f, 0.02f, 1.96f), M.Brass, false);
+            Cylinder("Step", rig, new Vector3(0, 0.32f, 0), new Vector3(1.4f, 0.1f, 1.4f), M.Terracotta, false);
+            Cylinder("StepTrim", rig, new Vector3(0, 0.43f, 0), new Vector3(1.44f, 0.02f, 1.44f), M.Brass, false);
+            Cylinder("Column", rig, new Vector3(0, 0.66f, 0), new Vector3(0.7f, 0.22f, 0.7f), M.Terracotta, false);
+            Cylinder("ColumnCap", rig, new Vector3(0, 0.9f, 0), new Vector3(0.8f, 0.03f, 0.8f), M.Brass, false);
+            for (int i = 0; i < 4; i++)                                           // glowing vents in the step
+            {
+                float a = i * 90f + 45f;
+                var dir = Quaternion.Euler(0, a, 0) * Vector3.forward;
+                Box($"Vent_{i}", rig, dir * 0.66f + Vector3.up * 0.32f, new Vector3(0.22f, 0.05f, 0.04f), crystal, false, Quaternion.Euler(0, a, 0));
+            }
+
+            const float cy = 1.95f;
+            Cylinder("PivotLow", rig, new Vector3(0, 0.95f, 0), new Vector3(0.06f, 0.06f, 0.06f), M.Brass, false);
+            Cylinder("HangerRod", rig, new Vector3(0, (cy + 0.95f + H) * 0.5f, 0), new Vector3(0.06f, (H - cy - 0.95f) * 0.5f, 0.06f), M.Brass, false);
+            Cylinder("HangerPlate", rig, new Vector3(0, H - 0.03f, 0), new Vector3(0.6f, 0.03f, 0.6f), M.Brass, false);
+
+            // gimbal: outer (vertical axis) > middle (local X) > inner (local Z, tilted)
+            var outer = Group("Ring_Outer", rig, new Vector3(0, cy, 0));
+            Ring("Band", outer.transform, Vector3.zero, 0.95f, 0.07f, 0.09f, 32, M.Brass);
+            foreach (float y in new[] { -0.95f, 0.95f })
+                Sphere($"Pin_{y:0}", outer.transform, new Vector3(0, y, 0), Vector3.one * 0.11f, M.Brass, false, false);
+            outer.AddComponent<FlagSpinner>().EditorSet(null, Vector3.up, 9f);
+
+            var middle = Group("Ring_Middle", outer.transform);
+            middle.transform.localRotation = Quaternion.Euler(0, 90f, 0);
+            Ring("Band", middle.transform, Vector3.zero, 0.78f, 0.05f, 0.07f, 28, M.Brass);
+            foreach (int s in new[] { -1, 1 })
+                Sphere($"Orb_{s}", middle.transform, new Vector3(s * 0.78f, 0, 0), Vector3.one * 0.16f, M.GlassTeal, false, false);
+            middle.AddComponent<FlagSpinner>().EditorSet(null, Vector3.right, 14f);
+
+            var inner = Group("Ring_Inner", middle.transform);
+            inner.transform.localRotation = Quaternion.Euler(60f, 0, 0);
+            Ring("Band", inner.transform, Vector3.zero, 0.6f, 0.045f, 0.06f, 24, M.Brass);
+            Ring("Teeth", inner.transform, new Vector3(0, 0, 0.035f), 0.56f, 0.03f, 0.02f, 24, M.TrimRondel);
+            inner.AddComponent<FlagSpinner>().EditorSet(null, Vector3.forward, 22f);
+
+            // the shard: two crossed, tilted prisms glowing teal, slowly turning
+            var shard = Group("Shard", rig, new Vector3(0, cy, 0));
+            Box("Prism_A", shard.transform, Vector3.zero, new Vector3(0.2f, 0.62f, 0.2f), crystal, false, Quaternion.Euler(8f, 45f, 6f), false);
+            Box("Prism_B", shard.transform, new Vector3(0.05f, -0.08f, 0), new Vector3(0.13f, 0.4f, 0.13f), crystal, false, Quaternion.Euler(-14f, 20f, 22f), false);
+            shard.AddComponent<FlagSpinner>().EditorSet(null, Vector3.up, -16f);
+            PointLight("ShardGlow", rig, new Vector3(0, cy, 0), TealLight, 2.6f, 5f);
+        }
 
         private static void BuildTrialWall(Transform props)
         {

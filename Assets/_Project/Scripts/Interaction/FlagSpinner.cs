@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LastSignal.Interaction
 {
-    /// <summary>Spins (with spin-up/down) while a WorldState flag is true — generator governors, fans, reactor rings.</summary>
+    /// <summary>Spins (with spin-up/down) while a WorldState flag is true (or always, with no flag) — generator governors, fans, reactor rings, the lab armillary.</summary>
     public sealed class FlagSpinner : MonoBehaviour
     {
         [SerializeField] private string flag;
@@ -15,7 +15,8 @@ namespace LastSignal.Interaction
 
         private void Update()
         {
-            float target = GameServices.World.GetBool(flag) ? degreesPerSecond : 0f;
+            bool on = string.IsNullOrEmpty(flag) || GameServices.World.GetBool(flag); // no flag = always turning
+            float target = on ? degreesPerSecond : 0f;
             _speed = Mathf.MoveTowards(_speed, target, degreesPerSecond / Mathf.Max(0.1f, spinUpSeconds) * Time.deltaTime);
             if (_speed > 0.01f) transform.Rotate(axis, _speed * Time.deltaTime, Space.Self);
         }

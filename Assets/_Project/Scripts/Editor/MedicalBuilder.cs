@@ -31,8 +31,8 @@ namespace LastSignal.EditorTools
         public static void Build()
         {
             StationMaterials.Create();
-            _clinical = Lit("M_Clinical_Wall", Hex("#9FAAB0"), 0.55f, 0.05f);
-            _clinicalTrim = Lit("M_Clinical_Trim", Hex("#C3CDD2"), 0.6f, 0.05f);
+            _clinical = StationMaterials.Painted(Lit("M_Clinical_Wall", Hex("#9FAAB0"), 0.55f, 0.05f), StationTextures.PaintedMetal(), 0.7f);
+            _clinicalTrim = StationMaterials.Painted(Lit("M_Clinical_Trim", Hex("#C3CDD2"), 0.6f, 0.05f), StationTextures.Enamel(), 0.5f);
             _coolLamp = Emissive("M_Emissive_ClinicalCool", Hex("#CFEFF2"), 1.6f, Hex("#CFEFF2"));
             _warmLamp = Emissive("M_Emissive_DeskWarm", Hex("#FFC27A"), 2.2f, Hex("#FFC27A"));
             _frost = Glass("M_Glass_Frost", Hex("#D9F2F5"), 0.97f, 0.08f);

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3092368032338095819
+--- !u!114 &-4341222621417136131
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,23 +9,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29fa0085f50d5e54f8144f766051a691, type: 3}
-  m_Name: FilmGrain
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FilmGrain
+  m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
+  m_Name: Tonemapping
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Tonemapping
   active: 1
-  type:
+  mode:
+    m_OverrideState: 1
+    m_Value: 2
+  neutralHDRRangeReductionMode:
+    m_OverrideState: 1
+    m_Value: 2
+  acesPreset:
+    m_OverrideState: 1
+    m_Value: 3
+  hueShiftAmount:
     m_OverrideState: 1
     m_Value: 0
-  intensity:
+  detectPaperWhite:
     m_OverrideState: 1
-    m_Value: 0.18
-  response:
+    m_Value: 0
+  paperWhite:
     m_OverrideState: 1
-    m_Value: 0.8
-  texture:
+    m_Value: 300
+  detectBrightnessLimits:
     m_OverrideState: 1
-    m_Value: {fileID: 0}
---- !u!114 &-2334222326886426454
+    m_Value: 1
+  minNits:
+    m_OverrideState: 1
+    m_Value: 0.005
+  maxNits:
+    m_OverrideState: 1
+    m_Value: 1000
+--- !u!114 &-2605526896923700297
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -66,13 +81,13 @@ MonoBehaviour:
   m_Name: Volume_DockingBay
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
   components:
-  - {fileID: 794861320142904469}
-  - {fileID: 7864741956451525342}
-  - {fileID: -2334222326886426454}
-  - {fileID: 5201482091262174791}
-  - {fileID: 7840422878742437501}
-  - {fileID: -3092368032338095819}
---- !u!114 &794861320142904469
+  - {fileID: 2129579256673422098}
+  - {fileID: -4341222621417136131}
+  - {fileID: -2605526896923700297}
+  - {fileID: 5292096140517628640}
+  - {fileID: 6018056049459625295}
+  - {fileID: 6841268850983232583}
+--- !u!114 &2129579256673422098
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -122,7 +137,7 @@ MonoBehaviour:
   dirtIntensity:
     m_OverrideState: 1
     m_Value: 0
---- !u!114 &5201482091262174791
+--- !u!114 &5292096140517628640
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +159,7 @@ MonoBehaviour:
   balance:
     m_OverrideState: 1
     m_Value: 10
---- !u!114 &7840422878742437501
+--- !u!114 &6018056049459625295
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -172,7 +187,7 @@ MonoBehaviour:
   rounded:
     m_OverrideState: 1
     m_Value: 0
---- !u!114 &7864741956451525342
+--- !u!114 &6841268850983232583
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,34 +196,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
-  m_Name: Tonemapping
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Tonemapping
+  m_Script: {fileID: 11500000, guid: 29fa0085f50d5e54f8144f766051a691, type: 3}
+  m_Name: FilmGrain
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FilmGrain
   active: 1
-  mode:
-    m_OverrideState: 1
-    m_Value: 2
-  neutralHDRRangeReductionMode:
-    m_OverrideState: 1
-    m_Value: 2
-  acesPreset:
-    m_OverrideState: 1
-    m_Value: 3
-  hueShiftAmount:
+  type:
     m_OverrideState: 1
     m_Value: 0
-  detectPaperWhite:
+  intensity:
     m_OverrideState: 1
-    m_Value: 0
-  paperWhite:
+    m_Value: 0.18
+  response:
     m_OverrideState: 1
-    m_Value: 300
-  detectBrightnessLimits:
+    m_Value: 0.8
+  texture:
     m_OverrideState: 1
-    m_Value: 1
-  minNits:
-    m_OverrideState: 1
-    m_Value: 0.005
-  maxNits:
-    m_OverrideState: 1
-    m_Value: 1000
+    m_Value: {fileID: 0}

@@ -31,7 +31,7 @@ namespace LastSignal.EditorTools
         {
             StationMaterials.Create();
             _orangeLamp = Emissive("M_Emissive_IndustrialOrange", Hex("#FF8F3F"), 1.8f, Hex("#FF8F3F"));
-            _rust = Lit("M_Metal_Rust", Color.Lerp(Hex("#6B3A24"), Navy, 0.35f), 0.25f, 0.4f);
+            _rust = StationMaterials.Painted(Lit("M_Metal_Rust", Color.Lerp(Hex("#6B3A24"), Navy, 0.35f), 0.25f, 0.4f), StationTextures.Enamel(), 0.8f);
             _redTag = Emissive("M_Tag_Red", EmergencyRed, 0.25f, EmergencyRed);
             DockingBayContent.CreateAll();
             var playerPrefab = PlayerPrefabBuilder.Build();
@@ -108,7 +108,7 @@ namespace LastSignal.EditorTools
             foreach (int side in new[] { -1, 1 })
             {
                 float x = side * (HalfW - 0.03f);
-                Box($"Band_{side}", r, new Vector3(x, 1.2f, 0), new Vector3(0.05f, 0.25f, HalfL * 2), M.Terracotta, false);
+                Box($"Band_{side}", r, new Vector3(x, 1.2f, 0), new Vector3(0.05f, StationTextures.TrimHeight, HalfL * 2), M.TrimRondel, false);
                 for (float z = -HalfL + 1f; z < HalfL; z += 2.5f)
                     Box($"Rib_{side}_{z:0}", r, new Vector3(x - side * 0.07f, H / 2, z), new Vector3(0.14f, H, 0.2f), M.Brass, false);
                 // overhead pipes

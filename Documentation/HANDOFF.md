@@ -84,6 +84,16 @@ the new look? (Not yet seen in play.) Note `Builds/macOS/TheLastSignal.app` pred
 clutter; cable/signage decals; warmer key light in Command; hatch rivets are Unity spheres (~770 tris each) → low-poly
 if triangles ever matter. Light shafts skipped (need a custom shader; cost).
 
+### 4.4 Progress (2026-11-21, session 2)
+- **Audio:** all 222 clips re-measured, every one on its mix target (voices -17, ambience -20, per-effect). Still needs a
+  human ear in a real playthrough (Claude can't listen) — ask the user while they play the new build.
+- **BG pass (automated part):** placeholders match EN, no empty/untranslated keys, terms consistent („Шепотът“ ×4,
+  „Решетката“ ×14, CAIRN Latin), lines to Noa already feminine („би направила“). Fixed: „Добре дошъл“ → „Добре дошли“
+  (account greeting, gender-neutral). Remaining: tone review with the user.
+- **macOS clean build:** succeeded, 144 MB, 0 errors; smoke test of all 8 scenes: exit 0, 0 errors/exceptions/warnings.
+  Font asset unchanged by the build. `Builds/macOS/TheLastSignal.app` is now current (includes the art pass).
+  Note: macOS has no `timeout` command — run the smoke loop without it (the player quits itself).
+
 ### 4.4 Then
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.
 - BG translation pass with the user (tone, gender forms; Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).

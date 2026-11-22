@@ -96,9 +96,12 @@ wall), hazard plate at the pod, 4 warm unshadowed brass sconces + warmer ceiling
   Font asset unchanged by the build. `Builds/macOS/TheLastSignal.app` is now current (includes the art pass).
   Note: macOS has no `timeout` command — run the smoke loop without it (the player quits itself).
 - **Windows:** official `sqlite3.dll` 3.54.1 (hash-verified) added as a Win64-only plugin (`Assets/Plugins/Windows/x86_64`).
-  The Windows build itself is blocked: Unity 6000.3.10f1 has only Mac + WebGL modules → user must add **Windows Build
-  Support (Mono)** in Unity Hub, then `Last Signal/Build/Windows`. A failed build leaves `Assets/Resources/PerformanceTest*.json`
-  behind — delete them, don't commit.
+  Windows Build Support (Mono) installed 2026-11-22 (official pkg, md5 verified, payload copied to
+  `PlaybackEngines/WindowsStandaloneSupport`). **Windows build done:** 129 MB, 0 errors, `sqlite3.dll` in
+  `TheLastSignal_Data/Plugins/x86_64`; zip for a Windows PC = `Builds/TheLastSignal_Windows.zip` (51 MB, without the
+  `*_DoNotShip` Burst debug folder). Not run on real Windows yet. Batch build: quit the editor, then
+  `Unity -batchmode -quit -projectPath … -buildTarget Win64 -executeMethod LastSignal.EditorTools.BuildTools.BuildWindows`,
+  reopen with `-buildTarget OSXUniversal`. A failed build leaves `Assets/Resources/PerformanceTest*.json` — delete them.
 
 ### 4.4 Then
 - Listen to the new audio mix in a real playthrough (levels were measured, not heard); optional music stingers.

@@ -13,6 +13,14 @@ namespace LastSignal.UI
         private GameObject _highlight;
         private TMP_Text _label;
         private Color _normal, _selected;
+        private bool _pinned, _isSelected;
+
+        /// <summary>Keeps the frame on while this item's side panel is open, even when focus is inside the panel.</summary>
+        public bool Pinned
+        {
+            get => _pinned;
+            set { _pinned = value; Set(_isSelected); }
+        }
 
         public bool IsHighlighted => _highlight != null && _highlight.activeSelf;
 
@@ -35,8 +43,10 @@ namespace LastSignal.UI
         public void OnDeselect(BaseEventData eventData) => Set(false);
         private void OnDisable() => Set(false);
 
-        private void Set(bool on)
+        private void Set(bool selected)
         {
+            _isSelected = selected;
+            bool on = selected || _pinned;
             if (_highlight != null) _highlight.SetActive(on);
             if (_label != null) _label.color = on ? _selected : _normal;
         }

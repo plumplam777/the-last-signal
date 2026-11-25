@@ -27,8 +27,9 @@ namespace LastSignal.UI
         private Button _quality;
         private Button _continue, _mainLogout, _adminSubmit, _adminOpenPanel, _adminLogout;
         private GameObject _restartConfirm, _adminForm;
-        private Image _frame;
-        private Button _newGame;
+        private PopOutPanel _pop;
+        private Button _newGame, _loadItem, _settingsItem;
+        private MenuItemSelect _pinned;
 
         private static readonly Color ItemColor = new(0.93f, 0.96f, 1f);
         private static readonly Color QuitColor = new(0.96f, 0.52f, 0.44f);
@@ -78,21 +79,20 @@ namespace LastSignal.UI
             ((RectTransform)lang.transform).anchorMin = ((RectTransform)lang.transform).anchorMax = new Vector2(1, 1);
             SetButtonText(lang, "EN  |  БГ");
 
-            // left column (as in a console game menu): the main page is plain text items, the other pages sit on a panel
-            _frame = Panel("Frame", canvas, new Vector2(110 + 320, -70), new Vector2(640, 520));
-            var anchor = new Vector2(0f, 0.5f);
-            ((RectTransform)_frame.transform).anchorMin = ((RectTransform)_frame.transform).anchorMax = anchor;
-            _frame.color = new Color(0.02f, 0.035f, 0.06f, 0.82f);
-            _frame.GetComponent<Outline>().effectColor = new Color(Cyan.r, Cyan.g, Cyan.b, 0.45f);
-            var frame = _frame.transform;
+            // left column (as in a console game menu): the main page is plain text items and always stays; every
+            // other page slides out beside it on a glass HUD panel
+            var leftMid = new Vector2(0f, 0.5f);
+            var column = Rect("MenuColumn", canvas, new Vector2(110 + 320, -70), new Vector2(640, 520), leftMid);
+            var frame = GlassPanel(canvas, new Vector2(790 + 320, -70), new Vector2(640, 540), leftMid);
+            _pop = frame.gameObject.AddComponent<PopOutPanel>();
             _feedback = Text("Feedback", frame, new Vector2(0, -238), new Vector2(600, 36), 21, Red);
 
             // main: new game / load game / settings / quit
-            var mp = Page_(Page.Main, frame);
+            var mp = Page_(Page.Main, column);
             _signedIn = Text("SignedIn", mp, new Vector2(0, 225), new Vector2(600, 36), 21, TealLight, null, TextAlignmentOptions.Left);
             _newGame = MenuItem("NewGame", mp, 150, "ui.start.new_game", "ui.start.sub.new_game", NewGame, ItemColor);
-            MenuItem("LoadGame", mp, 66, "ui.start.load_game", "ui.start.sub.load_game", LoadGame, ItemColor);
-            MenuItem("Settings", mp, -18, "ui.start.settings", "ui.start.sub.settings", () => Show(Page.Settings), ItemColor);
+            _loadItem = MenuItem("LoadGame", mp, 66, "ui.start.load_game", "ui.start.sub.load_game", LoadGame, ItemColor);
+            _settingsItem = MenuItem("Settings", mp, -18, "ui.start.settings", "ui.start.sub.settings", () => Show(Page.Settings), ItemColor);
             MenuItem("Quit", mp, -102, "ui.menu.quit", "ui.start.sub.quit", Quit, QuitColor);
             _mainLogout = MenuItem("Logout", mp, -186, "ui.start.logout", "ui.start.sub.logout", Logout, Muted, 24);
 
@@ -162,6 +162,7 @@ namespace LastSignal.UI
             _admin = new GameObject("AdminPanel").AddComponent<AdminPanel>();
             _admin.transform.SetParent(transform, false);
             _admin.Closed += () => Show(Page.Admin);
+            GlassControls(frame);
         }
 
         /// <summary>Graphics quality: Low → Medium → High → Low (Medium is the default; Low for hot laptops).</summary>
@@ -180,6 +181,80 @@ namespace LastSignal.UI
         }
 
         // ------------------------------------------------------------------ start-screen look
+
+        private static readonly Color GlassTint = new(0.04f, 0.13f, 0.18f, 0.62f);
+        private static readonly Color ControlTint = new(0.04f, 0.12f, 0.16f, 0.72f);
+
+        /// <summary>
+        /// The pop-out panel: translucent glass (no blur, it stays cheap) with a cyan cut-corner edge and HUD trim —
+        /// a slanted tab and a dot row on top, hazard hatching down the right side, two short bars at the bottom.
+        /// </summary>
+        private static RectTransform GlassPanel(Transform canvas, Vector2 pos, Vector2 size, Vector2 anchor)
+        {
+            var glass = Image("Frame", canvas, pos, size, GlassTint, anchor);
+            glass.sprite = MenuArt.HudFill;
+            glass.type = UnityEngine.UI.Image.Type.Sliced;
+            var r = glass.rectTransform;
+            var cyan = new Color(Cyan.r, Cyan.g, Cyan.b, 0.9f);
+            void Deco(Image img, Sprite sprite, UnityEngine.UI.Image.Type type)
+            {
+                img.sprite = sprite;
+                img.type = type;
+                img.raycastTarget = false;
+            }
+            var edge = Image("Edge", r, Vector2.zero, Vector2.zero, cyan);
+            Deco(edge, MenuArt.HudLine, UnityEngine.UI.Image.Type.Sliced);
+            Stretch(edge.rectTransform);
+            var sheen = Image("Sheen", r, new Vector2(0, -6), new Vector2(-70, 2), new Color(1f, 1f, 1f, 0.12f), new Vector2(0.5f, 1f));
+            sheen.raycastTarget = false;
+            sheen.rectTransform.anchorMin = new Vector2(0f, 1f);
+            sheen.rectTransform.anchorMax = new Vector2(1f, 1f);
+            sheen.rectTransform.anchoredPosition = new Vector2(10, -6);
+            var tab = Image("AccentTab", r, new Vector2(150, 10), new Vector2(190, 14), cyan, new Vector2(0f, 1f));
+            Deco(tab, MenuArt.Slant, UnityEngine.UI.Image.Type.Sliced);
+            var dots = Image("Dots", r, new Vector2(-95, -14), new Vector2(112, 10), new Color(Cyan.r, Cyan.g, Cyan.b, 0.75f), new Vector2(1f, 1f));
+            Deco(dots, MenuArt.Dots, UnityEngine.UI.Image.Type.Tiled);
+            var hatch = Image("Hatch", r, new Vector2(14, 60), new Vector2(12, 132), new Color(Cyan.r, Cyan.g, Cyan.b, 0.7f), new Vector2(1f, 0.5f));
+            Deco(hatch, MenuArt.Hatch, UnityEngine.UI.Image.Type.Tiled);
+            foreach (var (x, w) in new[] { (-190f, 80f), (-95f, 46f) })
+                Image($"Bar_{w}", r, new Vector2(x, 2), new Vector2(w, 7), cyan, new Vector2(1f, 0f)).raycastTarget = false;
+            return r;
+        }
+
+        /// <summary>Buttons, fields and the confirm box inside the panel get the same glass look (cut corners, cyan edge).</summary>
+        private static void GlassControls(Transform panel)
+        {
+            void Glass(Image img, Color tint)
+            {
+                img.sprite = MenuArt.BevelFill;
+                img.type = UnityEngine.UI.Image.Type.Sliced;
+                img.color = tint;
+                var outline = img.GetComponent<Outline>();
+                if (outline != null) Destroy(outline); // an offset copy shows through translucent glass
+                var edge = Image("Edge", img.transform, Vector2.zero, Vector2.zero, new Color(Cyan.r, Cyan.g, Cyan.b, 0.6f));
+                edge.sprite = MenuArt.BevelLine;
+                edge.type = UnityEngine.UI.Image.Type.Sliced;
+                edge.raycastTarget = false;
+                Stretch(edge.rectTransform);
+                edge.transform.SetAsFirstSibling();
+            }
+            foreach (var b in panel.GetComponentsInChildren<Button>(true)) Glass(b.image, ControlTint);
+            foreach (var f in panel.GetComponentsInChildren<TMP_InputField>(true)) Glass(f.GetComponent<Image>(), new Color(0.02f, 0.07f, 0.1f, 0.8f));
+            foreach (var s in panel.GetComponentsInChildren<Slider>(true))
+            {
+                // on glass: a faint cyan track, a cyan fill and a pale handle that stands apart from the fill
+                var track = s.transform.Find("Background");
+                if (track != null && track.TryGetComponent<Image>(out var bg)) bg.color = new Color(Cyan.r, Cyan.g, Cyan.b, 0.18f);
+                if (s.fillRect != null && s.fillRect.TryGetComponent<Image>(out var fill)) fill.color = new Color(Cyan.r, Cyan.g, Cyan.b, 0.75f);
+                if (s.handleRect != null && s.handleRect.TryGetComponent<Image>(out var handle))
+                {
+                    handle.color = new Color(0.9f, 0.97f, 1f);
+                    s.handleRect.sizeDelta = new Vector2(10, s.handleRect.sizeDelta.y);
+                }
+            }
+            var confirm = panel.Find("Load/RestartConfirm");
+            if (confirm != null) Glass(confirm.GetComponent<Image>(), new Color(0.02f, 0.07f, 0.1f, 0.96f));
+        }
 
         /// <summary>Top-left logo: a glowing arc, the title in brushed silver, the tagline underneath.</summary>
         private static void Logo(Transform canvas)
@@ -256,9 +331,20 @@ namespace LastSignal.UI
         private void Show(Page page)
         {
             _current = page;
-            foreach (var kv in _pages) kv.Value.SetActive(kv.Key == page);
-            _frame.enabled = page != Page.Main; // the main page floats over the backdrop, the forms keep their panel
-            _frame.GetComponent<Outline>().enabled = page != Page.Main;
+            foreach (var kv in _pages) kv.Value.SetActive(kv.Key == page || kv.Key == Page.Main); // the menu column stays
+            if (page == Page.Main) _pop.Hide();
+            else _pop.Pop();
+            // the item that opened the panel keeps its frame while the player works in the panel
+            if (_pinned != null) _pinned.Pinned = false;
+            var opener = page switch
+            {
+                Page.Settings or Page.Admin => _settingsItem,
+                Page.Load => _loadItem,
+                Page.Login or Page.Register => _intent == Intent.LoadGame ? _loadItem : _newGame,
+                _ => null,
+            };
+            _pinned = opener != null ? opener.GetComponent<MenuItemSelect>() : null;
+            if (_pinned != null) _pinned.Pinned = true;
             _feedback.text = string.Empty;
             _dbBanner.text = GameServices.Database.IsAvailable ? string.Empty : Loc.Get("auth.err.no_database");
             var s = GameServices.Auth.Current;

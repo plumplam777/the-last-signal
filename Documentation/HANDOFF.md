@@ -67,7 +67,7 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   screenshot `PlayerCamera`; `manage_gameobject modify` does not work in Play mode (use debug menus / `Teleport`).
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 29 EditMode + 103 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 29 EditMode + 104 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables), `DoorOpeningClearTests`, `WorldTextFitTests`
   (EN+BG), `GlyphRenderTests` (Cyrillic font), `MaterialSanityTests` (no pink), `PerformanceBudgetTests`, `MovingPartsTests`. Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
@@ -172,8 +172,14 @@ The user played and wants these, **flashlight first** (in this order unless they
    sways the camera slowly. UI (`StartScreen`): logo top-left (cyan `MenuArt.Arc`, silver-gradient title,
    tagline), main page = left-column text items; the selected one (hover or arrows) shows a bevelled cyan frame
    with a hex pattern + a hint line (`MenuItemSelect`, sprites drawn in code by `MenuArt`), Quit in salmon,
-   key hints bottom-right. Other pages keep the panel (now cyan-edged) in the same left column. Keys
-   `ui.start.sub.*`, `ui.start.hints`. Screenshot `menu_new_en.png`. Not yet looked at by the user.
+   key hints bottom-right. Keys `ui.start.sub.*`, `ui.start.hints`. User loved it (2026-11-25), then asked for the
+   options to **pop out to the side on glass**: the menu column always stays; every other page (Settings,
+   Register/Login, Load, Admin) slides out beside it (`PopOutPanel`, 0.25 s) on a translucent HUD panel drawn by
+   `MenuArt` (cut-corner glass + cyan edge, slanted tab, dot row, hatching, bottom bars — after the user's sci-fi
+   frame sheet); buttons/fields/sliders inside get the glass look (`StartScreen.GlassControls`); the opening item
+   stays framed (`MenuItemSelect.Pinned`). No blur (cost). `StartScreenLookTests` checks it and renders
+   `$TMPDIR/lastsignal_menu_popout.png` (Play mode in the unfocused editor never animates, so use the test).
+   Screenshots `menu_new_en.png`, `menu_popout_settings.png`.
 6. **Art style** still not exactly what the user wants: wait for their screenshots/notes, don't guess.
 7. **Bulgarian voices:** TTS is bad; later the user records them. Prepare a recording script (line + file name);
    `Tools/normalize_audio.py` evens the levels.

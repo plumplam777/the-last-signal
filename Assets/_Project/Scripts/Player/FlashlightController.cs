@@ -16,7 +16,7 @@ namespace LastSignal.Player
         public const string BatteryKey = "flashlight.battery";
 
         [SerializeField] private Light spotLight;
-        [SerializeField] private float baseIntensity = 6f;
+        [SerializeField] private float baseIntensity = 10f;
         [SerializeField, Range(0f, 0.3f)] private float flickerAmount = 0.05f;
         [SerializeField] private float flickerSpeed = 7f;
 
@@ -33,6 +33,10 @@ namespace LastSignal.Player
         private float _charge = 1f;
 
         public bool IsOn { get; private set; }
+        /// <summary>The beam itself (for things that react to being lit, e.g. <c>BeamRevealText</c>).</summary>
+        public Light Beam => spotLight;
+        /// <summary>The player's flashlight in the loaded scene (null in scenes without a player).</summary>
+        public static FlashlightController Current { get; private set; }
         public bool IsOwned => GameServices.World.GetBool(OwnedFlag);
         /// <summary>0..1</summary>
         public float Charge => _charge;
@@ -42,6 +46,13 @@ namespace LastSignal.Player
         public event Action<bool> Toggled;
         /// <summary>Raised when F is pressed but the battery is too low.</summary>
         public event Action Refused;
+
+        private void OnEnable() => Current = this;
+
+        private void OnDisable()
+        {
+            if (Current == this) Current = null;
+        }
 
         private void Awake()
         {

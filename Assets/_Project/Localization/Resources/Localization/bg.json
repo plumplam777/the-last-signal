@@ -592,5 +592,7 @@
   "ui.start.graphics": "Графика: {0}",
   "ui.quality.0": "Ниска",
   "ui.quality.1": "Средна",
-  "ui.quality.2": "Висока"
+  "ui.quality.2": "Висока",
+  "dock.uv.not_us": "НЕ НИЕ ИЗПРАТИХМЕ СИГНАЛА\n— М.",
+  "dock.uv.fuse": "РЕЗЕРВЕН 30А — ПОД БРЕЗЕНТА ↓"
 }

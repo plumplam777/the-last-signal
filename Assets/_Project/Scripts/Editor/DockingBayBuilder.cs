@@ -75,6 +75,8 @@ namespace LastSignal.EditorTools
             spawn.AddComponent<SpawnPoint>().EditorSetId("default");
 
             SetupLightingAndPost(root.transform);
+            AddPowerDarkness(root.transform, SectorIds.Docking);
+            BuildUvMessages(props);
             root.AddComponent<LastSignal.Audio.SectorAmbience>().EditorSet(new List<LastSignal.Audio.AmbienceLoop>
             {
                 new() { clip = "amb_station_hum", volume = 0.5f },
@@ -95,6 +97,18 @@ namespace LastSignal.EditorTools
         // ---------------------------------------------------------------- architecture
 
         private const float HallHalfWidth = 5f, HallHeight = 4.6f, HallBack = -10f, HallFront = 6f;
+
+        private static Material WindowUnpowered
+        {
+            get
+            {
+                if (_windowUnpowered != null) return _windowUnpowered;
+                _windowUnpowered = Emissive("M_Window_Unpowered", new Color(0.03f, 0.07f, 0.1f), 0.12f, Navy * 0.12f);
+                _windowUnpowered.SetFloat("_Smoothness", 0.08f); // matte: no grazing-angle sheen in the dark
+                return _windowUnpowered;
+            }
+        }
+        private static Material _windowUnpowered;
 
         private static void BuildHall(Transform env, List<GameObject> on, List<GameObject> off)
         {
@@ -124,7 +138,9 @@ namespace LastSignal.EditorTools
                 Box($"Wall_{s}_Dado", hall, new Vector3(inner, 0.55f, midZ), new Vector3(0.06f, 1.1f, len), StationMaterials.SlateDark, false);
                 Box($"Wall_{s}_Band", hall, new Vector3(inner - side * 0.02f, 1.2f, midZ), new Vector3(0.06f, StationTextures.TrimHeight, len), StationMaterials.TrimRondel, false);
                 Box($"Wall_{s}_BandTrim", hall, new Vector3(inner - side * 0.03f, 1.33f, midZ), new Vector3(0.05f, 0.04f, len), StationMaterials.Brass, false);
-                Box($"Wall_{s}_Window", hall, new Vector3(inner, 3.35f, midZ), new Vector3(0.04f, 0.7f, len - 1f), StationMaterials.WindowGlow, false);
+                on.Add(Box($"Wall_{s}_Window", hall, new Vector3(inner, 3.35f, midZ), new Vector3(0.04f, 0.7f, len - 1f), StationMaterials.WindowGlow, false));
+                // without power the window band is only faint starlight (keeps the hall dark)
+                off.Add(Box($"Wall_{s}_WindowDark", hall, new Vector3(inner, 3.35f, midZ), new Vector3(0.04f, 0.7f, len - 1f), WindowUnpowered, false));
                 Box($"Wall_{s}_WindowSillTrim", hall, new Vector3(inner - side * 0.03f, 2.97f, midZ), new Vector3(0.07f, 0.06f, len), StationMaterials.Brass, false);
 
                 // brass ribs with rivets
@@ -200,7 +216,7 @@ namespace LastSignal.EditorTools
                 var fixture = Box($"Emergency_{e}_Fixture", hall, p, new Vector3(0.12f, 0.18f, 0.5f), StationMaterials.SlateDark, false);
                 _ = fixture;
                 var glow = Box($"Emergency_{e}_Glow", hall, p + new Vector3(-Mathf.Sign(p.x) * 0.07f, 0, 0), new Vector3(0.03f, 0.1f, 0.4f), StationMaterials.RedLamp, false, null, false);
-                var red = PointLight($"Emergency_{e}_Light", hall, p + new Vector3(-Mathf.Sign(p.x) * 0.5f, -0.3f, 0), EmergencyRed, 1.7f, 6f);
+                var red = PointLight($"Emergency_{e}_Light", hall, p + new Vector3(-Mathf.Sign(p.x) * 0.5f, -0.3f, 0), EmergencyRed, 0.9f, 4f);
                 off.Add(glow);
                 off.Add(red.gameObject);
                 e++;
@@ -286,7 +302,20 @@ namespace LastSignal.EditorTools
             Box("Datapad", bench, new Vector3(0.15f, 0.93f, -0.7f), new Vector3(0.28f, 0.02f, 0.2f), StationMaterials.Rubber, false);
             Box("Datapad_Screen", bench, new Vector3(0.15f, 0.945f, -0.7f), new Vector3(0.24f, 0.005f, 0.16f), StationMaterials.CyanStrip, false);
 
-            var pickupGo = Group("Pickup_Flashlight", props, new Vector3(-4.05f, 0.97f, -5.4f));
+            // the flashlight waits on an emergency post right next to the airlock exit: in the dark the blinking
+            // green locator LED is the first (and almost the only) thing the player sees
+            var post = Group("EmergencyPost", props, new Vector3(1.25f, 0, -6.35f)).transform;
+            post.localRotation = Quaternion.Euler(0, -25, 0);
+            Box("Base", post, new Vector3(0, 0.03f, 0), new Vector3(0.5f, 0.06f, 0.5f), StationMaterials.SlateDark, false);
+            Cylinder("Pole", post, new Vector3(0, 0.5f, 0), new Vector3(0.07f, 0.5f, 0.07f), StationMaterials.Brass, true);
+            Box("Cradle", post, new Vector3(0, 1.0f, 0), new Vector3(0.36f, 0.06f, 0.2f), StationMaterials.Terracotta, false);
+            Box("Plate", post, new Vector3(0, 0.82f, -0.05f), new Vector3(0.22f, 0.26f, 0.02f), StationMaterials.SlateDark, false);
+            var led = Group("LocatorLed", post, new Vector3(0, 0.9f, -0.065f));
+            Sphere("Lamp", led.transform, Vector3.zero, Vector3.one * 0.035f, Emissive("M_Emissive_Locator", Hex("#3FCB7E"), 1.1f), false, false);
+            PointLight("LampLight", led.transform, new Vector3(0, 0, -0.08f), Hex("#5BE39B"), 0.9f, 1.8f);
+            post.gameObject.AddComponent<LocatorBlink>().EditorConfigure(led, FlashlightController.OwnedFlag);
+
+            var pickupGo = Group("Pickup_Flashlight", post, new Vector3(0, 1.08f, 0));
             var col = pickupGo.AddComponent<BoxCollider>();
             col.size = new Vector3(0.45f, 0.25f, 0.45f);
             Cylinder("Body", pickupGo.transform, Vector3.zero, new Vector3(0.08f, 0.14f, 0.08f), StationMaterials.Brass, false, Quaternion.Euler(0, 0, 90), false);
@@ -297,8 +326,8 @@ namespace LastSignal.EditorTools
             Box("Jacket", bench, new Vector3(-0.05f, 0.95f, 0.05f), new Vector3(0.7f, 0.06f, 0.55f), StationMaterials.Terracotta, false, Quaternion.Euler(0, 12, 3));
             Box("Jacket_NameTape", bench, new Vector3(0.1f, 0.985f, 0.05f), new Vector3(0.2f, 0.01f, 0.06f), StationMaterials.Ceramic, false, Quaternion.Euler(0, 12, 3));
             BuildRecorder(props, "Recorder_LogDock01", new Vector3(-4.1f, 0.95f, -5.05f), Quaternion.Euler(0, 70, 0), DockingBayContent.LogDock01);
-            // little pool of light so the first pickup reads in the dark
-            PointLight("Bench_Glow", props, new Vector3(-3.9f, 1.5f, -5.4f), TealLight, 0.9f, 2.4f);
+            // faint glow of the datapad: the bench is something to find with the flashlight now
+            PointLight("Bench_Glow", props, new Vector3(-3.9f, 1.2f, -5.4f), TealLight, 0.35f, 1.6f);
 
             var pickup = pickupGo.AddComponent<PickupInteractable>();
             pickup.EditorConfigure("dock_flashlight", "prompt.pickup", flashlightItem.NameKey, true, null,
@@ -647,6 +676,59 @@ namespace LastSignal.EditorTools
             var volume = volumeGo.AddComponent<Volume>();
             volume.isGlobal = true;
             volume.sharedProfile = profile;
+        }
+
+        public const string DarkVolumePath = "Assets/_Project/Settings/Volume_Unpowered.asset";
+
+        /// <summary>While the sector has no power: ambient/fog/reflections at 12 % and a darker post volume.</summary>
+        internal static void AddPowerDarkness(Transform root, string sectorId)
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(DarkVolumePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                AssetDatabase.CreateAsset(profile, DarkVolumePath);
+            }
+            foreach (var c in profile.components.ToArray())
+            {
+                profile.Remove(c.GetType());
+                Object.DestroyImmediate(c, true);
+            }
+            var grade = AddComponent<ColorAdjustments>(profile);
+            grade.postExposure.Override(-0.35f);
+            grade.saturation.Override(-10f);
+            var vignette = AddComponent<Vignette>(profile);
+            vignette.intensity.Override(0.48f);
+            vignette.smoothness.Override(0.5f);
+            vignette.color.Override(Color.black);
+            EditorUtility.SetDirty(profile);
+
+            var go = Group("UnpoweredVolume", root);
+            var volume = go.AddComponent<Volume>();
+            volume.isGlobal = true;
+            volume.priority = 10f;
+            volume.sharedProfile = profile;
+            volume.weight = 1f;
+            root.gameObject.AddComponent<PowerDarkness>().EditorConfigure(sectorId, volume, 0.12f);
+        }
+
+        /// <summary>Crew warnings in fluorescent paint: only visible in the flashlight beam (BeamRevealText).</summary>
+        private static void BuildUvMessages(Transform props)
+        {
+            var g = Group("UvMessages", props).transform;
+            var paint = Hex("#8CFFD0");
+            // right wall, low, just past the service-tunnel hatch: the first thing the beam finds
+            var a = WorldText("Uv_NotUs", g, new Vector3(HallHalfWidth - 0.1f, 0.66f, -4.0f), Quaternion.Euler(0, 90, 2), "dock.uv.not_us", 2.4f, paint);
+            ((RectTransform)a.transform).sizeDelta = new Vector2(1.6f, 0.72f); // between the ribs at z -5 and -3
+            a.characterSpacing = 2;
+            a.fontStyle = TMPro.FontStyles.Bold;
+            a.gameObject.AddComponent<BeamRevealText>();
+            // above the crate stack: where the spare fuse is
+            var b = WorldText("Uv_Fuse", g, new Vector3(HallHalfWidth - 0.1f, 2.15f, 0f), Quaternion.Euler(0, 90, -3), "dock.uv.fuse", 1.9f, paint);
+            ((RectTransform)b.transform).sizeDelta = new Vector2(1.6f, 0.7f); // between the ribs at z -1 and 1
+            b.characterSpacing = 2;
+            b.fontStyle = TMPro.FontStyles.Bold;
+            b.gameObject.AddComponent<BeamRevealText>();
         }
 
         private static void AddDockingProbes(Transform root)

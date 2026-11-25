@@ -592,5 +592,7 @@
   "ui.start.graphics": "Graphics: {0}",
   "ui.quality.0": "Low",
   "ui.quality.1": "Medium",
-  "ui.quality.2": "High"
+  "ui.quality.2": "High",
+  "dock.uv.not_us": "WE DID NOT SEND THE SIGNAL\n— M.",
+  "dock.uv.fuse": "SPARE 30A — UNDER THE TARP ↓"
 }

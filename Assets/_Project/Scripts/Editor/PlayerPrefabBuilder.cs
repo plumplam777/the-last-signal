@@ -44,7 +44,8 @@ namespace LastSignal.EditorTools
             camData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
 
             var flash = SpotLight("Flashlight", camGo.transform, new Vector3(0.18f, -0.12f, 0.1f), Quaternion.identity,
-                new Color(1f, 0.93f, 0.82f), 6f, 20f, 58f, LightShadows.Soft);
+                new Color(1f, 0.9f, 0.76f), 10f, 17f, 46f, LightShadows.Soft);
+            flash.innerSpotAngle = 46f * 0.38f; // soft edge: a torch, not a headlight
             flash.enabled = false;
 
             var controller = root.AddComponent<PlayerController>();

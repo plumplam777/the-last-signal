@@ -122,6 +122,33 @@ wall), hazard plate at the pod, 4 warm unshadowed brass sconces + warmer ceiling
 - Known doc-relevant gaps: the `Puzzles` DB catalogue only lists the 3 early puzzles; `PuzzleManager.PuzzleSolved`
   has no listeners yet (both documented, harmless).
 
+### 4.5 Phase 8 — the user's playtest feedback (2026-11-25)
+The user played and wants these, **flashlight first** (in this order unless they say otherwise):
+
+1. **Dark Docking Bay + flashlight — DONE 2026-11-25.** Unpowered Docking is near-black: `PowerDarkness`
+   (Interaction/) scales ambient, fog, reflections **and baked reflection probes** to 12 % and blends in
+   `Volume_Unpowered` (exposure −0.35, black vignette) until `power.docking`; matte dim window band while unpowered.
+   Flashlight moved from the bench to an **emergency post 1.6 m from the spawn** with a blinking green
+   `LocatorBlink` LED. Beam: 46°, soft edge (inner 38 %), warmer, **intensity is `FlashlightController.baseIntensity`
+   (10)** — the light component's own value is overwritten every frame. **Hidden crew messages** (`BeamRevealText`,
+   Player/): fluorescent TMP text whose alpha follows the beam; Docking has "WE DID NOT SEND THE SIGNAL — M." (right
+   wall, low, z −4) and the fuse hint over the crates (keys `dock.uv.*`). Keep them between wall ribs (every 2 m) and
+   ≥ 4 cm off the wall (z-fighting). Debug menus: `Toggle Flashlight`, `Look At Hidden Message` (cycles messages).
+   Tests: `DarkDockingTests`. Screenshots: `dark_dock_*`. Unity in the background freezes Play mode: `sleep 3` after
+   a debug action, then screenshot the `PlayerCamera`.
+2. **Valves before Command are unclear** (Reactor: High/Mid/Low): add per-valve pressure gauges that react, a
+   diagram plaque, and a hidden-message clue.
+3. **Floating props next to desks** (user saw them; room unknown): write a test that every prop rests on something,
+   then fix all hits.
+4. **Harder to find/do:** hide key items better (dark rooms + hidden messages in every sector), fewer hand-holding
+   prompts, CAIRN hints only at high trust (gives the trust system a gameplay effect).
+5. **Start screen:** "very cool and eye-catching": live slow camera drift past Lantern Station above Nereth's glowing
+   cracks, title typing in like a signal through static, brass/teal console menu with a waveform; keep it light.
+6. **Art style** still not exactly what the user wants: wait for their screenshots/notes, don't guess.
+7. **Bulgarian voices:** TTS is bad; later the user records them. Prepare a recording script (line + file name);
+   `Tools/normalize_audio.py` evens the levels.
+8. Diploma framing: complexity matters more than length; show the systems in the demo.
+
 ## 5. Where things are
 
 | Path | What |

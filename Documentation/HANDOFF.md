@@ -1,12 +1,15 @@
 # The Last Signal — Handoff for a new chat
 
 **Updated:** 2026-11-25 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
-Phase 7 (polish): playtest bugs, performance and the big art pass are **done**; next is **§4.4** (audio listen, BG pass,
-builds, GitHub, diploma docs). Everything is committed on `main` (last art commit `908bd0c`); pushed to **github.com/plumplam777/the-last-signal**
-(public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push` after each commit.
+Phases 1–7 are done (incl. art pass, performance, macOS + Windows builds, diploma docs). **Now: Phase 8 = the user's
+playtest feedback, §4.5** — item 1 (dark Docking Bay + flashlight + hidden beam messages) is done (`c677554`);
+**next is §4.5 item 2 (Reactor valves before Command)**. Everything is committed on `main` and pushed to
+**github.com/plumplam777/the-last-signal** (public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push`
+after each commit. `Builds/macOS/TheLastSignal.app` and `Builds/TheLastSignal_Windows.zip` predate `c677554`:
+rebuild before the user plays.
 
 > New chat: read this file, then `Documentation/ArtDirection.md` (+ the two images in `Documentation/ArtReference/`).
-> Do not re-ask the user anything under "User decisions". Work through **§4 To do** top to bottom.
+> Do not re-ask the user anything under "User decisions". Work through **§4.5** in order; ask the user before starting items 5–7 (start screen, art style, voices).
 
 ## 1. The project in short
 
@@ -57,9 +60,14 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   (Command Center sits at y + 20 in `Sector_ReactorCommand`.)
 - MCP quirks: `Build All Sectors` may report "Timeout receiving Unity response" but still finishes — check the console
   for `[…Builder] Built …` lines. Don't edit C# while a PlayMode run is going (full PlayMode run ≈ 6 min).
+- **Windows build:** quit the editor first (it must restart to see the Windows module), then
+  `Unity -batchmode -quit -projectPath … -buildTarget Win64 -executeMethod LastSignal.EditorTools.BuildTools.BuildWindows`,
+  reopen with `-buildTarget OSXUniversal`. macOS has no `timeout`; the player quits itself with `-quitAfterSeconds`.
+- **Unity in the background freezes Play mode** (no Update while unfocused): after a debug action `sleep 3`, then
+  screenshot `PlayerCamera`; `manage_gameobject modify` does not work in Play mode (use debug menus / `Teleport`).
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 28 EditMode + 93 PlayMode, all green (2026-11-21). Key ones: `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 28 EditMode + 96 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables), `DoorOpeningClearTests`, `WorldTextFitTests`
   (EN+BG), `GlyphRenderTests` (Cyrillic font), `MaterialSanityTests` (no pink), `PerformanceBudgetTests`, `MovingPartsTests`. Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.

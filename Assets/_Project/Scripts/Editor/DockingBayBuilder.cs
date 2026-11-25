@@ -339,14 +339,14 @@ namespace LastSignal.EditorTools
         {
             var crates = Group("CrateStack", props, new Vector3(3.7f, 0, 0.3f)).transform;
             Crate(crates, new Vector3(0, 0.45f, 0), 0.9f, 0f);
-            Crate(crates, new Vector3(-0.15f, 1.2f, 0.1f), 0.6f, 12f);
+            Crate(crates, new Vector3(-0.15f, 1.165f, 0.1f), 0.6f, 12f); // the model's top is ~3 cm below its nominal size
             Crate(crates, new Vector3(0.1f, 0.35f, 1.0f), 0.7f, -8f);
             // scattered debris telling something went wrong
             Box("FallenPanel", props, new Vector3(2.4f, 0.05f, 1.8f), new Vector3(1.2f, 0.05f, 0.7f), StationMaterials.Wall, true, Quaternion.Euler(0, 28, 4));
             Box("Cable_A", props, new Vector3(2.9f, 0.03f, -0.9f), new Vector3(0.05f, 0.05f, 2.2f), StationMaterials.Rubber, false, Quaternion.Euler(0, 35, 0));
             Box("Cable_B", props, new Vector3(3.4f, 0.03f, -1.6f), new Vector3(0.05f, 0.05f, 1.6f), StationMaterials.Rubber, false, Quaternion.Euler(0, -20, 0));
 
-            var fuseGo = Group("Pickup_Fuse", props, new Vector3(3.6f, 1.58f, 0.42f));
+            var fuseGo = Group("Pickup_Fuse", props, new Vector3(3.6f, 1.51f, 0.42f)); // resting on the top crate
             var col = fuseGo.AddComponent<BoxCollider>();
             col.size = new Vector3(0.4f, 0.22f, 0.4f);
             Cylinder("Ceramic", fuseGo.transform, Vector3.zero, new Vector3(0.09f, 0.11f, 0.09f), StationMaterials.Ceramic, false, Quaternion.Euler(0, 0, 90), false);
@@ -368,6 +368,16 @@ namespace LastSignal.EditorTools
             Box("BandTop", t, new Vector3(0, 0.45f, 0), new Vector3(1.02f, 0.08f, 1.02f), StationMaterials.Brass, false);
             Box("BandBottom", t, new Vector3(0, -0.45f, 0), new Vector3(1.02f, 0.08f, 1.02f), StationMaterials.Brass, false);
             Box("Label", t, new Vector3(0, 0.05f, 0.505f), new Vector3(0.5f, 0.3f, 0.01f), StationMaterials.Terracotta, false);
+        }
+
+        private static void RecorderStand(Transform parent, string name, Vector3 floor, float height, Quaternion rot)
+        {
+            var s = Group(name, parent, floor);
+            s.transform.localRotation = rot;
+            var t = s.transform;
+            Box("Top", t, new Vector3(0, height - 0.015f, 0), new Vector3(0.34f, 0.03f, 0.26f), StationMaterials.Brass, false);
+            Box("Post", t, new Vector3(0, (height - 0.03f) / 2, 0), new Vector3(0.07f, height - 0.03f, 0.07f), StationMaterials.SlateDark, true);
+            Box("Foot", t, new Vector3(0, 0.01f, 0), new Vector3(0.3f, 0.02f, 0.3f), StationMaterials.Brass, false);
         }
 
         private static void BuildFuseBox(Transform props, ItemDefinition fuseItem, List<GameObject> off)
@@ -461,8 +471,10 @@ namespace LastSignal.EditorTools
         }
 
         internal static GameObject BuildRecorder(Transform parent, string name, Vector3 pos, Quaternion rot, LastSignal.Audio.AudioLogDefinition log,
-            ConditionSet requirements = null)
+            ConditionSet requirements = null, bool stand = false)
         {
+            // a recorder with nothing under it gets a slim brass stand down to the floor (parent floor = local y 0)
+            if (stand) RecorderStand(parent, name + "_Stand", new Vector3(pos.x, 0, pos.z), pos.y, rot);
             var go = Group(name, parent, pos);
             go.transform.localRotation = rot;
             var col = go.AddComponent<BoxCollider>();
@@ -544,7 +556,7 @@ namespace LastSignal.EditorTools
             terminal.EditorConfigure("dock_console", "prompt.terminal.use", null, false);
             terminal.EditorSetTerminal(DockingBayContent.BayTerminal, glow);
 
-            BuildRecorder(props, "Recorder_LogDock02", new Vector3(-4.2f, 0.98f, 2.05f), Quaternion.Euler(0, 100, 0), DockingBayContent.LogDock02);
+            BuildRecorder(props, "Recorder_LogDock02", new Vector3(-4.2f, 0.98f, 2.05f), Quaternion.Euler(0, 100, 0), DockingBayContent.LogDock02, stand: true);
         }
 
         private static void BuildEscapePodCradle(Transform props)

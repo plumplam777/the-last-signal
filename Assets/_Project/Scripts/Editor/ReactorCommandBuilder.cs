@@ -451,7 +451,7 @@ namespace LastSignal.EditorTools
                 foreach (int side in new[] { -1, 1 })
                     foreach (float z in new[] { -0.6f, 3.5f })
                     {
-                        var g = Group($"Sconce_{s}", r, new Vector3(side * (CmdHalfW - 0.02f), 2.35f, z));
+                        var g = Group($"Sconce_{s}", r, new Vector3(side * CmdHalfW, 2.35f, z)); // back plate flush with the wall
                         g.transform.localRotation = Quaternion.Euler(0, side * 90f, 0); // local +Z into the wall
                         PropModels.Place("prop_wall_sconce", g.transform, Vector3.zero);
                         Box("ShadeOff", g.transform, new Vector3(0, 0.11f, -0.2f), new Vector3(0.12f, 0.09f, 0.12f), M.LampOff, false);
@@ -570,7 +570,7 @@ namespace LastSignal.EditorTools
             var term = comms.AddComponent<TerminalInteractable>();
             term.EditorConfigure("cmd_comms", "prompt.terminal.use", null, false);
             term.EditorSetTerminal(StationContent.CommsTerminal, cglow);
-            DockingBayBuilder.BuildRecorder(p, "Recorder_LogCore02", new Vector3(-5.95f, 1.0f, 0.3f), Quaternion.Euler(0, 90, 0), StationContent.LogCore02);
+            DockingBayBuilder.BuildRecorder(p, "Recorder_LogCore02", new Vector3(-5.95f, 1.0f, 0.3f), Quaternion.Euler(0, 90, 0), StationContent.LogCore02, stand: true);
 
             // CAIRN's private archive (east): sealed until LOG_RES_03 was played
             var arch = Group("PrivateArchive", p, new Vector3(CmdHalfW - 0.08f, 0, 1.2f));

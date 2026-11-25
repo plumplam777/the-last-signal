@@ -3,7 +3,7 @@
 **Updated:** 2026-11-25 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
 Phases 1–7 are done (incl. art pass, performance, macOS + Windows builds, diploma docs). **Now: Phase 8 = the user's
 playtest feedback, §4.5** — items 1 (dark Docking Bay + flashlight + hidden beam messages, `c677554`) and 2 (Reactor valve clarity) are done;
-**next is §4.5 item 3 (floating props test)**. Everything is committed on `main` and pushed to
+**next is §4.5 item 5 (start screen, user sent references)**; item 4 after it. Everything is committed on `main` and pushed to
 **github.com/plumplam777/the-last-signal** (public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push`
 after each commit. `Builds/macOS/TheLastSignal.app` is current (rebuilt 2026-11-25 with items 1+2, smoke-tested);
 `Builds/TheLastSignal_Windows.zip` predates `c677554` — rebuild before a Windows test.
@@ -67,7 +67,7 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   screenshot `PlayerCamera`; `manage_gameobject modify` does not work in Play mode (use debug menus / `Teleport`).
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 29 EditMode + 98 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 29 EditMode + 103 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables), `DoorOpeningClearTests`, `WorldTextFitTests`
   (EN+BG), `GlyphRenderTests` (Cyrillic font), `MaterialSanityTests` (no pink), `PerformanceBudgetTests`, `MovingPartsTests`. Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
@@ -156,8 +156,12 @@ The user played and wants these, **flashlight first** (in this order unless they
    `HiddenMessagesShowOnlyInTheBeam` now runs for Docking + Reactor. Screenshots `valves_*`.
    Note for item 4 (harder): the plaque + status line make the rule explicit; if it becomes too easy, drop the
    status line's loop names first.
-3. **Floating props next to desks** (user saw them; room unknown): write a test that every prop rests on something,
-   then fix all hits.
+3. **Floating props — DONE 2026-11-25.** `PropRestingTests` (all 5 sectors): every `Model_*`/`Clutter_*` prop and
+   every pickup/audio-log recorder must rest on a surface (≤ 3 cm gap under its footprint centre) or be attached
+   (≤ 1.5 cm from a large mesh, or interpenetrating a small one). Culprits were recorders placed for the old
+   greybox desks (Blender kiosks are narrower) hanging ~1 m in the air: Dock02, Eng02, Core02 now get a brass
+   stand (`BuildRecorder(..., stand: true)`); Eng01/03, the fuse and a stacked crate lowered; Command sconces flush
+   with the wall.
 4. **Harder to find/do:** hide key items better (dark rooms + hidden messages in every sector), fewer hand-holding
    prompts, CAIRN hints only at high trust (gives the trust system a gameplay effect).
 5. **Start screen:** "very cool and eye-catching": live slow camera drift past Lantern Station above Nereth's glowing

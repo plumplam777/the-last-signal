@@ -367,7 +367,7 @@ namespace LastSignal.EditorTools
                 PrefabUtility.SaveAsPrefabAsset(inspect, "Assets/_Project/Prefabs/Interactables/Inspect/Inspect_PowerCoupling.prefab"));
             Object.DestroyImmediate(inspect);
 
-            DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng01", new Vector3(-5.15f, 0.97f, -3.3f), Quaternion.Euler(0, 80, 0), EngineeringContent.LogEng01);
+            DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng01", new Vector3(-5.15f, 0.94f, -3.3f), Quaternion.Euler(0, 80, 0), EngineeringContent.LogEng01);
         }
 
         private static void BuildInterlockPanel(Transform props)
@@ -390,7 +390,7 @@ namespace LastSignal.EditorTools
             }
             if (PropModels.Crate(props, "Crate", new Vector3(-5.3f, 0.3f, 3.0f), new Vector3(0.7f, 0.6f, 0.7f), 90f) == null)
                 Box("Crate", props, new Vector3(-5.3f, 0.3f, 3.0f), new Vector3(0.7f, 0.6f, 0.7f), M.SlateDark);
-            DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng03", new Vector3(-5.3f, 0.62f, 3.0f), Quaternion.Euler(0, 60, 0), EngineeringContent.LogEng03);
+            DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng03", new Vector3(-5.3f, 0.59f, 3.0f), Quaternion.Euler(0, 60, 0), EngineeringContent.LogEng03);
         }
 
         private static void BuildStatusDesk(Transform props)
@@ -414,7 +414,7 @@ namespace LastSignal.EditorTools
             var terminal = desk.AddComponent<TerminalInteractable>();
             terminal.EditorConfigure("eng_status", "prompt.terminal.use", null, false);
             terminal.EditorSetTerminal(EngineeringContent.StatusTerminal, glow);
-            DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng02", new Vector3(5.2f, 0.98f, -2.65f), Quaternion.Euler(0, -100, 0), EngineeringContent.LogEng02);
+            DockingBayBuilder.BuildRecorder(props, "Recorder_LogEng02", new Vector3(5.2f, 0.98f, -2.65f), Quaternion.Euler(0, -100, 0), EngineeringContent.LogEng02, stand: true);
         }
 
         private static void BuildDialogueTriggers(Transform root)

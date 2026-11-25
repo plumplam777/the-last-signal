@@ -343,4 +343,6 @@ before/after numbers are in `Performance.md` and `PerformanceReport.txt`.
 | ![Docking Bay powered](Screenshots/art43_after_dock_hall.png) Docking Bay | ![Engineering](Screenshots/art43_eng_room.png) Engineering |
 | ![Medical](Screenshots/art43b_after_med.png) Medical Bay | ![Research](Screenshots/art43_after_res_rig_wide.png) Research Laboratory |
 | ![Reactor](Screenshots/art43_after_reactor.png) Reactor Core | ![Command](Screenshots/art44_after_command.png) Command Center |
+| ![Main menu EN](Screenshots/phase5_start_screen.png) Main menu (EN) | ![Main menu BG](Screenshots/docs_main_menu_bg.png) Main menu (BG) |
+| ![Admin panel](Screenshots/phase5_admin_panel_users.png) Admin panel | ![Settings](Screenshots/phase5_settings.png) Settings |
 | ![CAIRN dialogue](Screenshots/phase4_cairn_choices.png) CAIRN dialogue with choices | ![Ending](Screenshots/phase4_ending_b.png) Ending B |

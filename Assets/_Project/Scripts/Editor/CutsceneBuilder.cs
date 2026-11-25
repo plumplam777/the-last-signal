@@ -206,7 +206,7 @@ namespace LastSignal.EditorTools
             return lights;
         }
 
-        private static void Stars(Transform parent, Vector3 localPos, float radius, int count)
+        internal static void Stars(Transform parent, Vector3 localPos, float radius, int count)
         {
             var go = Group("Stars", parent, localPos);
             var ps = go.AddComponent<ParticleSystem>();

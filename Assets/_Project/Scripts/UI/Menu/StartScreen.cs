@@ -3,6 +3,7 @@ using LastSignal.Core;
 using LastSignal.Database;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static LastSignal.UI.RuntimeUi;
 
@@ -26,6 +27,11 @@ namespace LastSignal.UI
         private Button _quality;
         private Button _continue, _mainLogout, _adminSubmit, _adminOpenPanel, _adminLogout;
         private GameObject _restartConfirm, _adminForm;
+        private Image _frame;
+        private Button _newGame;
+
+        private static readonly Color ItemColor = new(0.93f, 0.96f, 1f);
+        private static readonly Color QuitColor = new(0.96f, 0.52f, 0.44f);
         private AdminPanel _admin;
         private Page _current;
         private Intent _intent;
@@ -63,26 +69,32 @@ namespace LastSignal.UI
         private void Build()
         {
             var canvas = Canvas("StartScreenUI", transform, 10).transform;
-            var title = Text("Title", canvas, new Vector2(0, 330), new Vector2(1400, 120), 92, Brass, "ui.game.title");
-            title.characterSpacing = 18;
-            Text("Tagline", canvas, new Vector2(0, 250), new Vector2(1400, 40), 24, TealLight, "ui.start.tagline").characterSpacing = 6;
+            Logo(canvas);
+            var hints = Text("Hints", canvas, new Vector2(-330, 46), new Vector2(600, 32), 20, new Color(0.85f, 0.9f, 0.95f, 0.75f), "ui.start.hints", TextAlignmentOptions.Right, new Vector2(1, 0));
+            hints.richText = true;
             _dbBanner = Text("DbBanner", canvas, new Vector2(0, -470), new Vector2(1500, 40), 22, Red);
             Text("Version", canvas, new Vector2(150, 30), new Vector2(300, 30), 16, Muted, null, TextAlignmentOptions.Left, Vector2.zero).text = $"v{Application.version}";
             var lang = Button("Language", canvas, new Vector2(-110, -50), new Vector2(170, 48), null, () => GameServices.Localization.ToggleLanguage(), 22);
             ((RectTransform)lang.transform).anchorMin = ((RectTransform)lang.transform).anchorMax = new Vector2(1, 1);
             SetButtonText(lang, "EN  |  БГ");
 
-            var frame = Panel("Frame", canvas, new Vector2(0, -90), new Vector2(640, 520)).transform;
+            // left column (as in a console game menu): the main page is plain text items, the other pages sit on a panel
+            _frame = Panel("Frame", canvas, new Vector2(110 + 320, -70), new Vector2(640, 520));
+            var anchor = new Vector2(0f, 0.5f);
+            ((RectTransform)_frame.transform).anchorMin = ((RectTransform)_frame.transform).anchorMax = anchor;
+            _frame.color = new Color(0.02f, 0.035f, 0.06f, 0.82f);
+            _frame.GetComponent<Outline>().effectColor = new Color(Cyan.r, Cyan.g, Cyan.b, 0.45f);
+            var frame = _frame.transform;
             _feedback = Text("Feedback", frame, new Vector2(0, -238), new Vector2(600, 36), 21, Red);
 
             // main: new game / load game / settings / quit
             var mp = Page_(Page.Main, frame);
-            _signedIn = Text("SignedIn", mp, new Vector2(0, 205), new Vector2(600, 40), 22, TealLight);
-            Button("NewGame", mp, new Vector2(0, 125), new Vector2(480, 64), "ui.start.new_game", NewGame);
-            Button("LoadGame", mp, new Vector2(0, 45), new Vector2(480, 64), "ui.start.load_game", LoadGame);
-            Button("Settings", mp, new Vector2(0, -35), new Vector2(480, 64), "ui.start.settings", () => Show(Page.Settings));
-            Button("Quit", mp, new Vector2(0, -115), new Vector2(480, 64), "ui.menu.quit", Quit);
-            _mainLogout = Button("Logout", mp, new Vector2(0, -185), new Vector2(240, 44), "ui.start.logout", Logout, 19);
+            _signedIn = Text("SignedIn", mp, new Vector2(0, 225), new Vector2(600, 36), 21, TealLight, null, TextAlignmentOptions.Left);
+            _newGame = MenuItem("NewGame", mp, 150, "ui.start.new_game", "ui.start.sub.new_game", NewGame, ItemColor);
+            MenuItem("LoadGame", mp, 66, "ui.start.load_game", "ui.start.sub.load_game", LoadGame, ItemColor);
+            MenuItem("Settings", mp, -18, "ui.start.settings", "ui.start.sub.settings", () => Show(Page.Settings), ItemColor);
+            MenuItem("Quit", mp, -102, "ui.menu.quit", "ui.start.sub.quit", Quit, QuitColor);
+            _mainLogout = MenuItem("Logout", mp, -186, "ui.start.logout", "ui.start.sub.logout", Logout, Muted, 24);
 
             // register (new game, no account yet)
             var rp = Page_(Page.Register, frame);
@@ -167,6 +179,73 @@ namespace LastSignal.UI
             SetButtonText(_quality, Loc.Get("ui.start.graphics", level));
         }
 
+        // ------------------------------------------------------------------ start-screen look
+
+        /// <summary>Top-left logo: a glowing arc, the title in brushed silver, the tagline underneath.</summary>
+        private static void Logo(Transform canvas)
+        {
+            var topLeft = new Vector2(0f, 1f);
+            var arc = Image("LogoArc", canvas, new Vector2(110 + 300, -78), new Vector2(600, 96), new Color(Cyan.r, Cyan.g, Cyan.b, 0.85f), topLeft);
+            arc.sprite = MenuArt.Arc;
+            arc.raycastTarget = false;
+            var shadow = Text("TitleShadow", canvas, new Vector2(110 + 450 + 3, -150 - 4), new Vector2(900, 96), 78, new Color(0f, 0f, 0f, 0.55f),
+                "ui.game.title", TextAlignmentOptions.Left, topLeft);
+            var title = Text("Title", canvas, new Vector2(110 + 450, -150), new Vector2(900, 96), 78, Color.white, "ui.game.title", TextAlignmentOptions.Left, topLeft);
+            foreach (var t in new[] { shadow, title })
+            {
+                t.fontStyle = FontStyles.Bold;
+                t.characterSpacing = 4;
+                t.enableAutoSizing = true;
+                t.fontSizeMin = 40;
+                t.fontSizeMax = 78;
+                t.textWrappingMode = TextWrappingModes.NoWrap;
+            }
+            title.enableVertexGradient = true;
+            title.colorGradient = new VertexGradient(Color.white, Color.white, new Color(0.62f, 0.68f, 0.76f), new Color(0.62f, 0.68f, 0.76f));
+            Text("Tagline", canvas, new Vector2(114 + 450, -212), new Vector2(900, 32), 21, TealLight, "ui.start.tagline", TextAlignmentOptions.Left, topLeft)
+                .characterSpacing = 6;
+        }
+
+        /// <summary>Plain text item; when selected it gets the bevelled cyan frame (hex pattern inside) and its hint line.</summary>
+        private static Button MenuItem(string name, Transform parent, float y, string key, string hintKey, UnityEngine.Events.UnityAction onClick,
+            Color color, float fontSize = 34)
+        {
+            var hit = Image(name, parent, new Vector2(-10, y), new Vector2(600, 78), new Color(0, 0, 0, 0));
+            var item = hit.transform;
+            var highlight = Rect("Highlight", item, Vector2.zero, Vector2.zero);
+            Stretch(highlight);
+            var fill = Image("Fill", highlight, Vector2.zero, Vector2.zero, new Color(0.03f, 0.09f, 0.14f, 0.82f));
+            fill.sprite = MenuArt.BevelFill;
+            fill.type = UnityEngine.UI.Image.Type.Sliced;
+            Stretch(fill.rectTransform);
+            var hex = Image("Hex", highlight, Vector2.zero, Vector2.zero, new Color(Cyan.r, Cyan.g, Cyan.b, 0.07f));
+            hex.sprite = MenuArt.Hex;
+            hex.type = UnityEngine.UI.Image.Type.Tiled;
+            Stretch(hex.rectTransform).offsetMin = new Vector2(10, 6);
+            hex.rectTransform.offsetMax = new Vector2(-10, -6);
+            var line = Image("Line", highlight, Vector2.zero, Vector2.zero, new Color(Cyan.r, Cyan.g, Cyan.b, 0.9f));
+            line.sprite = MenuArt.BevelLine;
+            line.type = UnityEngine.UI.Image.Type.Sliced;
+            Stretch(line.rectTransform);
+            foreach (var g in new Graphic[] { fill, hex, line }) g.raycastTarget = false;
+            var hint = Text("Hint", highlight, new Vector2(0, -20), new Vector2(560, 26), 18, new Color(0.78f, 0.86f, 0.92f), hintKey, TextAlignmentOptions.Left);
+            hint.textWrappingMode = TextWrappingModes.NoWrap;
+            hint.enableAutoSizing = true;
+            hint.fontSizeMin = 13;
+            hint.fontSizeMax = 18;
+
+            var label = Text("Label", item, new Vector2(0, 9), new Vector2(560, 46), fontSize, color, key, TextAlignmentOptions.Left);
+            label.fontStyle = FontStyles.Bold | FontStyles.UpperCase;
+            label.characterSpacing = 3;
+
+            var b = hit.gameObject.AddComponent<Button>();
+            b.transition = Selectable.Transition.None;
+            b.onClick.AddListener(onClick);
+            b.onClick.AddListener(() => { if (GameServices.IsReady) GameServices.Audio.Sfx("sfx_ui", 0.8f); });
+            hit.gameObject.AddComponent<MenuItemSelect>().Setup(highlight.gameObject, label, color, color == QuitColor ? QuitColor : Cyan);
+            return b;
+        }
+
         private Transform Page_(Page page, Transform parent)
         {
             var r = Rect(page.ToString(), parent, Vector2.zero, new Vector2(640, 520));
@@ -178,6 +257,8 @@ namespace LastSignal.UI
         {
             _current = page;
             foreach (var kv in _pages) kv.Value.SetActive(kv.Key == page);
+            _frame.enabled = page != Page.Main; // the main page floats over the backdrop, the forms keep their panel
+            _frame.GetComponent<Outline>().enabled = page != Page.Main;
             _feedback.text = string.Empty;
             _dbBanner.text = GameServices.Database.IsAvailable ? string.Empty : Loc.Get("auth.err.no_database");
             var s = GameServices.Auth.Current;
@@ -186,6 +267,7 @@ namespace LastSignal.UI
                 case Page.Main:
                     _signedIn.text = SignedIn ? Loc.Get(s.IsAdmin ? "ui.start.welcome_admin" : "ui.start.welcome", s.Username) : string.Empty;
                     _mainLogout.gameObject.SetActive(SignedIn);
+                    if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_newGame.gameObject);
                     break;
                 case Page.Login:
                     _loginHeading.text = Loc.Get(_intent == Intent.LoadGame ? "ui.start.login_load" : "ui.start.login");

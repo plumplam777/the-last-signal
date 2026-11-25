@@ -780,7 +780,7 @@ namespace LastSignal.EditorTools
             foreach (var go in poweredOn) go.SetActive(false);
         }
 
-        private static T AddComponent<T>(VolumeProfile profile) where T : VolumeComponent
+        internal static T AddComponent<T>(VolumeProfile profile) where T : VolumeComponent
         {
             var c = profile.Add<T>(true);
             c.name = typeof(T).Name;

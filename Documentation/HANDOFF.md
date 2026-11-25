@@ -3,7 +3,7 @@
 **Updated:** 2026-11-25 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
 Phases 1–7 are done (incl. art pass, performance, macOS + Windows builds, diploma docs). **Now: Phase 8 = the user's
 playtest feedback, §4.5** — items 1 (dark Docking Bay + flashlight + hidden beam messages, `c677554`) and 2 (Reactor valve clarity) are done;
-**next is §4.5 item 5 (start screen, user sent references)**; item 4 after it. Everything is committed on `main` and pushed to
+**next is §4.5 item 4 (harder to find/do)** — items 1, 2, 3, 5 are done. Everything is committed on `main` and pushed to
 **github.com/plumplam777/the-last-signal** (public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push`
 after each commit. `Builds/macOS/TheLastSignal.app` is current (rebuilt 2026-11-25 with items 1+2, smoke-tested);
 `Builds/TheLastSignal_Windows.zip` predates `c677554` — rebuild before a Windows test.
@@ -164,8 +164,16 @@ The user played and wants these, **flashlight first** (in this order unless they
    with the wall.
 4. **Harder to find/do:** hide key items better (dark rooms + hidden messages in every sector), fewer hand-holding
    prompts, CAIRN hints only at high trust (gives the trust system a gameplay effect).
-5. **Start screen:** "very cool and eye-catching": live slow camera drift past Lantern Station above Nereth's glowing
-   cracks, title typing in like a signal through static, brass/teal console menu with a waveform; keep it light.
+5. **Start screen — DONE 2026-11-25** (from the user's two reference images: a cold blue space shot + a console
+   game menu). `MenuBackdrop` (Editor/) builds MainMenu's backdrop: Nereth upper right (`M_Menu_Nereth` = dimmer
+   copy of the window material, slow spin), a star just off its lower-left limb with soft additive rays/streak,
+   the icy limb of a moon across the bottom (`Menu_HorizonCap` mesh, R 20 km, camera 250 m up) under haze bands,
+   starfield, a cool fill light, `Volume_Menu` (bloom, ACES, -35 saturation, vignette, grain). `MenuCameraDrift`
+   sways the camera slowly. UI (`StartScreen`): logo top-left (cyan `MenuArt.Arc`, silver-gradient title,
+   tagline), main page = left-column text items; the selected one (hover or arrows) shows a bevelled cyan frame
+   with a hex pattern + a hint line (`MenuItemSelect`, sprites drawn in code by `MenuArt`), Quit in salmon,
+   key hints bottom-right. Other pages keep the panel (now cyan-edged) in the same left column. Keys
+   `ui.start.sub.*`, `ui.start.hints`. Screenshot `menu_new_en.png`. Not yet looked at by the user.
 6. **Art style** still not exactly what the user wants: wait for their screenshots/notes, don't guess.
 7. **Bulgarian voices:** TTS is bad; later the user records them. Prepare a recording script (line + file name);
    `Tools/normalize_audio.py` evens the levels.

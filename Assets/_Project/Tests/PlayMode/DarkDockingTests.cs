@@ -41,11 +41,15 @@ namespace LastSignal.Tests
             Assert.Greater(lit, dark * 4f, $"ambient should rise a lot with power (dark {dark:0.000}, lit {lit:0.000})");
         }
 
+        private static readonly string[] BeamScenes = { SceneIds.DockingBay, SceneIds.ReactorCommand };
+
         [UnityTest]
-        public IEnumerator HiddenMessagesShowOnlyInTheBeam()
+        public IEnumerator HiddenMessagesShowOnlyInTheBeam([ValueSource(nameof(BeamScenes))] string scene)
         {
             GameServices.StartNewRun();
-            yield return Phase6.Load(SceneIds.DockingBay);
+            if (scene == SceneIds.ReactorCommand) GameServices.World.SetBool("dlg.ai_core_01.played", true);
+            yield return Phase6.Load(scene);
+            GameServices.Dialogue.StopAll();
             var player = Object.FindAnyObjectByType<PlayerController>();
             var flashlight = FlashlightController.Current;
             Assert.IsNotNull(player);
@@ -53,7 +57,7 @@ namespace LastSignal.Tests
             GameServices.World.SetBool(FlashlightController.OwnedFlag, true);
 
             var messages = Object.FindObjectsByType<BeamRevealText>(FindObjectsSortMode.InstanceID);
-            Assert.GreaterOrEqual(messages.Length, 2, "expected the crew's hidden messages in the Docking Bay");
+            Assert.GreaterOrEqual(messages.Length, scene == SceneIds.DockingBay ? 2 : 1, $"expected the crew's hidden messages in {scene}");
             foreach (var m in messages)
             {
                 var t = m.transform;

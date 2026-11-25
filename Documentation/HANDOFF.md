@@ -2,11 +2,11 @@
 
 **Updated:** 2026-11-25 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
 Phases 1–7 are done (incl. art pass, performance, macOS + Windows builds, diploma docs). **Now: Phase 8 = the user's
-playtest feedback, §4.5** — item 1 (dark Docking Bay + flashlight + hidden beam messages) is done (`c677554`);
-**next is §4.5 item 2 (Reactor valves before Command)**. Everything is committed on `main` and pushed to
+playtest feedback, §4.5** — items 1 (dark Docking Bay + flashlight + hidden beam messages, `c677554`) and 2 (Reactor valve clarity) are done;
+**next is §4.5 item 3 (floating props test)**. Everything is committed on `main` and pushed to
 **github.com/plumplam777/the-last-signal** (public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push`
-after each commit. `Builds/macOS/TheLastSignal.app` and `Builds/TheLastSignal_Windows.zip` predate `c677554`:
-rebuild before the user plays.
+after each commit. `Builds/macOS/TheLastSignal.app` is current (rebuilt 2026-11-25 with items 1+2, smoke-tested);
+`Builds/TheLastSignal_Windows.zip` predates `c677554` — rebuild before a Windows test.
 
 > New chat: read this file, then `Documentation/ArtDirection.md` (+ the two images in `Documentation/ArtReference/`).
 > Do not re-ask the user anything under "User decisions". Work through **§4.5** in order; ask the user before starting items 5–7 (start screen, art style, voices).
@@ -67,7 +67,7 @@ User = solo developer; Claude = technical lead (code, content, docs, decides on 
   screenshot `PlayerCamera`; `manage_gameobject modify` does not work in Play mode (use debug menus / `Teleport`).
 - Smoke-test a build only with `-batchmode -startScene <Scene> -quitAfterSeconds 8 -logFile <scratch>` — **never kill the player**.
 - Every MonoBehaviour in a file of the same name. Commit one step at a time, message ends with the session's Co-Authored-By line.
-- Tests: 28 EditMode + 96 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
+- Tests: 29 EditMode + 98 PlayMode, all green (2026-11-25). Key ones: `DarkDockingTests` (flashlight by spawn, beam-only messages, power relights), `FullPlaythroughTests` (all endings start→menu, Load game in every
   sector, BG run, 14/14 logs), `InteractableReachabilityTests` (props must not bury interactables), `DoorOpeningClearTests`, `WorldTextFitTests`
   (EN+BG), `GlyphRenderTests` (Cyrillic font), `MaterialSanityTests` (no pink), `PerformanceBudgetTests`, `MovingPartsTests`. Spec §16 evidence:
   `Documentation/AcceptanceChecklist.md`.
@@ -144,8 +144,18 @@ The user played and wants these, **flashlight first** (in this order unless they
    ≥ 4 cm off the wall (z-fighting). Debug menus: `Toggle Flashlight`, `Look At Hidden Message` (cycles messages).
    Tests: `DarkDockingTests`. Screenshots: `dark_dock_*`. Unity in the background freezes Play mode: `sleep 3` after
    a debug action, then screenshot the `PlayerCamera`.
-2. **Valves before Command are unclear** (Reactor: High/Mid/Low): add per-valve pressure gauges that react, a
-   diagram plaque, and a hidden-message clue.
+2. **Reactor valve clarity — DONE 2026-11-25.** Each valve has a `PressureGauge` (Puzzles/) beside the wheel:
+   sprung needle (LOW left / MID up / HIGH right, Update only while moving), readout "1.6 bar · MID", amber while
+   that loop **resonates** (shares its setting with another loop = the reason the core is off-band), teal otherwise.
+   Console pedestal status line: "RESONANCE · LOOPS A = B SHARE A PRESSURE" / SCRAM / STABLE
+   (`ReactorBalance.IsResonating/ResonatingLoops`; no resonance ⇔ stable). Brass **diagram plaque** next to the
+   console (core + loops A/B/C, pressures, the resonance rule, SCRAM). **Hidden beam message** from Kaye on the
+   shaft wall at 300° (between loops A and B, low): "NEVER RUN TWO LOOPS ALIKE · ONE LOW · ONE MID · ONE HIGH — K."
+   Keys `reactor.gauge.loop`, `reactor.status.*`, `reactor.plaque.*`, `reactor.uv.kaye`. Tests:
+   `ValveGauges_React_AndTheConsoleNamesResonatingLoops`, `Reactor_ResonanceNamesTheLoopsThatShareAPressure`,
+   `HiddenMessagesShowOnlyInTheBeam` now runs for Docking + Reactor. Screenshots `valves_*`.
+   Note for item 4 (harder): the plaque + status line make the rule explicit; if it becomes too easy, drop the
+   status line's loop names first.
 3. **Floating props next to desks** (user saw them; room unknown): write a test that every prop rests on something,
    then fix all hits.
 4. **Harder to find/do:** hide key items better (dark rooms + hidden messages in every sector), fewer hand-holding

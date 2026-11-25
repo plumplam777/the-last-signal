@@ -237,6 +237,36 @@ namespace LastSignal.Tests
         }
 
         [UnityTest]
+        public IEnumerator ValveGauges_React_AndTheConsoleNamesResonatingLoops()
+        {
+            var puzzle = Object.FindAnyObjectByType<ReactorBalancePuzzle>();
+            for (int i = 0; i < 3; i++)
+            {
+                var gauge = puzzle.LoopGauge(i);
+                Assert.IsNotNull(gauge, $"Loop {i} has a pressure gauge.");
+                Assert.Less(Vector3.Distance(gauge.transform.position, Valve(i + 1).transform.position), 1.2f, "The gauge sits by its own valve.");
+                StringAssert.Contains("1.6", gauge.Readout);
+                Assert.AreEqual(PressureGauge.Resonant, gauge.ReadoutColour, "Mid/Mid/Mid resonates.");
+            }
+            StringAssert.Contains("A = B = C", puzzle.StatusLine);
+
+            float before = puzzle.LoopGauge(0).TargetAngle;
+            Valve(1).Interact(null); // H M M
+            Assert.AreNotEqual(before, puzzle.LoopGauge(0).TargetAngle, "Turning a valve swings its gauge.");
+            Assert.IsTrue(puzzle.LoopGauge(0).enabled, "The needle animates towards the new pressure.");
+            StringAssert.Contains("2.4", puzzle.LoopGauge(0).Readout);
+            Assert.AreEqual(PressureGauge.Calm, puzzle.LoopGauge(0).ReadoutColour);
+            StringAssert.Contains("B = C", puzzle.StatusLine);
+            yield return new WaitForSeconds(1.5f);
+            Assert.IsFalse(puzzle.LoopGauge(0).enabled, "The gauge stops updating once the needle settles.");
+
+            Assert.IsNotNull(GameObject.Find("DiagramPlaque"), "A diagram plaque explains the loops.");
+            var note = GameObject.Find("Uv_Kaye");
+            Assert.IsNotNull(note, "Kaye's hint is painted on the shaft wall.");
+            Assert.IsNotNull(note.GetComponent<BeamRevealText>(), "…and only shows in the flashlight beam.");
+        }
+
+        [UnityTest]
         public IEnumerator Overshoot_RaisesAlarm_AndResetsToMid()
         {
             var puzzle = Object.FindAnyObjectByType<ReactorBalancePuzzle>();

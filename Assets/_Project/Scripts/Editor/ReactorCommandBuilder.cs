@@ -221,6 +221,13 @@ namespace LastSignal.EditorTools
             Object.DestroyImmediate(outText.GetComponent<LocalizedText>());
             Object.DestroyImmediate(tempText.GetComponent<LocalizedText>());
 
+            // status line on the pedestal front: names the loops that resonate (share a pressure)
+            var status = WorldText("StatusText", ct, new Vector3(0, 0.88f, -0.27f), Quaternion.identity, "reactor.status.clear", 0.9f, PressureGauge.Calm);
+            ((RectTransform)status.transform).sizeDelta = new Vector2(1.9f, 0.32f);
+            status.characterSpacing = 1;
+            Object.DestroyImmediate(status.GetComponent<LocalizedText>());
+            BuildDiagramPlaque(ct, new Vector3(1.75f, 0, 0));
+
             // the face (local -Z) points at the core / the player coming in from the south hatch
             c.transform.localRotation = Quaternion.Euler(0, 224f, 0);
 
@@ -230,6 +237,7 @@ namespace LastSignal.EditorTools
             puzzle.EditorBindGauges(outText, tempText, outNeedle, tempNeedle, coreLight);
 
             // three coolant loop valves on the shaft wall: west, north, east
+            var gauges = new PressureGauge[3];
             var spots = new[] { (-90f, "reactor.valve.1"), (0f, "reactor.valve.2"), (90f, "reactor.valve.3") };
             for (int i = 0; i < spots.Length; i++)
             {
@@ -254,11 +262,85 @@ namespace LastSignal.EditorTools
                 var tag = WorldText("Label", v.transform, new Vector3(0, 0.6f, -0.05f), Quaternion.identity, label, 1.0f, Brass);
                 ((RectTransform)tag.transform).sizeDelta = new Vector2(1.6f, 0.2f);
                 tag.characterSpacing = 1;
+                gauges[i] = LoopGauge(v.transform, new Vector3(0.66f, 0.12f, -0.08f));
                 v.AddComponent<BoxCollider>().size = new Vector3(0.8f, 0.8f, 0.5f);
                 var valve = v.AddComponent<ValveInteractable>();
                 valve.EditorConfigure($"core_valve_{i + 1}", "prompt.valve", label, false);
                 valve.EditorSetValve(puzzle, i, wheel, label);
             }
+            puzzle.EditorBindLoopGauges(gauges, status);
+            BuildKayeMessage(t);
+        }
+
+        /// <summary>Pressure gauge beside a valve wheel: LOW/MID/HIGH ticks, a sprung needle, a readout underneath.</summary>
+        private static PressureGauge LoopGauge(Transform valve, Vector3 pos)
+        {
+            var g = Group("PressureGauge", valve, pos).transform;
+            Box("Bracket", g, new Vector3(-0.3f, 0, 0.18f), new Vector3(0.45f, 0.05f, 0.05f), M.Brass, false);
+            Cylinder("Bezel", g, new Vector3(0, 0, 0.02f), new Vector3(0.36f, 0.02f, 0.36f), M.Brass, false, Quaternion.Euler(90, 0, 0));
+            Cylinder("Face", g, Vector3.zero, new Vector3(0.31f, 0.01f, 0.31f), _consoleGlow, false, Quaternion.Euler(90, 0, 0));
+            // ticks at LOW (left), MID (top), HIGH (right): the same angles PressureGauge uses
+            foreach (var (angle, mat) in new[] { (70f, M.Ceramic), (0f, M.Ceramic), (-70f, M.Ceramic) })
+            {
+                var rot = Quaternion.Euler(0, 0, angle);
+                Box($"Tick_{angle:0}", g, rot * new Vector3(0, 0.115f, -0.012f), new Vector3(0.018f, 0.04f, 0.004f), mat, false, rot, false);
+            }
+            var pivot = Group("Needle", g, new Vector3(0, 0, -0.018f));
+            Box("Hand", pivot.transform, new Vector3(0, 0.055f, 0), new Vector3(0.014f, 0.11f, 0.004f), M.RedLamp, false, null, false);
+            Cylinder("Hub", g, new Vector3(0, 0, -0.02f), new Vector3(0.03f, 0.006f, 0.03f), M.Brass, false, Quaternion.Euler(90, 0, 0), false);
+            MakeDynamic(pivot);
+            var readout = WorldText("Readout", g, new Vector3(0, -0.25f, -0.01f), Quaternion.identity, "reactor.gauge.loop", 0.7f, PressureGauge.Calm);
+            ((RectTransform)readout.transform).sizeDelta = new Vector2(0.5f, 0.13f);
+            readout.characterSpacing = 1;
+            Object.DestroyImmediate(readout.GetComponent<LocalizedText>());
+            var gauge = g.gameObject.AddComponent<PressureGauge>();
+            gauge.EditorSet(pivot.transform, readout);
+            return gauge;
+        }
+
+        /// <summary>A brass-framed schematic next to the balance console: the core, three loops, how to read them.</summary>
+        private static void BuildDiagramPlaque(Transform console, Vector3 pos)
+        {
+            var p = Group("DiagramPlaque", console, pos).transform;
+            Box("Post", p, new Vector3(0, 0.62f, 0.12f), new Vector3(0.09f, 1.24f, 0.09f), M.Brass);
+            Box("Frame", p, new Vector3(0, 1.72f, 0.08f), new Vector3(1.34f, 1.04f, 0.05f), M.Brass, false);
+            Box("Face", p, new Vector3(0, 1.72f, 0.05f), new Vector3(1.24f, 0.94f, 0.02f), _console, false);
+            var title = WorldText("Title", p, new Vector3(0, 2.1f, 0.03f), Quaternion.identity, "reactor.plaque.title", 0.9f, Brass);
+            ((RectTransform)title.transform).sizeDelta = new Vector2(1.15f, 0.14f);
+            title.characterSpacing = 2;
+            // schematic: the core in the middle, loop A left, B above, C right, each fed by a brass pipe
+            const float y = 1.82f;
+            Cylinder("Core", p, new Vector3(0, y, 0.035f), new Vector3(0.14f, 0.005f, 0.14f), _coreGlow, false, Quaternion.Euler(90, 0, 0), false);
+            Box("Pipe_A", p, new Vector3(-0.2f, y, 0.037f), new Vector3(0.26f, 0.016f, 0.004f), M.Brass, false, null, false);
+            Box("Pipe_C", p, new Vector3(0.2f, y, 0.037f), new Vector3(0.26f, 0.016f, 0.004f), M.Brass, false, null, false);
+            Box("Pipe_B", p, new Vector3(0, y + 0.09f, 0.037f), new Vector3(0.016f, 0.08f, 0.004f), M.Brass, false, null, false);
+            foreach (var (letter, at) in new[] { ("A", new Vector3(-0.38f, y, 0)), ("B", new Vector3(0, y + 0.135f, 0)), ("C", new Vector3(0.38f, y, 0)) })
+            {
+                Cylinder($"Dial_{letter}", p, at + new Vector3(0, 0, 0.034f), new Vector3(0.11f, 0.005f, 0.11f), _consoleGlow, false, Quaternion.Euler(90, 0, 0), false);
+                var tag = WorldText($"Letter_{letter}", p, at + new Vector3(0, 0, 0.022f), Quaternion.identity, letter, 0.55f, Navy);
+                ((RectTransform)tag.transform).sizeDelta = new Vector2(0.1f, 0.1f);
+                tag.characterSpacing = 0;
+                Object.DestroyImmediate(tag.GetComponent<LocalizedText>());
+                tag.text = letter;
+            }
+            var legend = WorldText("Legend", p, new Vector3(0, 1.62f, 0.03f), Quaternion.identity, "reactor.plaque.legend", 0.7f, PressureGauge.Calm);
+            ((RectTransform)legend.transform).sizeDelta = new Vector2(1.15f, 0.12f);
+            legend.characterSpacing = 1;
+            var rule = WorldText("Rule", p, new Vector3(0, 1.41f, 0.03f), Quaternion.identity, "reactor.plaque.rule", 0.62f, new Color(0.92f, 0.88f, 0.78f));
+            ((RectTransform)rule.transform).sizeDelta = new Vector2(1.15f, 0.3f);
+            rule.characterSpacing = 0;
+        }
+
+        /// <summary>Kaye's fluorescent note on the wall between loop A and B: only visible in the flashlight beam.</summary>
+        private static void BuildKayeMessage(Transform t)
+        {
+            const float yaw = 300f; // a flat face: its ribs are at 285 and 315 degrees
+            var dir = Quaternion.Euler(0, yaw, 0) * Vector3.forward;
+            var note = WorldText("Uv_Kaye", t, dir * (R - 0.06f) + Vector3.up * 0.75f, Quaternion.Euler(0, yaw, -2f), "reactor.uv.kaye", 2.0f, Hex("#8CFFD0"));
+            ((RectTransform)note.transform).sizeDelta = new Vector2(3.2f, 0.9f); // ribs at +-1.9 m
+            note.characterSpacing = 2;
+            note.fontStyle = TMPro.FontStyles.Bold;
+            note.gameObject.AddComponent<BeamRevealText>();
         }
 
         private static void BuildLift(Transform t, string name, Vector3 pos, float yaw, string spawnId, string destinationKey, bool needsPower)

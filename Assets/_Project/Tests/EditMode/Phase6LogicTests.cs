@@ -68,5 +68,20 @@ namespace LastSignal.Tests
             r.Reset();
             Assert.AreEqual(ReactorBalance.Mid, r.Get(2));
         }
+
+        [Test]
+        public void Reactor_ResonanceNamesTheLoopsThatShareAPressure()
+        {
+            var r = new ReactorBalance();
+            CollectionAssert.AreEqual(new[] { 0, 1, 2 }, r.ResonatingLoops(), "Mid/Mid/Mid: all three resonate.");
+            r.Set(0, ReactorBalance.High);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, r.ResonatingLoops());
+            Assert.IsFalse(r.IsResonating(0));
+            r.Set(2, ReactorBalance.Low);
+            Assert.IsEmpty(r.ResonatingLoops());
+            Assert.IsTrue(r.IsStable, "No resonance is exactly the stable state.");
+            Assert.Less(ReactorBalance.PressureBar(ReactorBalance.Low), ReactorBalance.PressureBar(ReactorBalance.Mid));
+            Assert.Less(ReactorBalance.PressureBar(ReactorBalance.Mid), ReactorBalance.PressureBar(ReactorBalance.High));
+        }
     }
 }

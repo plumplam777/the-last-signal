@@ -41,6 +41,26 @@ namespace LastSignal.Puzzles
         public bool IsStable => InBand(Output) && InBand(Temperature);
         public bool IsOvershoot => Output > OvershootAbove;
 
+        /// <summary>Loop pressure shown on each valve's gauge, in bar.</summary>
+        public static float PressureBar(int setting) => 0.8f * (Math.Clamp(setting, Low, High) + 1);
+
+        /// <summary>True when another loop runs at the same setting as <paramref name="valve"/> ("resonance").</summary>
+        public bool IsResonating(int valve)
+        {
+            for (int i = 0; i < ValveCount; i++)
+                if (i != valve && _settings[i] == _settings[valve]) return true;
+            return false;
+        }
+
+        /// <summary>Indices of all loops that share a setting with another loop (empty when every loop differs).</summary>
+        public int[] ResonatingLoops()
+        {
+            var list = new System.Collections.Generic.List<int>();
+            for (int i = 0; i < ValveCount; i++)
+                if (IsResonating(i)) list.Add(i);
+            return list.ToArray();
+        }
+
         public static bool InBand(int v) => v >= BandMin && v <= BandMax;
 
         private int Sum(int[,] table)

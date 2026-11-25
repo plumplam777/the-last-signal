@@ -1,6 +1,6 @@
 # The Last Signal — Handoff for a new chat
 
-**Updated:** 2026-11-21 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
+**Updated:** 2026-11-25 · **Deadline:** ≈ 2026-12-19 · **State:** the full game works start → all 3 endings (EN + BG).
 Phase 7 (polish): playtest bugs, performance and the big art pass are **done**; next is **§4.4** (audio listen, BG pass,
 builds, GitHub, diploma docs). Everything is committed on `main` (last art commit `908bd0c`); pushed to **github.com/plumplam777/the-last-signal**
 (public, `origin`, SSH key `~/.ssh/id_ed25519` on this Mac) — `git push` after each commit.
@@ -108,8 +108,19 @@ wall), hazard plate at the pod, 4 warm unshadowed brass sconces + warmer ceiling
 - BG translation pass with the user (tone, gender forms; Murmur = „Шепотът“, Array = „Решетката“, CAIRN stays Latin).
 - Builds: clean macOS build (`Last Signal/Build/macOS (clean)`) + smoke test of all 8 scenes; Windows build (ask before downloading `sqlite3.dll`).
 - ~~GitHub push~~ done 2026-11-21: public repo `plumplam777/the-last-signal`, push after every commit.
-- Diploma docs (Dec 17–19): demo script, architecture/DB diagrams (`TechnicalArchitecture.md`, `DatabaseSchema.md`),
-  screenshots. Cut list if late: hidden Ending C → item combination → Windows build.
+- ~~Diploma docs~~ **done 2026-11-25** (commits 767c1cd, 59f8118, 8df5773, 4fe03d9):
+  - `DemoScript.md`: 12–15 min defence demo (timeline, what to say, prep, fallbacks, spoiler walkthrough).
+  - `TechnicalArchitecture.md`: rewritten from the code; Mermaid module/dependency overview, scene flow, and the
+    routing board → `power.medical` → door → autosave sequence; screenshot table (§12).
+  - `DatabaseSchema.md`: schema v1 exactly as in `DatabaseManager.Migrate()`, Mermaid ER diagram, code map, queries.
+  - Screenshots: reused `art43_*`/`art44_*` (every sector powered), `phase5_*` (EN menu, admin, settings),
+    `phase4_ending_b`; new `docs_main_menu_bg.png`. (BG menu shot: the editor does not draw overlay UI while
+    unfocused; run `Last Signal/Diagnostics/Attach UI To Camera (Play Mode)` first and click EN|БГ with Unity in front.)
+- **Left for the user:** (1) demo prep from `DemoScript.md` §1. The local DB has **no administrator yet**, so create
+  `admin` first, then the checkpoint accounts `demo_med`/`demo_res`/`demo_core` with copied saves. (2) Rehearse the
+  demo once with a timer. (3) Optional: BG tone review, listen to the audio mix, real Windows test.
+- Known doc-relevant gaps: the `Puzzles` DB catalogue only lists the 3 early puzzles; `PuzzleManager.PuzzleSolved`
+  has no listeners yet (both documented, harmless).
 
 ## 5. Where things are
 
